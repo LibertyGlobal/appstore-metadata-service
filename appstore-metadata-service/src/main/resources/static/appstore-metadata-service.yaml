@@ -1,0 +1,713 @@
+openapi: 3.0.0
+
+info:
+  title: ASMS API
+  description: AppStore Metadata Service REST API. MAS API in RDK.
+  version: 0.1.5
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+
+paths:
+  /apps:
+    get:
+      summary: Returns paginated list of applications available in AppStore Metadata Service
+      operationId: listApplications
+      tags:
+        - STB
+      parameters:
+        - name: name
+          in: query
+          schema:
+            type: string
+          description: Application name (pattern)
+          required: false
+          example: you.i
+        - name: description
+          in: query
+          schema:
+            type: string
+          description: Application description (pattern)
+          required: false
+          example: Awesome application
+        - name: version
+          in: query
+          schema:
+            type: string
+            default: latest
+          description: Searched version of application
+          required: false
+          example: 1.2.3
+        - name: type
+          in: query
+          schema:
+            type: string
+          description: Application type
+          required: false
+          example: application/vnd.rdk-app.dac.lightning
+        - name: platform
+          in: query
+          schema:
+            type: string
+          description: Running platform (architecture:[version]:[os])
+          required: false
+          example: arm:v7:linux
+        - name: category
+          in: query
+          schema:
+            $ref: '#/components/schemas/Category'
+          description: Application category
+          required: false
+          example: application
+        - name: maintainerName
+          in: query
+          schema:
+            type: string
+          description: Maintainer name
+          required: false
+          example: Liberty Global
+        - name: offset
+          in: query
+          schema:
+            type: integer
+          description: The number of items to skip before starting to collect the result set
+          required: false
+          example: 0
+        - name: limit
+          in: query
+          schema:
+            type: integer
+          description: The number of items to return
+          required: false
+          example: 10
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StbApplicationsList'
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /apps/{applicationId}:
+    get:
+      summary: Returns details of the specified application/version
+      operationId: getApplicationDetails
+      tags:
+        - STB
+      parameters:
+        - name: applicationId
+          in: path
+          schema:
+            type: string
+          description: Reverse Domain Notation ID + optional version separated by a colon. If the version is not specified then default latest version is considered
+          required: true
+          example: com.libertyglobal.app.awesome:1.2.3
+      responses:
+        200:
+          description: Requested application details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StbApplicationDetails'
+        403:
+          description: Access denied
+        404:
+          description: Not Found
+        5XX:
+          description: Unexpected error
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /maintainers/{maintainerCode}/apps:
+    get:
+      summary: Returns paginated list of applications from the maintainer
+      operationId: listMaintainerApplications
+      tags:
+        - Maintainer
+      parameters:
+        - name: maintainerCode
+          in: path
+          schema:
+            type: string
+          description: Maintainer code
+          required: true
+          example: lgi
+        - name: x-maintainer-id
+          in: header
+          schema:
+            type: string
+          description: Identifier of the requesting maintainer. Value should be set by intermediate proxies/api gateways. Used for authentication/authorization purposes.
+          required: false
+          example: 1234abcd
+        - name: name
+          in: query
+          schema:
+            type: string
+          description: Application name (pattern)
+          required: false
+          example: you.i
+        - name: description
+          in: query
+          schema:
+            type: string
+          description: Application description (pattern)
+          required: false
+          example: Awesome application
+        - name: version
+          in: query
+          schema:
+            type: string
+          description: Searched version
+          required: false
+          example: 1.2.3
+        - name: type
+          in: query
+          schema:
+            type: string
+          description: Application type
+          required: false
+          example: application/vnd.rdk-app.dac.lightning
+        - name: platform
+          in: query
+          schema:
+            type: string
+          description: Running platform
+          required: false
+          example: arm:v7:linux
+        - name: category
+          in: query
+          schema:
+            $ref: '#/components/schemas/Category'
+          description: Application category
+          required: false
+          example: application
+        - name: offset
+          in: query
+          schema:
+            type: integer
+          description: The number of items to skip before starting to collect the result set
+          required: false
+          example: 0
+        - name: limit
+          in: query
+          schema:
+            type: integer
+          description: The number of items to return
+          required: false
+          example: 10
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MaintainerApplicationsList'
+        400:
+          description: Bad request
+        401:
+          description: Access denied
+        5XX:
+          description: Unexpected error
+    post:
+      summary: Create new application/version
+      operationId: createMaintainerApplication
+      tags:
+        - Maintainer
+      parameters:
+        - name: maintainerCode
+          in: path
+          schema:
+            type: string
+          description: Maintainer code
+          required: true
+          example: lgi
+        - name: x-maintainer-id
+          in: header
+          schema:
+            type: string
+          description: Identifier of the requesting maintainer. Value should be set by intermediate proxies/api gateways
+          required: false
+          example: 1234abcd
+      requestBody:
+        description: Full information on the application/version
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Application'
+      responses:
+        201:
+          description: OK
+        400:
+          description: Bad request
+        401:
+          description: Access denied
+        5XX:
+          description: Unexpected error
+  /maintainers/{maintainerCode}/apps/{applicationId}:
+    put:
+      summary: Replace the contents of the specified application/version
+      operationId: replaceMaintainerApplication
+      tags:
+        - Maintainer
+      parameters:
+        - name: maintainerCode
+          in: path
+          schema:
+            type: string
+          description: Maintainer code
+          required: true
+          example: lgi
+        - name: applicationId
+          in: path
+          schema:
+            type: string
+          description: Reverse Domain Notation ID + optional version separated by a colon. If the version is not specified then default latest version is considered
+          required: true
+          example: com.libertyglobal.app.awesome:1.2.3
+        - name: x-maintainer-id
+          in: header
+          schema:
+            type: string
+          description: Identifier of the requesting maintainer, in case the Client is a MAINTAINER. Value should be set by intermediate proxies/api gateways
+          required: false
+          example: 1234abcd
+      requestBody:
+        description: Full information on the Application / version
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ApplicationForUpdate'
+      responses:
+        204:
+          description: OK
+        403:
+          description: Access denied
+        404:
+          description: Not Found
+        5XX:
+          description: Unexpected error
+    get:
+      summary: Returns the details of the specified application/version
+      operationId: getMaintainerApplication
+      tags:
+        - Maintainer
+      parameters:
+        - name: maintainerCode
+          in: path
+          schema:
+            type: string
+          description: Maintainer code
+          required: true
+          example: lgi
+        - name: applicationId
+          in: path
+          schema:
+            type: string
+          description: Reverse Domain Notation ID + optional version separated by a colon. If the version is not specified then default latest version is considered
+          required: true
+          example: com.libertyglobal.app.awesome:1.2.3
+        - name: x-maintainer-id
+          in: header
+          schema:
+            type: string
+          description: Identifier of the requesting maintainer, in case the Client is a MAINTAINER. Value should be set by intermediate proxies/api gateways. Used for authentication/authorization purposes.
+          required: false
+          example: 1234abcd
+      responses:
+        200:
+          description: Requested Application details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MaintainerApplicationDetails'
+        403:
+          description: Access denied
+        404:
+          description: Not Found
+        5XX:
+          description: Unexpected error
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      summary: Delete the specified application/version
+      operationId: deleteMaintainerApplication
+      tags:
+        - Maintainer
+      parameters:
+        - name: maintainerCode
+          in: path
+          schema:
+            type: string
+          description: Maintainer code
+          required: true
+          example: lgi
+        - name: applicationId
+          in: path
+          schema:
+            type: string
+          description: Reverse Domain Notation ID + optional version separated by a colon. If the version is not specified then default latest version is considered
+          required: true
+          example: com.libertyglobal.app.awesome:1.2.3
+        - name: x-maintainer-id
+          in: header
+          schema:
+            type: string
+          description: Identifier of the requesting maintainer, in case the Client is a MAINTAINER
+          required: false
+          example: 1234abcd
+      responses:
+        204:
+          description: Application/version successfully deleted
+        403:
+          description: Access denied. The requestor is not allowed to delete the application
+        404:
+          description: Not Found
+        5XX:
+          description: Unexpected error
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+components:
+  schemas:
+    MaintainerApplicationsList:
+      type: object
+      properties:
+        applications:
+          type: array
+          items:
+            $ref: '#/components/schemas/MaintainerApplicationHeader'
+        meta:
+          $ref: '#/components/schemas/Meta'
+    StbApplicationsList:
+      type: object
+      properties:
+        applications:
+          type: array
+          items:
+            $ref: '#/components/schemas/StbApplicationHeader'
+        meta:
+          $ref: '#/components/schemas/Meta'
+    ApplicationHeader:
+      type: object
+      required:
+        - icon
+        - name
+        - url
+        - type
+        - category
+      properties:
+        icon:
+          type: string
+          description: Icon location
+          example: https://libertyglobal.com/s/apps/com.libertyglobal.app.awesome/1.2.3/image/1920x1080/icon.png
+        name:
+          type: string
+          description: Application name
+          example: Awesome Application
+        description:
+          type: string
+          description: Application description
+          example: This is Awesome App
+        url:
+          type: string
+          description: Application url (eg. OCI Container Manifest, external web app url)
+          example: https://$SERVER/appcontainerstagingrdk/Libertyglobal/awesome_oci_image:1.2.3
+        type:
+          type: string
+          description: Application type (example&#58; application/vnd.rdk-app.dac.lightning)
+          example: application/vnd.rdk-app.dac.native
+        category:
+          $ref: '#/components/schemas/Category'
+        localisations:
+          type: array
+          items:
+            $ref: '#/components/schemas/Localisation'
+    StbApplicationHeader:
+      allOf:
+        - $ref: '#/components/schemas/ApplicationHeader'
+        - type: object
+          required:
+            - id
+            - version
+          properties:
+            id:
+              type: string
+              description: Reverse Domain Notation ID
+              example: com.libertyglobal.app.awesome
+            version:
+              type: string
+              description: Application version
+              example: 1.2.3
+    MaintainerApplicationHeader:
+      allOf:
+        - $ref: '#/components/schemas/StbApplicationHeader'
+        - type: object
+          required:
+            - visible
+          properties:
+            visible:
+              type: boolean
+              description: Visible version attribute
+              example: true
+    ApplicationHeaderForUpdate:
+      allOf:
+        - $ref: '#/components/schemas/ApplicationHeader'
+        - type: object
+          required:
+            - visible
+          properties:
+            visible:
+              type: boolean
+              description: Visible version attribute
+              example: true
+    StbApplicationDetails:
+      type: object
+      required:
+        - header
+        - requirements
+      properties:
+        header:
+          $ref: '#/components/schemas/StbApplicationHeader'
+        requirements:
+          $ref: '#/components/schemas/Requirements'
+        maintainer:
+          $ref: '#/components/schemas/Maintainer'
+        versions:
+          $ref: '#/components/schemas/StbVersions'
+    MaintainerApplicationDetails:
+      type: object
+      required:
+        - header
+        - requirements
+      properties:
+        header:
+          $ref: '#/components/schemas/MaintainerApplicationHeader'
+        requirements:
+          $ref: '#/components/schemas/Requirements'
+        maintainer:
+          $ref: '#/components/schemas/Maintainer'
+        versions:
+          $ref: '#/components/schemas/MaintainerVersions'
+    Application:
+      type: object
+      required:
+        - header
+        - requirements
+      properties:
+        header:
+          $ref: '#/components/schemas/MaintainerApplicationHeader'
+        requirements:
+          $ref: '#/components/schemas/Requirements'
+    ApplicationForUpdate:
+      type: object
+      required:
+        - header
+        - requirements
+      properties:
+        header:
+          $ref: '#/components/schemas/ApplicationHeaderForUpdate'
+        requirements:
+          $ref: '#/components/schemas/Requirements'
+    Localisation:
+      type: object
+      required:
+        - languageCode
+        - name
+      properties:
+        languageCode:
+          type: string
+          description: The ISO 639-2 three character language code
+          example: nld
+        name:
+          type: string
+          description: Application name in selected language (UTF-8)
+          example: Geweldige applicatie
+        description:
+          type: string
+          description: Application description in selected language (UTF-8)
+          example: Dit is een geweldige applicatie
+    Meta:
+      type: object
+      properties:
+        resultSet:
+          $ref: '#/components/schemas/ResultSetMeta'
+    ResultSetMeta:
+      type: object
+      properties:
+        count:
+          type: integer
+          description: Number of items in the current result set
+          example: 9
+        offset:
+          type: integer
+          description: Number of skipped items
+          example: 0
+        limit:
+          type: integer
+          description: Maximum number of items in the current result set
+          example: 10
+        total:
+          type: integer
+          description: Number of items that match the search criteria.
+          example: 9
+    Requirements:
+      type: object
+      properties:
+        dependencies:
+          type: array
+          items:
+            $ref: '#/components/schemas/Dependency'
+        platform:
+          $ref: '#/components/schemas/Platform'
+        hardware:
+          $ref: '#/components/schemas/Hardware'
+        features:
+          type: array
+          items:
+            $ref: '#/components/schemas/Feature'
+    Dependency:
+      type: object
+      required:
+        - id
+      properties:
+        id:
+          type: string
+          description: ID/Package name in Reverse Domain Notation
+          example: com.libertyglobal.service.voice
+        version:
+          type: string
+          description: Package version
+          example: 0.3.4
+    Platform:
+      type: object
+      properties:
+        architecture:
+          type: string
+          description: Architecture (eg. arm, mips, x86, amd64)
+          example: arm
+        variant:
+          type: string
+          description: Variant (eg. v7, v8a)
+          example: v7
+        os:
+          type: string
+          description: OS (eg. linux)
+          example: linux
+    Hardware:
+      type: object
+      properties:
+        ram:
+          type: string
+          description: Minimum RAM (G/M/K) (eg. 512M)
+          example: 512M
+        dmips:
+          type: string
+          description: Minimum DMIPS (eg. 3000)
+          example: 2000
+        image:
+          type: string
+          description: Image size
+          example: 120M
+        persistent:
+          type: string
+          description: Persistent Storage (G/M/K)
+          example: 60M
+        cache:
+          type: string
+          description: Maximum cache size (G/M/K)
+          example: 200M
+    Feature:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Feature name
+          example: rdk.api.awc
+        version:
+          type: string
+          description: Feature version
+          example: 2.0
+        required:
+          type: boolean
+          description: Required for run
+          example: false
+    StbVersion:
+      type: object
+      properties:
+        version:
+          type: string
+          description: Version code
+          example: 1.2.3
+    StbVersions:
+      type: array
+      items:
+        $ref: '#/components/schemas/StbVersion'
+    MaintainerVersion:
+      allOf:
+        - $ref: '#/components/schemas/StbVersion'
+        - type: object
+          required:
+            - visible
+          properties:
+            visible:
+              type: boolean
+              description: Visible version attribute
+              example: true
+    MaintainerVersions:
+      type: array
+      items:
+        $ref: '#/components/schemas/MaintainerVersion'
+    Maintainer:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          description: Maintainer name
+          example: Liberty Global
+        address:
+          type: string
+          description: Maintainer's office address
+          example: Liberty Global B.V., Boeing Avenue 53, 1119 PE Schiphol Rijk, The Netherlands
+        homepage:
+          type: string
+          description: Maintainer's homepage
+          example: https://www.libertyglobal.com
+        email:
+          type: string
+          description: Maintainer's email address
+          example: developer@libertyglobal.com
+    ErrorResponse:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string
+    Category:
+      type: string
+      enum:
+        - application
+        - dev
+        - service
+        - resource
+        - plugin
+      description: Application category
