@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.lgi.appstore.metadata</groupId>
+    <artifactId>appstore-metadata-service-parent</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>2.3.4.RELEASE</version>
+    </parent>
+
+    <modules>
+        <module>appstore-metadata-service</module>
+        <module>appstore-metadata-service-tests</module>
+    </modules>
+
+    <properties>
+        <java.version>13</java.version>
+        <swagger-annotations-version>1.5.22</swagger-annotations-version>
+        <springdoc-openapi-ui-version>1.4.3</springdoc-openapi-ui-version>
+        <junit-version>5.6.2</junit-version>
+        <maven-surefire-version>2.22.2</maven-surefire-version>
+        <skipUTs>false</skipUTs>
+        <license.failOnMissing>true</license.failOnMissing>
+        <license.failOnBlacklist>true</license.failOnBlacklist>
+        <license.outputDirectory>${project.basedir}</license.outputDirectory>
+        <license.thirdPartyFilename>LICENSE-THIRD-PARTY.txt</license.thirdPartyFilename>
+        <license.includedLicenses>Apache2|${line.separator}
+            Apache 2|${line.separator}
+            Apache 2.0|${line.separator}
+            Apache License 2.0|${line.separator}
+            Apache License v2.0|${line.separator}
+            Apache License, version 2.0|${line.separator}
+            Apache License, Version 2.0|${line.separator}
+            The Apache License, Version 2.0|${line.separator}
+            The Apache Software License, Version 2.0|${line.separator}
+            BSD|${line.separator}
+            BSD License 3|${line.separator}
+            BSD-2-Clause|${line.separator}
+            CC0|${line.separator}
+            CC0 1.0 Universal License|${line.separator}
+            COMMON DEVELOPMENT AND DISTRIBUTION LICENSE (CDDL) Version 1.0|${line.separator}
+            CDDL/GPLv2+CE|${line.separator}
+            Eclipse Public License 1.0|${line.separator}
+            Eclipse Public License - v 1.0|${line.separator}
+            Eclipse Public License v2.0|${line.separator}
+            EDL 1.0|${line.separator}
+            Eclipse Distribution License - v 1.0|${line.separator}
+            GPL2 w/ CPE|${line.separator}
+            MIT|${line.separator}
+            MIT License|${line.separator}
+            The MIT License|${line.separator}
+            The MIT License (MIT)
+        </license.includedLicenses>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+        </dependency>
+    </dependencies>
+
+    <profiles>
+        <profile>
+            <id>no-tests</id>
+            <properties>
+                <skipUTs>true</skipUTs>
+                <skipFTs>true</skipFTs>
+            </properties>
+        </profile>
+    </profiles>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.lgi.appstore.metadata</groupId>
+                <artifactId>appstore-metadata-service</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.junit.jupiter</groupId>
+                <artifactId>junit-jupiter</artifactId>
+                <version>${junit-version}</version>
+                <scope>test</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>${maven-surefire-version}</version>
+                <configuration>
+                    <skip>${skipUTs}</skip>
+                    <forkedProcessExitTimeoutInSeconds>120</forkedProcessExitTimeoutInSeconds>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>license-maven-plugin</artifactId>
+                <version>2.0.0</version>
+                <executions>
+                    <execution>
+                        <id>generate-third-party-dependency-licenses-report</id>
+                        <goals>
+                            <goal>aggregate-add-third-party</goal>
+                        </goals>
+                        <phase>validate</phase>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>
