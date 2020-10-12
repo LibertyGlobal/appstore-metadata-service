@@ -29,6 +29,7 @@ import io.restassured.response.ExtractableResponse
 import io.restassured.response.Response
 import spock.lang.Unroll
 
+import static com.lgi.appstore.metadata.api.testing.functional.framework.model.ModelUtils.pickRandomCategory
 import static com.lgi.appstore.metadata.api.testing.functional.framework.model.request.ApiMaintainerApplicationsQueryParams.LIMIT
 import static com.lgi.appstore.metadata.api.testing.functional.framework.model.request.ApiMaintainerApplicationsQueryParams.OFFSET
 import static com.lgi.appstore.metadata.api.testing.functional.framework.model.request.ApplicationBuilder.newApplication
@@ -117,6 +118,7 @@ class MaintainerApiFTSpec extends AsmsMaintainerSpecBase {
     @Unroll
     def "update application details for #behavior - PUT operation does complete overwrite"() {
         given: "developer creates an application with #field value #valueBefore"
+        def appId = randId()
         Application app = newApplication()
                 .withId(appId).withVersion("0.0.1").with(field, valueBefore).build()
         maintainerSteps.createNewApplication_expectSuccess(DEFAULT_DEV_CODE, app)
@@ -140,14 +142,14 @@ class MaintainerApiFTSpec extends AsmsMaintainerSpecBase {
         receivedStatusUpdate == SC_NO_CONTENT ? extract(field).from(bodyAfter) == valueAfter : IGNORE_THIS_ASSERTION
 
         where:
-        behavior                   | field             | appId    | valueBefore                   | valueAfter                           || httpStatus
-        "update field visible"     | FIELD_VISIBLE     | randId() | Boolean.FALSE                 | Boolean.TRUE                         || SC_NO_CONTENT
-        "update field name"        | FIELD_NAME        | randId() | "appNameBefore"               | "appNameAfter"                       || SC_NO_CONTENT
-        "update field description" | FIELD_DESCRIPTION | randId() | "Description Before ąćęłóśżź" | "Description After €\\€\\€\\€\\"     || SC_NO_CONTENT
-        "update field category"    | FIELD_CATEGORY    | randId() | String.valueOf(Category.DEV)  | String.valueOf(pickRandomCategory()) || SC_NO_CONTENT
-        "update field type"        | FIELD_TYPE        | randId() | "typeBefore"                  | "typeAfter"                          || SC_NO_CONTENT
-        "update field url"         | FIELD_URL         | randId() | "url://before"                | "url://after"                        || SC_NO_CONTENT
-        "update field icon"        | FIELD_ICON        | randId() | "c:\\Icon.before.png"         | "//home/alwi/Icon.after"             || SC_NO_CONTENT
+        behavior                   | field             | valueBefore                   | valueAfter                           || httpStatus
+        "update field visible"     | FIELD_VISIBLE     | Boolean.FALSE                 | Boolean.TRUE                         || SC_NO_CONTENT
+        "update field name"        | FIELD_NAME        | "appNameBefore"               | "appNameAfter"                       || SC_NO_CONTENT
+        "update field description" | FIELD_DESCRIPTION | "Description Before ąćęłóśżź" | "Description After €\\€\\€\\€\\"     || SC_NO_CONTENT
+        "update field category"    | FIELD_CATEGORY    | String.valueOf(Category.DEV)  | String.valueOf(pickRandomCategory()) || SC_NO_CONTENT
+        "update field type"        | FIELD_TYPE        | "typeBefore"                  | "typeAfter"                          || SC_NO_CONTENT
+        "update field url"         | FIELD_URL         | "url://before"                | "url://after"                        || SC_NO_CONTENT
+        "update field icon"        | FIELD_ICON        | "c:\\Icon.before.png"         | "//home/alwi/Icon.after"             || SC_NO_CONTENT
     }
 
     @Unroll

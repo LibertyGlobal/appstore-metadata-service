@@ -71,7 +71,7 @@ public final class ApplicationBuilder {
     }
 
     public ApplicationBuilder withDescription(String headerDescription) {
-        this.headerVersion = headerDescription;
+        this.headerDescription = headerDescription;
         return this;
     }
 
