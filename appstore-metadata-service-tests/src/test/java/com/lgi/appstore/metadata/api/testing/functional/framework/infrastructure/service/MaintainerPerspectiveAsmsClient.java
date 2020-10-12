@@ -32,56 +32,57 @@ import static com.lgi.appstore.metadata.api.testing.functional.framework.utils.S
 
 @Component
 public class MaintainerPerspectiveAsmsClient extends ServiceClientBase {
-    private static final String PATH_MAINTAINER_CREATE_APP = "/maintainers/{maintainerCode}/apps/";
+    private static final String PATH_MAINTAINER_POST_APP = "/maintainers/{maintainerCode}/apps/";
     private static final String PATH_MAINTAINER_PUT_APP = "/maintainers/{maintainerCode}/apps/{applicationId}";
-    private static final String PATH_MAINTAINER_READ_APP_DETAILS = "/maintainers/{maintainerCode}/apps/{applicationId}";
-    private static final String PATH_MAINTAINER_READ_APPS_LIST = "/maintainers/{maintainerCode}/apps";
+    private static final String PATH_MAINTAINER_GET_APP = "/maintainers/{maintainerCode}/apps/{applicationId}";
+    private static final String PATH_MAINTAINER_DELETE_APP = "/maintainers/{maintainerCode}/apps/{applicationId}";
+    private static final String PATH_MAINTAINER_GET_APPS = "/maintainers/{maintainerCode}/apps";
 
-    public ValidatableResponse postApplicationDetails(String maintainerCode, Application applicationDetails) {
+    public ValidatableResponse postApp(String maintainerCode, Application app) {
         return given()
                 .baseUri(getBaseUri())
-                .body(toJson(applicationDetails))
+                .body(toJson(app))
                 .contentType(ContentType.JSON)
                 .when().log().uri().log().method().log().body()
-                .post(PATH_MAINTAINER_CREATE_APP, maintainerCode)
+                .post(PATH_MAINTAINER_POST_APP, maintainerCode)
                 .then().log().status().log().body();
     }
 
-    public ValidatableResponse putApplicationDetails(String maintainerCode, String applicationKey, ApplicationForUpdate newApplication) {
+    public ValidatableResponse putApp(String maintainerCode, String applicationKey, ApplicationForUpdate appForUpdate) {
         return given()
                 .baseUri(getBaseUri())
-                .body(toJson(newApplication))
+                .body(toJson(appForUpdate))
                 .contentType(ContentType.JSON)
                 .when().log().uri().log().method().log().body()
                 .put(PATH_MAINTAINER_PUT_APP, maintainerCode, applicationKey)
                 .then().log().status().log().body();
     }
 
-    public ValidatableResponse deleteApplication(String maintainerCode, String applicationKey) {
+    public ValidatableResponse deleteApp(String maintainerCode, String applicationKey) {
         return given()
                 .baseUri(getBaseUri())
                 .contentType(ContentType.JSON)
                 .when().log().uri().log().method().log().body()
-                .delete(PATH_MAINTAINER_READ_APP_DETAILS, maintainerCode, applicationKey)
+                .delete(PATH_MAINTAINER_DELETE_APP, maintainerCode, applicationKey)
                 .then().log().status().log().body();
     }
 
-    public ValidatableResponse getApplicationDetails(String maintainerCode, String applicationKey) {
+    public ValidatableResponse getApp(String maintainerCode, String applicationKey) {
         return given()
                 .baseUri(getBaseUri())
                 .contentType(ContentType.JSON)
                 .when().log().uri().log().method().log().body()
-                .get(PATH_MAINTAINER_READ_APP_DETAILS, maintainerCode, applicationKey)
+                .get(PATH_MAINTAINER_GET_APP, maintainerCode, applicationKey)
                 .then().log().status().log().body();
     }
 
-    public ValidatableResponse getApplicationsList(String maintainerCode, Map<String, ?> queryParams) {
+    public ValidatableResponse getApps(String maintainerCode, Map<String, ?> queryParams) {
         return given()
                 .baseUri(getBaseUri())
                 .contentType(ContentType.JSON)
                 .params(queryParams)
                 .when().log().uri().log().method().log().body()
-                .get(PATH_MAINTAINER_READ_APPS_LIST, maintainerCode)
+                .get(PATH_MAINTAINER_GET_APPS, maintainerCode)
                 .then().log().status().log().body();
     }
 }

@@ -23,9 +23,11 @@ import com.lgi.appstore.metadata.api.testing.functional.framework.model.response
 import com.lgi.appstore.metadata.model.Application;
 import com.lgi.appstore.metadata.model.Category;
 import com.lgi.appstore.metadata.model.MaintainerApplicationHeader;
+import com.lgi.appstore.metadata.model.Platform;
 import com.lgi.appstore.metadata.model.Requirements;
 import org.testcontainers.shaded.org.apache.commons.lang.NotImplementedException;
 
+import java.util.Optional;
 import java.util.UUID;
 
 public final class ApplicationBuilder {
@@ -38,6 +40,7 @@ public final class ApplicationBuilder {
     private String headerIcon;
     private Boolean headerVisible;
     private Category headerCategory;
+    private Platform platform;
 
     private final Boolean defaultHeaderVisible = Boolean.TRUE;
     private final Category defaultHeaderCategory = Category.APPLICATION;
@@ -67,6 +70,16 @@ public final class ApplicationBuilder {
         return this;
     }
 
+    public ApplicationBuilder withDescription(String headerDescription) {
+        this.headerVersion = headerDescription;
+        return this;
+    }
+
+    public ApplicationBuilder withType(String headerType) {
+        this.headerType = headerType;
+        return this;
+    }
+
     public ApplicationBuilder withName(String headerName) {
         this.headerName = headerName;
         return this;
@@ -77,23 +90,23 @@ public final class ApplicationBuilder {
         return this;
     }
 
-    public ApplicationBuilder withType(String headerType) {
-        this.headerType = headerType;
-        return this;
-    }
-
     public ApplicationBuilder withIcon(String headerIcon) {
         this.headerIcon = headerIcon;
         return this;
     }
 
-    public ApplicationBuilder withHeaderCategory(Category headerCategory) {
+    public ApplicationBuilder withCategory(Category headerCategory) {
         this.headerCategory = headerCategory;
         return this;
     }
 
     public ApplicationBuilder withVisible(Boolean headerVisible) {
         this.headerVisible = headerVisible;
+        return this;
+    }
+
+    public ApplicationBuilder withPlatform(String arch, String os, String variant) {
+        this.platform = new Platform().architecture(arch).os(os).variant(variant);
         return this;
     }
 
@@ -142,8 +155,11 @@ public final class ApplicationBuilder {
                 .url(headerUrl)
                 .visible(headerVisible);
 
+        Requirements requirements = new Requirements();
+        Optional.ofNullable(platform).ifPresent(requirements::platform);
+
         return new Application()
                 .header(appHeader)
-                .requirements(new Requirements());
+                .requirements(requirements);
     }
 }

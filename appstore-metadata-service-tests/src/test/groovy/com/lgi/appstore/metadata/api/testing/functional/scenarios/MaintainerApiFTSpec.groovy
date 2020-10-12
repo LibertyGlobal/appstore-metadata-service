@@ -45,7 +45,7 @@ import static com.lgi.appstore.metadata.api.testing.functional.framework.model.r
 import static com.lgi.appstore.metadata.api.testing.functional.framework.model.response.ApplicationDetailsPath.extract
 import static com.lgi.appstore.metadata.api.testing.functional.framework.model.response.ApplicationDetailsPath.field
 import static com.lgi.appstore.metadata.api.testing.functional.framework.model.response.PathBase.anyOf
-import static com.lgi.appstore.metadata.api.testing.functional.framework.steps.MaintainerSteps.DEFAULT_MAINTAINER_CODE
+import static com.lgi.appstore.metadata.api.testing.functional.framework.steps.MaintainerSteps.DEFAULT_DEV_CODE
 import static org.apache.http.HttpStatus.SC_BAD_REQUEST
 import static org.apache.http.HttpStatus.SC_CREATED
 import static org.apache.http.HttpStatus.SC_NOT_FOUND
@@ -59,12 +59,12 @@ class MaintainerApiFTSpec extends AsmsSpecBase {
 
     @Unroll
     def "create application very basic validation for #behavior"() {
-        given: "maintainers attempts create application with incorrect data"
+        given:
         Application app = newApplication()
                 .withId(appId).withVersion(v1).withVisible(visible).build()
 
-        when:
-        def response = maintainerSteps.createNewApplication(DEFAULT_MAINTAINER_CODE, app)
+        when: "developer attempts to create application with incorrect data with #behavior"
+        def response = maintainerSteps.createNewApplication(DEFAULT_DEV_CODE, app)
         def receivedStatus = response.extract().statusCode()
 
         then: "expected response HTTP status should be #httpStatus"
@@ -79,7 +79,7 @@ class MaintainerApiFTSpec extends AsmsSpecBase {
 
     @Unroll
     def "create non-existing app and view details for #behavior"() {
-        given: "2 maintainers create 2 applications: first with 2 versions (incl. hidden latest) and second with only one version"
+        given: "2 developers create 2 applications: first with 2 versions (incl. hidden latest) and second with only one version"
         Application app1v1 = newApplication()
                 .withId(appId).withVersion(v1).build()
         Application app1v2 = newApplication()
@@ -87,12 +87,12 @@ class MaintainerApiFTSpec extends AsmsSpecBase {
         Application app2v1 = newApplication()
                 .withId("someOther_$appId").withVersion(v1) build()
 
-        maintainerSteps.createNewApplication_expectSuccess(DEFAULT_MAINTAINER_CODE, app1v1)
-        maintainerSteps.createNewApplication_expectSuccess(DEFAULT_MAINTAINER_CODE, app1v2)
-        maintainerSteps.createNewApplication_expectSuccess(DEFAULT_MAINTAINER_CODE, app2v1)
+        maintainerSteps.createNewApplication_expectSuccess(DEFAULT_DEV_CODE, app1v1)
+        maintainerSteps.createNewApplication_expectSuccess(DEFAULT_DEV_CODE, app1v2)
+        maintainerSteps.createNewApplication_expectSuccess(DEFAULT_DEV_CODE, app2v1)
 
-        when: "maintainer asks for details of application #queryAppKey"
-        ExtractableResponse<Response> response = maintainerSteps.getApplicationDetails(DEFAULT_MAINTAINER_CODE, queryAppKey).extract()
+        when: "default developer asks for details of application #queryAppKey"
+        ExtractableResponse<Response> response = maintainerSteps.getApplicationDetails(DEFAULT_DEV_CODE, queryAppKey).extract()
         def receivedStatus = response.statusCode()
 
         then: "expected response HTTP status should be #httpStatus"
@@ -116,27 +116,27 @@ class MaintainerApiFTSpec extends AsmsSpecBase {
 
     @Unroll
     def "update application details for #behavior - PUT operation does complete overwrite"() {
-        given: "maintainer creates an application with #field value #before"
+        given: "developer creates an application with #field value #valueBefore"
         Application app = newApplication()
                 .withId(appId).withVersion("0.0.1").with(field, valueBefore).build()
-        maintainerSteps.createNewApplication_expectSuccess(DEFAULT_MAINTAINER_CODE, app)
+        maintainerSteps.createNewApplication_expectSuccess(DEFAULT_DEV_CODE, app)
 
-        and: "maintainer gets details of updated application"
-        JsonPath bodyBefore = maintainerSteps.getApplicationDetails_expectSuccess(DEFAULT_MAINTAINER_CODE, app.getHeader().getId())
+        and: "developer gets details of updated application"
+        JsonPath bodyBefore = maintainerSteps.getApplicationDetails_expectSuccess(DEFAULT_DEV_CODE, app.getHeader().getId())
         assertThat(extract(field).from(bodyBefore)).describedAs("$field value before update").isEqualTo(valueBefore)
 
-        when: "maintainer updates application"
+        when: "developer updates application"
         ApplicationForUpdate updatedApp = basedOnApplication(app).with(field, valueAfter).build()
-        def responseUpdate = maintainerSteps.updateApplication(DEFAULT_MAINTAINER_CODE, app.getHeader().getId() + ":" + app.getHeader().getVersion(), updatedApp).extract()
+        def responseUpdate = maintainerSteps.updateApplication(DEFAULT_DEV_CODE, app.getHeader().getId() + ":" + app.getHeader().getVersion(), updatedApp).extract()
         def receivedStatusUpdate = responseUpdate.statusCode()
 
         then: "expected response HTTP status should be #httpStatus"
         receivedStatusUpdate == httpStatus
 
-        and: "maintainer gets details of updated application"
-        JsonPath bodyAfter = maintainerSteps.getApplicationDetails_expectSuccess(DEFAULT_MAINTAINER_CODE, app.getHeader().getId())
+        and: "developer gets details of updated application"
+        JsonPath bodyAfter = maintainerSteps.getApplicationDetails_expectSuccess(DEFAULT_DEV_CODE, app.getHeader().getId())
 
-        and: "application has #field updated with value #after"
+        and: "application has #field updated with value #valueAfter"
         receivedStatusUpdate == SC_NO_CONTENT ? extract(field).from(bodyAfter) == valueAfter : IGNORE_THIS_ASSERTION
 
         where:
@@ -152,25 +152,25 @@ class MaintainerApiFTSpec extends AsmsSpecBase {
 
     @Unroll
     def "deletes application with #behavior"() {
-        given: "maintainer creates an application with 2 versions"
+        given: "developer creates an application with 2 versions"
         Application appV1 = newApplication().withId(appId).withVersion(v1).build()
         Application appV2 = newApplication().withId(appId).withVersion(v2).build()
-        maintainerSteps.createNewApplication_expectSuccess(DEFAULT_MAINTAINER_CODE, appV1)
-        maintainerSteps.createNewApplication_expectSuccess(DEFAULT_MAINTAINER_CODE, appV2)
+        maintainerSteps.createNewApplication_expectSuccess(DEFAULT_DEV_CODE, appV1)
+        maintainerSteps.createNewApplication_expectSuccess(DEFAULT_DEV_CODE, appV2)
 
-        and: "maintainer gets details of updated application"
-        JsonPath bodyBefore = maintainerSteps.getApplicationDetails_expectSuccess(DEFAULT_MAINTAINER_CODE, appV2.getHeader().getId())
+        and: "developer gets details of updated application"
+        JsonPath bodyBefore = maintainerSteps.getApplicationDetails_expectSuccess(DEFAULT_DEV_CODE, appV2.getHeader().getId())
         assertThat(field().header().version().from(bodyBefore)).describedAs("Version value before delete").isEqualTo(v2)
 
-        when: "maintainer calls delete application with #deleteAppKey"
-        def responseDelete = maintainerSteps.deleteApplication(DEFAULT_MAINTAINER_CODE, deleteAppKey).extract()
+        when: "developer calls delete application with #deleteAppKey"
+        def responseDelete = maintainerSteps.deleteApplication(DEFAULT_DEV_CODE, deleteAppKey).extract()
         def responseStatusDelete = responseDelete.statusCode()
 
         then: "expected response HTTP status should be #httpStatus"
         responseStatusDelete == SC_NO_CONTENT
 
         when:
-        def responseGet = maintainerSteps.getApplicationDetails(DEFAULT_MAINTAINER_CODE, appV2.getHeader().getId()).extract()
+        def responseGet = maintainerSteps.getApplicationDetails(DEFAULT_DEV_CODE, appV2.getHeader().getId()).extract()
         def responseGetStatus = responseGet.statusCode()
         JsonPath bodyGet = responseGet.jsonPath()
 
@@ -191,9 +191,9 @@ class MaintainerApiFTSpec extends AsmsSpecBase {
     }
 
     @Unroll
-    def "query for applications list for #queryMaintainerCode returns apps in latest versions in amount corresponding to given limit=#limit offset=#offset"() {
-        given: "2 maintainers create 3 application: first creates 2 incl. multi-versioned and second only 1"
-        dbSteps.createNewMaintainer(maintainer2)
+    def "query for applications list for #queryDevCode returns apps in latest versions in amount corresponding to given limit=#limit offset=#offset"() {
+        given: "2 developers create 3 application: first creates 2 incl. multi-versioned and second only 1"
+        dbSteps.createNewMaintainer(dev2)
         dbSteps.listMaintainers()
 
         Application app1v1 = newApplication()
@@ -205,21 +205,21 @@ class MaintainerApiFTSpec extends AsmsSpecBase {
         Application app3v1 = newApplication()
                 .withId(id3).withVersion(v1).build()
 
-        maintainerSteps.createNewApplication_expectSuccess(DEFAULT_MAINTAINER_CODE, app1v1)
-        maintainerSteps.createNewApplication_expectSuccess(DEFAULT_MAINTAINER_CODE, app1v2)
-        maintainerSteps.createNewApplication_expectSuccess(DEFAULT_MAINTAINER_CODE, app2v1)
-        maintainerSteps.createNewApplication_expectSuccess(maintainer2, app3v1)
+        maintainerSteps.createNewApplication_expectSuccess(DEFAULT_DEV_CODE, app1v1)
+        maintainerSteps.createNewApplication_expectSuccess(DEFAULT_DEV_CODE, app1v2)
+        maintainerSteps.createNewApplication_expectSuccess(DEFAULT_DEV_CODE, app2v1)
+        maintainerSteps.createNewApplication_expectSuccess(dev2, app3v1)
 
-        when: "maintainer asks for list of his applications specifying limit and offset"
+        when: "default developer asks for list of his applications specifying limit=#limit and offset=#offset"
         Map<String, Object> queryParams = queryParams(
                 mapping(LIMIT, limit),
                 mapping(OFFSET, offset)
         )
-        ExtractableResponse<Response> response = maintainerSteps.getApplicationsList(queryMaintainerCode, queryParams).extract()
+        ExtractableResponse<Response> response = maintainerSteps.getApplicationsList(queryDevCode, queryParams).extract()
         JsonPath jsonBody = response.jsonPath()
         def receivedStatus = response.statusCode()
 
-        then: "he gets response #response"
+        then: "he gets positive response"
         receivedStatus == SC_OK
         assertThat(ApplicationsPath.field().applications().from(jsonBody)).asList().hasSizeLessThanOrEqualTo(returnedLimit)
 
@@ -227,7 +227,7 @@ class MaintainerApiFTSpec extends AsmsSpecBase {
         ApplicationsPath.field().meta().resultSet().count().from(jsonBody) == count
         ApplicationsPath.field().meta().resultSet().total().from(jsonBody) == total
         ApplicationsPath.field().meta().resultSet().limit().from(jsonBody) == returnedLimit
-        ApplicationsPath.field().meta().resultSet().offset().from(jsonBody) == returnedOffset
+        ApplicationsPath.field().meta().resultSet().offset().from(jsonBody) == offset
 
         and: "in case he gets response with applications count > 0 then it should be latest version of one of his applications"
         if (ApplicationsPath.field().applications().at(0).id().isPresentIn(jsonBody)) {
@@ -236,12 +236,12 @@ class MaintainerApiFTSpec extends AsmsSpecBase {
         }
 
         where:
-        maintainer2 | id1      | id2        | id3        | limit | offset | v1       | v2      | queryMaintainerCode     || possibleIds | possibleV | count | total | returnedLimit | returnedOffset
-        "lgi2"      | randId() | "2_" + id1 | "3_" + id1 | 3     | 0      | "0.0.11" | "0.1.0" | DEFAULT_MAINTAINER_CODE || [id1]       | [v2]      | 2     | 2     | limit         | offset
-        "lgi2"      | randId() | "2_" + id1 | "3_" + id1 | null  | 0      | "0.1.1"  | "0.0.1" | maintainer2             || [id3]       | [v1]      | 1     | 1     | DEFAULT_LIMIT | offset
-        "lgi2"      | randId() | "2_" + id1 | "3_" + id1 | 1     | 0      | "0.11.1" | "1.0.1" | DEFAULT_MAINTAINER_CODE || [id1]       | [v2]      | 1     | 2     | limit         | offset
-        "lgi2"      | randId() | "2_" + id1 | "3_" + id1 | 1     | 1      | "0.1.1"  | "0.0.1" | DEFAULT_MAINTAINER_CODE || [id1, id2]  | [v1, v2]  | 1     | 2     | limit         | offset
-        "lgi2"      | randId() | "2_" + id1 | "3_" + id1 | 1     | 2      | "0.1.1"  | "0.0.1" | DEFAULT_MAINTAINER_CODE || _           | _         | 0     | 2     | limit         | offset
+        dev2   | id1      | id2        | id3        | limit | offset | v1       | v2      | queryDevCode     || possibleIds | possibleV | count | total | returnedLimit
+        "lgi2" | randId() | "2_" + id1 | "3_" + id1 | 3     | 0      | "0.0.11" | "0.1.0" | DEFAULT_DEV_CODE || [id1]       | [v2]      | 2     | 2     | limit
+        "lgi2" | randId() | "2_" + id1 | "3_" + id1 | null  | 0      | "0.1.1"  | "0.0.1" | dev2             || [id3]       | [v1]      | 1     | 1     | DEFAULT_LIMIT
+        "lgi2" | randId() | "2_" + id1 | "3_" + id1 | 1     | 0      | "0.11.1" | "1.0.1" | DEFAULT_DEV_CODE || [id1]       | [v2]      | 1     | 2     | limit
+        "lgi2" | randId() | "2_" + id1 | "3_" + id1 | 1     | 1      | "0.1.1"  | "0.0.1" | DEFAULT_DEV_CODE || [id1, id2]  | [v1, v2]  | 1     | 2     | limit
+        "lgi2" | randId() | "2_" + id1 | "3_" + id1 | 1     | 2      | "0.1.1"  | "0.0.1" | DEFAULT_DEV_CODE || _           | _         | 0     | 2     | limit
     }
 
     private static String randId() {
