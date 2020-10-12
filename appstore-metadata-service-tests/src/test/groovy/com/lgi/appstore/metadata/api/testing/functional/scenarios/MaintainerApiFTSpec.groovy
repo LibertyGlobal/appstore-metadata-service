@@ -19,7 +19,7 @@
 
 package com.lgi.appstore.metadata.api.testing.functional.scenarios
 
-import com.lgi.appstore.metadata.api.testing.functional.AsmsSpecBase
+import com.lgi.appstore.metadata.api.testing.functional.AsmsMaintainerSpecBase
 import com.lgi.appstore.metadata.api.testing.functional.framework.model.response.ApplicationsPath
 import com.lgi.appstore.metadata.model.Application
 import com.lgi.appstore.metadata.model.ApplicationForUpdate
@@ -53,7 +53,7 @@ import static org.apache.http.HttpStatus.SC_NO_CONTENT
 import static org.apache.http.HttpStatus.SC_OK
 import static org.assertj.core.api.Assertions.assertThat
 
-class MaintainerApiFTSpec extends AsmsSpecBase {
+class MaintainerApiFTSpec extends AsmsMaintainerSpecBase {
     def static final IGNORE_THIS_ASSERTION = true
     public static final int DEFAULT_LIMIT = 10
 
@@ -191,6 +191,41 @@ class MaintainerApiFTSpec extends AsmsSpecBase {
     }
 
     @Unroll
+    def "consecutive deletes of application versions"() {
+        given: "developer creates an application with 2 versions"
+        def appId = randId()
+        def v1 = "1.0.0"
+        def v2 = "2.0.0"
+        Application appV1 = newApplication().withId(appId).withVersion(v1).build()
+        Application appV2 = newApplication().withId(appId).withVersion(v2).build()
+        maintainerSteps.createNewApplication_expectSuccess(DEFAULT_DEV_CODE, appV1)
+        maintainerSteps.createNewApplication_expectSuccess(DEFAULT_DEV_CODE, appV2)
+
+        and: "developer gets details of updated application"
+        JsonPath bodyBefore = maintainerSteps.getApplicationDetails_expectSuccess(DEFAULT_DEV_CODE, appV2.getHeader().getId())
+        assertThat(field().header().version().from(bodyBefore)).describedAs("Version value before delete").isEqualTo(v2)
+
+        when: "developer calls delete application v1"
+        def responseDeleteV1 = maintainerSteps.deleteApplication(DEFAULT_DEV_CODE, appId + ":" + v1).extract()
+        def responseStatusDeleteV1 = responseDeleteV1.statusCode()
+
+        and: "developer calls delete application v2"
+        def responseDeleteV2 = maintainerSteps.deleteApplication(DEFAULT_DEV_CODE, appId + ":" + v2).extract()
+        def responseStatusDeleteV2 = responseDeleteV2.statusCode()
+
+        then: "expected response HTTP status should success with no content returned"
+        responseStatusDeleteV1 == SC_NO_CONTENT
+        responseStatusDeleteV2 == SC_NO_CONTENT
+
+        when:
+        def responseGet = maintainerSteps.getApplicationDetails(DEFAULT_DEV_CODE, appV2.getHeader().getId()).extract()
+        def responseGetStatus = responseGet.statusCode()
+
+        then: "whole application was deleted"
+        responseGetStatus == SC_NOT_FOUND
+    }
+
+    @Unroll
     def "query for applications list for #queryDevCode returns apps in latest versions in amount corresponding to given limit=#limit offset=#offset"() {
         given: "2 developers create 3 application: first creates 2 incl. multi-versioned and second only 1"
         dbSteps.createNewMaintainer(dev2)
@@ -242,15 +277,5 @@ class MaintainerApiFTSpec extends AsmsSpecBase {
         "lgi2" | randId() | "2_" + id1 | "3_" + id1 | 1     | 0      | "0.11.1" | "1.0.1" | DEFAULT_DEV_CODE || [id1]       | [v2]      | 1     | 2     | limit
         "lgi2" | randId() | "2_" + id1 | "3_" + id1 | 1     | 1      | "0.1.1"  | "0.0.1" | DEFAULT_DEV_CODE || [id1, id2]  | [v1, v2]  | 1     | 2     | limit
         "lgi2" | randId() | "2_" + id1 | "3_" + id1 | 1     | 2      | "0.1.1"  | "0.0.1" | DEFAULT_DEV_CODE || _           | _         | 0     | 2     | limit
-    }
-
-    private static String randId() {
-        return String.format("appId_%s", UUID.randomUUID())
-    }
-
-    Category pickRandomCategory() {
-        List<Category> possibleCategories = Arrays.asList(Category.values())
-        Collections.shuffle(possibleCategories)
-        return possibleCategories.stream().findFirst().get()
     }
 }
