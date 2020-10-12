@@ -44,6 +44,8 @@ public class ServiceClientBase {
     private static final AllureRestAssured ALLURE_REPORTING_FILTER;
     private static final RestAssuredConfig REST_ASSURED_CONFIG;
 
+    private static final String SERVICE_HOST = "localhost";
+
     static {
         //noinspection deprecation - due to generic rest assured open issue: https://github.com/rest-assured/rest-assured/issues/497
         HttpClientConfig httpClientConfig = HttpClientConfig.httpClientConfig()
@@ -59,7 +61,8 @@ public class ServiceClientBase {
     }
 
     protected String getBaseUri() {
-        return String.format("http://localhost:%d", Integer.valueOf(Optional.ofNullable(environment.getProperty("local.server.port")).orElse("8080")));
+        Integer service_port = Integer.valueOf(Optional.ofNullable(environment.getProperty("local.server.port")).orElse("8080"));
+        return String.format(String.format("http://%s:%%d", SERVICE_HOST), service_port);
     }
 
     protected RequestSpecification given() {

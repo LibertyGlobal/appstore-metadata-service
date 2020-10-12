@@ -34,7 +34,7 @@ import java.util.UUID;
 import java.util.stream.Stream;
 
 import static com.lgi.appstore.metadata.api.testing.functional.framework.infrastructure.TestDataStore.DB_SCHEMA_NAME;
-import static com.lgi.appstore.metadata.api.testing.functional.framework.steps.MaintainerSteps.DEFAULT_MAINTAINER_CODE;
+import static com.lgi.appstore.metadata.api.testing.functional.framework.steps.MaintainerSteps.DEFAULT_DEV_CODE;
 
 @Component
 public class DbSteps {
@@ -56,7 +56,22 @@ public class DbSteps {
         String name = "Name_" + UUID.randomUUID();
         String address = "Address_" + UUID.randomUUID();
         String homepage = "Homepage_" + UUID.randomUUID();
-        String email = "Email_" + UUID.randomUUID();
+        String email= "Email_" + UUID.randomUUID();
+        createNewMaintainer(code, name, address, homepage, email);
+    }
+
+    @Step
+    public void createNewMaintainer(String code, String name) throws SQLException {
+        LOG.info("Adding a new maintainer");
+        String address = "Address_" + UUID.randomUUID();
+        String homepage = "Homepage_" + UUID.randomUUID();
+        String email= "Email_" + UUID.randomUUID();
+        createNewMaintainer(code, name, address, homepage, email);
+    }
+
+    @Step
+    private void createNewMaintainer(String code, String name, String address, String homepage, String email) throws SQLException {
+        LOG.info("Adding a new maintainer");
         Optional<RowSetDynaClass> rowSet = DB.performQuery(String.format("INSERT INTO %s.%s (code, name, address, homepage, email) " +
                 "VALUES ('%s', '%s', '%s', '%s', '%s')", DB_SCHEMA_NAME, ASMS_TABLE_NAME_MAINTAINER, code, name, address, homepage, email));
         rowSet.ifPresent(this::logRows);
@@ -81,8 +96,8 @@ public class DbSteps {
     }
 
     private void purgeTableMaintainer() throws SQLException {
-        LOG.info("Purging DB table: {}, leaving only hardcoded default entry for code = {}", ASMS_TABLE_NAME_MAINTAINER, DEFAULT_MAINTAINER_CODE);
-        DB.performQuery(String.format("DELETE FROM %s.%s WHERE code <> '%s'", DB_SCHEMA_NAME, ASMS_TABLE_NAME_MAINTAINER, DEFAULT_MAINTAINER_CODE));
+        LOG.info("Purging DB table: {}, leaving only hardcoded default entry for code = {}", ASMS_TABLE_NAME_MAINTAINER, DEFAULT_DEV_CODE);
+        DB.performQuery(String.format("DELETE FROM %s.%s WHERE code <> '%s'", DB_SCHEMA_NAME, ASMS_TABLE_NAME_MAINTAINER, DEFAULT_DEV_CODE));
     }
 
     /**

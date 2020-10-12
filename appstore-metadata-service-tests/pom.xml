@@ -14,7 +14,7 @@
 
     <properties>
         <junit-platform-version>1.6.2</junit-platform-version>
-        <maven-test-plugins-version>3.0.0-M5</maven-test-plugins-version>
+        <maven-test-plugins-version>3.0.0-M3</maven-test-plugins-version>
         <rest-assured-version>3.3.0</rest-assured-version>
         <spock-version>1.3-groovy-2.5</spock-version>
         <groovy-version>2.5.13</groovy-version>
@@ -25,6 +25,12 @@
     <profiles>
         <profile>
             <id>tests-for-development</id>
+            <activation>
+                <property>
+                    <name>ci-stage</name>
+                    <value>integration-tests</value> <!-- to activate integration tests from CI pipeline -->
+                </property>
+            </activation>
             <properties>
                 <maven-surefire-version>${maven-test-plugins-version}</maven-surefire-version>
                 <skipUTs>true</skipUTs>
@@ -38,6 +44,12 @@
             <groupId>com.lgi.appstore.metadata</groupId>
             <artifactId>appstore-metadata-service</artifactId>
             <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <artifactId>*</artifactId>
+                    <groupId>org.junit.jupiter</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
@@ -65,15 +77,11 @@
             <scope>test</scope>
             <exclusions>
                 <exclusion>
-                    <artifactId>junit-jupiter</artifactId>
+                    <artifactId>*</artifactId>
                     <groupId>org.junit.jupiter</groupId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>junit-jupiter-api</artifactId>
-                    <groupId>org.junit.jupiter</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>junit-vintage-engine</artifactId>
+                    <artifactId>*</artifactId>
                     <groupId>org.junit.vintage</groupId>
                 </exclusion>
             </exclusions>
@@ -105,7 +113,7 @@
             <scope>test</scope>
             <exclusions>
                 <exclusion>
-                    <artifactId>junit</artifactId>
+                    <artifactId>*</artifactId>
                     <groupId>junit</groupId>
                 </exclusion>
             </exclusions>
@@ -113,16 +121,16 @@
 
         <dependency>
             <groupId>io.qameta.allure</groupId>
-            <artifactId>allure-junit5</artifactId>
+            <artifactId>allure-junit-platform</artifactId>
             <version>${allure-version}</version>
             <scope>test</scope>
             <exclusions>
                 <exclusion>
-                    <artifactId>junit-jupiter-api</artifactId>
+                    <artifactId>*</artifactId>
                     <groupId>org.junit.jupiter</groupId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>junit-platform-launcher</artifactId>
+                    <artifactId>*</artifactId>
                     <groupId>org.junit.platform</groupId>
                 </exclusion>
             </exclusions>
@@ -134,7 +142,7 @@
             <scope>test</scope>
             <exclusions>
                 <exclusion>
-                    <artifactId>rest-assured</artifactId>
+                    <artifactId>*</artifactId>
                     <groupId>io.rest-assured</groupId>
                 </exclusion>
             </exclusions>
@@ -147,7 +155,7 @@
             <scope>test</scope>
             <exclusions>
                 <exclusion>
-                    <artifactId>junit</artifactId>
+                    <artifactId>*</artifactId>
                     <groupId>junit</groupId>
                 </exclusion>
             </exclusions>
@@ -159,24 +167,22 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>com.athaydes</groupId>
+            <artifactId>spock-reports</artifactId>
+            <version>1.7.1</version>
+            <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>*</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
             <groupId>org.codehaus.groovy</groupId>
             <artifactId>groovy</artifactId>
             <version>${groovy-version}</version>
             <type>pom</type>
-            <exclusions>
-                <exclusion>
-                    <artifactId>junit-jupiter-api</artifactId>
-                    <groupId>org.junit.jupiter</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>junit-jupiter-engine</artifactId>
-                    <groupId>org.junit.jupiter</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>junit-platform-launcher</artifactId>
-                    <groupId>org.junit.platform</groupId>
-                </exclusion>
-            </exclusions>
         </dependency>
     </dependencies>
 
@@ -194,7 +200,7 @@
                         -javaagent:"${settings.localRepository}/org/aspectj/aspectjweaver/${aspectj.version}/aspectjweaver-${aspectj.version}.jar"
                     </argLine>
                     <skipITs>${skipFTs}</skipITs>
-                    <forkedProcessExitTimeoutInSeconds>120</forkedProcessExitTimeoutInSeconds>
+                    <forkedProcessExitTimeoutInSeconds>1200</forkedProcessExitTimeoutInSeconds>
                 </configuration>
                 <dependencies>
                     <dependency>

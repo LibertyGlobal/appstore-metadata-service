@@ -22,7 +22,6 @@
         <db.url>jdbc:postgresql://${db.host}:${db.port}/${db.name}</db.url>
         <db.driver>org.postgresql.Driver</db.driver>
         <start-class>com.lgi.appstore.metadata.Application</start-class>
-        <skipUTs>false</skipUTs>
         <generated.source.package>com.lgi.appstore.metadata</generated.source.package>
     </properties>
 

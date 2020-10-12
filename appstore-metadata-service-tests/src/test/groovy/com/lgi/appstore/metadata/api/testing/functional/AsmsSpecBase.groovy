@@ -22,6 +22,7 @@ package com.lgi.appstore.metadata.api.testing.functional
 import com.lgi.appstore.metadata.api.testing.functional.framework.base.DatasourceInitializer
 import com.lgi.appstore.metadata.api.testing.functional.framework.steps.DbSteps
 import com.lgi.appstore.metadata.api.testing.functional.framework.steps.MaintainerSteps
+import com.lgi.appstore.metadata.api.testing.functional.framework.steps.StbSteps
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -40,6 +41,9 @@ class AsmsSpecBase extends Specification {
 
     @Autowired
     protected MaintainerSteps maintainerSteps
+
+    @Autowired
+    protected StbSteps stbSteps
 
     void cleanup() throws Exception {
         LOG.info("Test cleanup")

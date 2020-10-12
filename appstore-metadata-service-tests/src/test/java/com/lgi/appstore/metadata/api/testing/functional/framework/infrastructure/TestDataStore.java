@@ -80,18 +80,18 @@ public class TestDataStore extends PostgreSQLContainer<TestDataStore> {
     }
 
     public Optional<RowSetDynaClass> performQuery(String sqlCmd) throws SQLException {
-        Connection connection = ds.getConnection();
-        try (Statement statement = connection.createStatement()) {
-            boolean resultSetReceived = statement.execute(sqlCmd);
-
-            if (resultSetReceived) {
-                try (ResultSet resultSet = statement.getResultSet()) {
-                    LOG.info("SQL execution returned a set of results.");
-                    return Optional.of(new RowSetDynaClass(resultSet));
+        try (Connection connection = ds.getConnection()) {
+            try (Statement statement = connection.createStatement()) {
+                boolean resultSetReceived = statement.execute(sqlCmd);
+                if (resultSetReceived) {
+                    try (ResultSet resultSet = statement.getResultSet()) {
+                        LOG.info("SQL execution returned a set of results.");
+                        return Optional.of(new RowSetDynaClass(resultSet));
+                    }
+                } else {
+                    LOG.info("SQL execution resulted in updates only, count={}", statement.getUpdateCount());
+                    return Optional.empty();
                 }
-            } else {
-                LOG.info("SQL execution resulted in updates only, count={}", statement.getUpdateCount());
-                return Optional.empty();
             }
         }
     }
@@ -102,7 +102,7 @@ public class TestDataStore extends PostgreSQLContainer<TestDataStore> {
         poolConfig.setUsername(singleton.getUsername());
         poolConfig.setPassword(singleton.getPassword());
         poolConfig.setDriverClassName(singleton.getDriverClassName());
-        poolConfig.setIdleTimeout(3600000);
+        poolConfig.setIdleTimeout(5000);
         poolConfig.setMaximumPoolSize(100);
         return new HikariDataSource(poolConfig);
     }

@@ -37,7 +37,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @Component
 public class MaintainerSteps {
-    public static final String DEFAULT_MAINTAINER_CODE = "lgi";
+    public static final String DEFAULT_DEV_CODE = "lgi";
 
     @Autowired
     private MaintainerPerspectiveAsmsClient maintainerPerspectiveAsmsClient;
@@ -60,25 +60,25 @@ public class MaintainerSteps {
 
     @Step
     public ValidatableResponse createNewApplication(String maintainerCode, Application applicationDetails) {
-        return maintainerPerspectiveAsmsClient.postApplicationDetails(maintainerCode, applicationDetails);
+        return maintainerPerspectiveAsmsClient.postApp(maintainerCode, applicationDetails);
     }
 
     @Step
     public ValidatableResponse updateApplication(String maintainerCode, String applicationKey, ApplicationForUpdate newApplication) {
-        return maintainerPerspectiveAsmsClient.putApplicationDetails(maintainerCode, applicationKey, newApplication);
+        return maintainerPerspectiveAsmsClient.putApp(maintainerCode, applicationKey, newApplication);
     }
 
     public ValidatableResponse deleteApplication(String maintainerCode, String applicationKey) {
-        return maintainerPerspectiveAsmsClient.deleteApplication(maintainerCode, applicationKey);
+        return maintainerPerspectiveAsmsClient.deleteApp(maintainerCode, applicationKey);
     }
 
     @Step
     public ValidatableResponse getApplicationDetails(String maintainerCode, String applicationKey) {
-        return maintainerPerspectiveAsmsClient.getApplicationDetails(maintainerCode, applicationKey);
+        return maintainerPerspectiveAsmsClient.getApp(maintainerCode, applicationKey);
     }
 
     @Step
     public ValidatableResponse getApplicationsList(String maintainerCode, Map<String, ?> queryParams) {
-        return maintainerPerspectiveAsmsClient.getApplicationsList(maintainerCode, queryParams);
+        return maintainerPerspectiveAsmsClient.getApps(maintainerCode, queryParams);
     }
 }
