@@ -33,13 +33,16 @@ import static com.lgi.appstore.metadata.api.testing.functional.framework.model.r
 import static com.lgi.appstore.metadata.api.testing.functional.framework.model.request.ApplicationBuilder.newApplication
 import static com.lgi.appstore.metadata.api.testing.functional.framework.model.request.QueryParams.mapping
 import static com.lgi.appstore.metadata.api.testing.functional.framework.model.request.QueryParams.queryParams
+import static com.lgi.appstore.metadata.api.testing.functional.framework.model.response.ApplicationDetailsPath.field
 import static com.lgi.appstore.metadata.api.testing.functional.framework.model.response.PathBase.anyOf
 import static com.lgi.appstore.metadata.api.testing.functional.framework.steps.MaintainerSteps.DEFAULT_DEV_CODE
+import static org.apache.http.HttpStatus.SC_NOT_FOUND
 import static org.apache.http.HttpStatus.SC_OK
 import static org.assertj.core.api.Assertions.assertThat
 
 class StbApiFTSpec extends AsmsStbSpecBase {
     public static final int DEFAULT_LIMIT = 10
+    private static final boolean IGNORE_THIS_ASSERTION = true
 
     @Unroll
     def "queries for applications list returns apps in latest versions in amount corresponding to given limit=#limit offset=#offset"() {
@@ -169,5 +172,42 @@ class StbApiFTSpec extends AsmsStbSpecBase {
         "category"       | randId() | "2_" + id1 | "3_" + id1 | "0.1.9"  | "0.0.1" | id3 + ":" + v1   || [id3]       | [v1]      | 1
         "platform"       | randId() | "2_" + id1 | "3_" + id1 | "0.1.9"  | "0.0.1" | id2 + ":" + v1   || [id2]       | [v1]      | 1
         "maintainerName" | randId() | "2_" + id1 | "3_" + id1 | "0.1.9"  | "0.0.1" | id1 + ":" + v1   || [id1, id2]  | [v1]      | 2
+    }
+
+    @Unroll
+    def "create non-existing app and view details for #behavior"() {
+        given: "2 developers create 2 applications: first with 2 versions (incl. hidden latest) and second with only one version"
+        Application app1v1 = newApplication()
+                .withId(appId).withVersion(v1).build()
+        Application app1v2 = newApplication()
+                .withId(appId).withVersion(v2).withVisible(isV2Visible).build()
+        Application app2v1 = newApplication()
+                .withId("someOther_$appId").withVersion(v1) build()
+
+        maintainerSteps.createNewApplication_expectSuccess(DEFAULT_DEV_CODE, app1v1)
+        maintainerSteps.createNewApplication_expectSuccess(DEFAULT_DEV_CODE, app1v2)
+        maintainerSteps.createNewApplication_expectSuccess(DEFAULT_DEV_CODE, app2v1)
+
+        when: "default developer asks for details of application #queryAppKey"
+        ExtractableResponse<Response> response = stbSteps.getApplicationDetails(queryAppKey).extract()
+        def receivedStatus = response.statusCode()
+
+        then: "expected response HTTP status should be #httpStatus"
+        receivedStatus == httpStatus
+
+        and: "for positive HTTP response the body exposes first application details"
+        JsonPath jsonBody = response.jsonPath()
+        receivedStatus == SC_OK ? field().header().id().from(jsonBody) == appId : IGNORE_THIS_ASSERTION
+        receivedStatus == SC_OK ? field().header().version().from(jsonBody) == returnedV : IGNORE_THIS_ASSERTION
+        receivedStatus == SC_OK ? !field().header().visible().isPresentIn(jsonBody) : IGNORE_THIS_ASSERTION
+
+        where:
+        behavior                                       | appId    | v1       | v2       | isV2Visible | queryAppKey       || httpStatus   | returnedV
+        "no version specified - fallback to highest v" | randId() | "1.0.0"  | "0.10.0" | true        | appId             || SC_OK        | v1
+        "accepting 'latest' keyword"                   | randId() | "0.0.10" | "0.1.0"  | true        | appId + ":latest" || SC_OK        | v2
+        "query for specific version"                   | randId() | "0.1.0"  | "1.0.0"  | true        | appId + ":" + v1  || SC_OK        | v1
+        "fallback to latest that is hidden"            | randId() | "1.0.0"  | "2.0.0"  | false       | appId             || SC_OK        | v1
+        "not existing id"                              | randId() | "10.0.0" | "0.1.0"  | true        | "App3"            || SC_NOT_FOUND | _
+        "not existing version"                         | randId() | "10.0.0" | "20.0.0" | true        | appId + ":3.0"    || SC_NOT_FOUND | _
     }
 }
