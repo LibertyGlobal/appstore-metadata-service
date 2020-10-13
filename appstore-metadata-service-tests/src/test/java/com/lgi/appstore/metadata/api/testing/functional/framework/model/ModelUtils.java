@@ -17,10 +17,18 @@
  * limitations under the License.
  */
 
-package com.lgi.appstore.metadata.api.testing.functional
+package com.lgi.appstore.metadata.api.testing.functional.framework.model;
 
-class AsmsMaintainerSpecBase extends AsmsSpecBase {
-    protected static String randId() {
-        return String.format("appId_%s", UUID.randomUUID())
+import com.lgi.appstore.metadata.model.Category;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
+public class ModelUtils {
+    public static Category pickRandomCategory() {
+        List<Category> possibleCategories = Arrays.asList(Category.values());
+        Collections.shuffle(possibleCategories);
+        return possibleCategories.stream().findFirst().get();
     }
 }
