@@ -31,16 +31,28 @@ services:
 
   as3proxy:
     build: as3proxy
+    depends_on:
+      - asms
     ports:
       - 8081:80
 
   asmsproxy:
     build: asmsproxy
+    depends_on:
+      - asms
     ports:
       - 8082:80
 
   asms:
-    build: ../../appstore-metadata-service-poc/docker-compose/asms
+    build: ../../appstore-metadata-service/docker-compose/asms
+    depends_on:
+      - asmsdb
+    environment:
+      - JDBC_HOST=asmsdb
+      - JDBC_PORT=5432
+      - JDBC_DATABASE_NAME=asms
+      - JDBC_USER=asms
+      - JDBC_PASSWORD=asms
     ports:
       # for debug purposes
       - 8080:8080
