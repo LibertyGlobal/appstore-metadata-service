@@ -46,7 +46,11 @@ import static com.lgi.appstore.metadata.api.testing.functional.framework.model.r
 import static com.lgi.appstore.metadata.api.testing.functional.framework.model.response.ApplicationDetailsPath.extract
 import static com.lgi.appstore.metadata.api.testing.functional.framework.model.response.ApplicationDetailsPath.field
 import static com.lgi.appstore.metadata.api.testing.functional.framework.model.response.PathBase.anyOf
+import static com.lgi.appstore.metadata.api.testing.functional.framework.steps.MaintainerSteps.DEFAULT_DEV_ADDRESS
 import static com.lgi.appstore.metadata.api.testing.functional.framework.steps.MaintainerSteps.DEFAULT_DEV_CODE
+import static com.lgi.appstore.metadata.api.testing.functional.framework.steps.MaintainerSteps.DEFAULT_DEV_EMAIL
+import static com.lgi.appstore.metadata.api.testing.functional.framework.steps.MaintainerSteps.DEFAULT_DEV_HOMEPAGE
+import static com.lgi.appstore.metadata.api.testing.functional.framework.steps.MaintainerSteps.DEFAULT_DEV_NAME
 import static org.apache.http.HttpStatus.SC_BAD_REQUEST
 import static org.apache.http.HttpStatus.SC_CREATED
 import static org.apache.http.HttpStatus.SC_NOT_FOUND
@@ -113,6 +117,188 @@ class MaintainerApiFTSpec extends AsmsMaintainerSpecBase {
         "fallback to latest that is hidden"            | randId() | "1.0.0"  | "2.0.0"  | false       | appId             || SC_OK        | v2
         "not existing id"                              | randId() | "10.0.0" | "0.1.0"  | true        | "App3"            || SC_NOT_FOUND | _
         "not existing version"                         | randId() | "10.0.0" | "0.1.0"  | true        | appId + ":3.0"    || SC_NOT_FOUND | _
+    }
+
+    @Unroll
+    def "details of each version contain separate information about app requirements, maintainer and all available versions of the application"() {
+        given:
+        def appId = randId()
+        def v1 = "1.0.0"
+        def v2 = "1.2.0"
+        def v1QueryAppKey = appId + ":" + v1
+        def v2QueryAppKey = appId + ":" + v2
+
+        and: "application has v1 with some metadata"
+        def v1Visible = false
+        def v1Name = "v1Name"
+        def v1Description = "v1Description"
+        def v1Icon = "v1Icon"
+        def v1Type = "v1Type"
+        def v1PlatformArch = "v1PlatformArch"
+        def v1PlatformOs = "v1PlatformOs"
+        def v1PlatformVariant = "v1PlatformVariant"
+        def v1HardwareCache = "v1HardwareCache"
+        def v1HardwareDmips = "v1HardwareDmips"
+        def v1HardwarePersistent = "v1HardwarePersistent"
+        def v1HardwareImage = "v1HardwareImage"
+        def v1HardwareRam = "v1HardwareRam"
+        def v1Dependency1Id = "v1Dependency1Id"
+        def v1Dependency1Version = "v1Dependency1Version"
+        def v1Dependency2Id = "v1Dependency2Id"
+        def v1Dependency2Version = "v1Dependency2Version"
+        def v1Feature1Name = "v1Feature1Name"
+        def v1Feature1Version = "v1Feature1Version"
+        def v1Feature1Required = true
+        def v1Feature2Name = "v1Feature2Name"
+        def v1Feature2Version = "v1Feature2Version"
+        def v1Feature2Required = false
+        Application app1v1 = newApplication().withId(appId).withVersion(v1).withVisible(v1Visible)
+                .withVisible(v1Visible)
+                .withName(v1Name)
+                .withDescription(v1Description)
+                .withIcon(v1Icon)
+                .withType(v1Type)
+                .withPlatform(v1PlatformArch, v1PlatformOs, v1PlatformVariant)
+                .withHardware(v1HardwareCache, v1HardwareDmips, v1HardwarePersistent, v1HardwareRam, v1HardwareImage)
+                .withDependency(v1Dependency1Id, v1Dependency1Version)
+                .withDependency(v1Dependency2Id, v1Dependency2Version)
+                .withFeature(v1Feature1Name, v1Feature1Version, v1Feature1Required)
+                .withFeature(v1Feature2Name, v1Feature2Version, v1Feature2Required)
+                .build()
+
+        and: "application has v2 with completely different metadata"
+        def v2Visible = true
+        def v2Name = "v2Name"
+        def v2Description = "v2Description"
+        def v2Icon = "v2Icon"
+        def v2Type = "v2Type"
+        def v2PlatformArch = "v2PlatformArch"
+        def v2PlatformOs = "v2PlatformOs"
+        def v2PlatformVariant = "v2PlatformVariant"
+        def v2HardwareCache = "v2HardwareCache"
+        def v2HardwareDmips = "v2HardwareDmips"
+        def v2HardwarePersistent = "v2HardwarePersistent"
+        def v2HardwareImage = "v2HardwareImage"
+        def v2HardwareRam = "v2HardwareRam"
+        def v2Dependency1Id = "v2Dependency1Id"
+        def v2Dependency1Version = "v2Dependency1Version"
+        def v2Dependency2Id = "v2Dependency2Id"
+        def v2Dependency2Version = "v2Dependency2Version"
+        def v2Feature1Name = "v2Feature1Name"
+        def v2Feature1Version = "v2Feature1Version"
+        def v2Feature1Required = false
+        def v2Feature2Name = "v2Feature2Name"
+        def v2Feature2Version = "v2Feature2Version"
+        def v2Feature2Required = true
+        Application app1v2 = newApplication().withId(appId).withVersion(v2).withVisible(v2Visible)
+                .withVisible(v2Visible)
+                .withName(v2Name)
+                .withDescription(v2Description)
+                .withIcon(v2Icon)
+                .withType(v2Type)
+                .withPlatform(v2PlatformArch, v2PlatformOs, v2PlatformVariant)
+                .withHardware(v2HardwareCache, v2HardwareDmips, v2HardwarePersistent, v2HardwareRam, v2HardwareImage)
+                .withDependency(v2Dependency1Id, v2Dependency1Version)
+                .withDependency(v2Dependency2Id, v2Dependency2Version)
+                .withFeature(v2Feature1Name, v2Feature1Version, v2Feature1Required)
+                .withFeature(v2Feature2Name, v2Feature2Version, v2Feature2Required)
+                .build()
+
+        and: "developers creates application in these 2 versions"
+        maintainerSteps.createNewApplication_expectSuccess(DEFAULT_DEV_CODE, app1v1)
+        maintainerSteps.createNewApplication_expectSuccess(DEFAULT_DEV_CODE, app1v2)
+
+        when: "developer asks for details of application #v1QueryAppKey"
+        ExtractableResponse<Response> response1 = maintainerSteps.getApplicationDetails(DEFAULT_DEV_CODE, v1QueryAppKey).extract()
+        def receivedStatus1 = response1.statusCode()
+
+        then: "expected response HTTP status should be success/200"
+        receivedStatus1 == SC_OK
+
+        and: "the body exposes requested version details"
+        JsonPath theBody1 = response1.jsonPath()
+        field().header().id().from(theBody1) == appId
+        field().header().version().from(theBody1) == v1
+        field().header().visible().from(theBody1) == v1Visible
+
+        and: "the body exposes maintainer section with his details"
+        field().maintainer().name().from(theBody1) == DEFAULT_DEV_NAME
+        field().maintainer().address().from(theBody1) == DEFAULT_DEV_ADDRESS
+        field().maintainer().homepage().from(theBody1) == DEFAULT_DEV_HOMEPAGE
+        field().maintainer().email().from(theBody1) == DEFAULT_DEV_EMAIL
+
+        and: "the body exposes version section with all versions and visibility information"
+        field().versions().at(0).version().from(theBody1) == v1
+        field().versions().at(0).visible().from(theBody1) == v1Visible
+        field().versions().at(1).version().from(theBody1) == v2
+        field().versions().at(1).visible().from(theBody1) == v2Visible
+
+        and: "the body exposes requirements section with dependencies information"
+        assertThat(field().requirements().dependencies().id().from(theBody1)).asList().containsExactlyInAnyOrder(v1Dependency1Id, v1Dependency2Id)
+        assertThat(field().requirements().dependencies().version().from(theBody1)).asList().containsExactlyInAnyOrder(v1Dependency1Version, v1Dependency2Version)
+
+        and: "the body exposes requirements section with features information"
+        assertThat(field().requirements().features().name().from(theBody1)).asList().containsExactlyInAnyOrder(v1Feature1Name, v1Feature2Name)
+        assertThat(field().requirements().features().version().from(theBody1)).asList().containsExactlyInAnyOrder(v1Feature1Version, v1Feature2Version)
+        assertThat(field().requirements().features().required().from(theBody1)).asList().containsExactlyInAnyOrder(v1Feature1Required, v1Feature2Required)
+
+        and: "the body exposes requirements section with hardware information"
+        field().requirements().hardware().cache().from(theBody1) == v1HardwareCache
+        field().requirements().hardware().dmips().from(theBody1) == v1HardwareDmips
+        field().requirements().hardware().image().from(theBody1) == v1HardwareImage
+        field().requirements().hardware().ram().from(theBody1) == v1HardwareRam
+        field().requirements().hardware().persistent().from(theBody1) == v1HardwarePersistent
+
+        and: "the body exposes requirements section with platform information"
+        field().requirements().platform().architecture().from(theBody1) == v1PlatformArch
+        field().requirements().platform().variant().from(theBody1) == v1PlatformVariant
+        field().requirements().platform().os().from(theBody1) == v1PlatformOs
+
+        when: "developer asks for details of application #v2QueryAppKey"
+        ExtractableResponse<Response> response2 = maintainerSteps.getApplicationDetails(DEFAULT_DEV_CODE, v2QueryAppKey).extract()
+        def receivedStatus2 = response2.statusCode()
+
+        then: "expected response HTTP status should be success/200"
+        receivedStatus2 == SC_OK
+
+        and: "the body exposes requested version details"
+        JsonPath theBody2 = response2.jsonPath()
+        field().header().id().from(theBody2) == appId
+        field().header().version().from(theBody2) == v2
+        field().header().visible().from(theBody2) == v2Visible
+
+        and: "the body exposes maintainer section with his details"
+        field().maintainer().name().from(theBody2) == DEFAULT_DEV_NAME
+        field().maintainer().address().from(theBody2) == DEFAULT_DEV_ADDRESS
+        field().maintainer().homepage().from(theBody2) == DEFAULT_DEV_HOMEPAGE
+        field().maintainer().email().from(theBody2) == DEFAULT_DEV_EMAIL
+
+        and: "the body exposes version section with all versions and visibility information"
+        field().versions().at(0).version().from(theBody2) == v1
+        field().versions().at(0).visible().from(theBody2) == v1Visible
+        field().versions().at(1).version().from(theBody2) == v2
+        field().versions().at(1).visible().from(theBody2) == v2Visible
+
+        and: "the body exposes requirements section with dependencies information"
+        assertThat(field().requirements().dependencies().id().from(theBody2)).asList().containsExactlyInAnyOrder(v2Dependency1Id, v2Dependency2Id)
+        assertThat(field().requirements().dependencies().version().from(theBody2)).asList().containsExactlyInAnyOrder(v2Dependency1Version, v2Dependency2Version)
+
+        and: "the body exposes requirements section with features information"
+        assertThat(field().requirements().features().name().from(theBody2)).asList().containsExactlyInAnyOrder(v2Feature1Name, v2Feature2Name)
+        assertThat(field().requirements().features().version().from(theBody2)).asList().containsExactlyInAnyOrder(v2Feature1Version, v2Feature2Version)
+        assertThat(field().requirements().features().required().from(theBody2)).asList().containsExactlyInAnyOrder(v2Feature1Required, v2Feature2Required)
+
+        and: "the body exposes requirements section with hardware information"
+        field().requirements().hardware().cache().from(theBody2) == v2HardwareCache
+        field().requirements().hardware().dmips().from(theBody2) == v2HardwareDmips
+        field().requirements().hardware().image().from(theBody2) == v2HardwareImage
+        field().requirements().hardware().ram().from(theBody2) == v2HardwareRam
+        field().requirements().hardware().persistent().from(theBody2) == v2HardwarePersistent
+
+        and: "the body exposes requirements section with platform information"
+        field().requirements().platform().architecture().from(theBody2) == v2PlatformArch
+        field().requirements().platform().variant().from(theBody2) == v2PlatformVariant
+        field().requirements().platform().os().from(theBody2) == v2PlatformOs
     }
 
     @Unroll
@@ -240,7 +426,7 @@ class MaintainerApiFTSpec extends AsmsMaintainerSpecBase {
         Application app2v1 = newApplication()
                 .withId(id2).withVersion(v1).build()
         Application app3v1 = newApplication()
-                .withId(id3).withVersion(v1).build()
+                .withId(id3).withVersion(v3).withVisible(false).build()
 
         maintainerSteps.createNewApplication_expectSuccess(DEFAULT_DEV_CODE, app1v1)
         maintainerSteps.createNewApplication_expectSuccess(DEFAULT_DEV_CODE, app1v2)
@@ -272,12 +458,12 @@ class MaintainerApiFTSpec extends AsmsMaintainerSpecBase {
             assertThat(ApplicationsPath.field().applications().at(0).version().from(jsonBody)).matches(anyOf(possibleV), "received version matches any of: " + possibleV.toString())
         }
 
-        where:
-        dev2   | id1      | id2        | id3        | limit | offset | v1       | v2      | queryDevCode     || possibleIds | possibleV | count | total | returnedLimit
-        "lgi2" | randId() | "2_" + id1 | "3_" + id1 | 3     | 0      | "0.0.11" | "0.1.0" | DEFAULT_DEV_CODE || [id1]       | [v2]      | 2     | 2     | limit
-        "lgi2" | randId() | "2_" + id1 | "3_" + id1 | null  | 0      | "0.1.1"  | "0.0.1" | dev2             || [id3]       | [v1]      | 1     | 1     | DEFAULT_LIMIT
-        "lgi2" | randId() | "2_" + id1 | "3_" + id1 | 1     | 0      | "0.11.1" | "1.0.1" | DEFAULT_DEV_CODE || [id1]       | [v2]      | 1     | 2     | limit
-        "lgi2" | randId() | "2_" + id1 | "3_" + id1 | 1     | 1      | "0.1.1"  | "0.0.1" | DEFAULT_DEV_CODE || [id1, id2]  | [v1, v2]  | 1     | 2     | limit
-        "lgi2" | randId() | "2_" + id1 | "3_" + id1 | 1     | 2      | "0.1.1"  | "0.0.1" | DEFAULT_DEV_CODE || _           | _         | 0     | 2     | limit
+         where:
+        dev2   | id1      | id2        | id3        | limit | offset | v1       | v2      | v3      | queryDevCode     || possibleIds | possibleV | count | total | returnedLimit
+        "lgi2" | randId() | "2_" + id1 | "3_" + id1 | 3     | 0      | "0.0.11" | "0.1.0" | "1.1.0" | DEFAULT_DEV_CODE || [id1, id2]  | [v1, v2]  | 2     | 2     | limit
+        "lgi2" | randId() | "2_" + id1 | "3_" + id1 | null  | 0      | "0.1.1"  | "0.0.1" | "1.0.1" | dev2             || [id3]       | [v3]      | 1     | 1     | DEFAULT_LIMIT
+        "lgi2" | randId() | "2_" + id1 | "3_" + id1 | 1     | 0      | "0.11.1" | "1.0.1" | "2.0.1" | DEFAULT_DEV_CODE || [id1, id2]  | [v1, v2]  | 1     | 2     | limit
+        "lgi2" | randId() | "2_" + id1 | "3_" + id1 | 1     | 1      | "0.1.1"  | "0.0.1" | "1.0.1" | DEFAULT_DEV_CODE || [id1, id2]  | [v1, v2]  | 1     | 2     | limit
+        "lgi2" | randId() | "2_" + id1 | "3_" + id1 | 1     | 2      | "0.1.1"  | "0.0.1" | "1.0.1" | DEFAULT_DEV_CODE || _           | _         | 0     | 2     | limit
     }
 }

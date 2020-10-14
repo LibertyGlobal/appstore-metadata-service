@@ -35,7 +35,23 @@ public class ApplicationDetailsPath extends PathBase {
     public static final String FIELD_CATEGORY = "category";
     private static final String FIELD_LOCALISATIONS = "localisations";
     private static final String FIELD_REQUIREMENTS = "requirements";
+    private static final String FIELD_DEPENDENCIES = "dependencies";
+    private static final String FIELD_FEATURES = "features";
+    private static final String FIELD_REQUIRED = "required";
+    private static final String FIELD_HARDWARE = "hardware";
+    private static final String FIELD_PLATFORM = "platform";
+    private static final String FIELD_RAM = "ram";
+    private static final String FIELD_DMIPS = "dmips";
+    private static final String FIELD_IMAGE = "image";
+    private static final String FIELD_PERSISTENT = "persistent";
+    private static final String FIELD_CACHE = "cache";
+    private static final String FIELD_ARCHITECTURE = "architecture";
+    private static final String FIELD_VARIANT = "variant";
+    private static final String FIELD_OS = "os";
     private static final String FIELD_MAINTAINER = "maintainer";
+    private static final String FIELD_ADDRESS = "address";
+    private static final String FIELD_HOMEPAGE = "homepage";
+    private static final String FIELD_EMAIL = "email";
     private static final String FIELD_VERSIONS = "versions";
 
     private ApplicationDetailsPath() {
@@ -61,7 +77,7 @@ public class ApplicationDetailsPath extends PathBase {
         return this;
     }
 
-    private ApplicationDetailsPath name() {
+    public ApplicationDetailsPath name() {
         fields.add(FIELD_NAME);
         return this;
     }
@@ -103,6 +119,86 @@ public class ApplicationDetailsPath extends PathBase {
 
     public ApplicationDetailsPath maintainer() {
         fields.add(FIELD_MAINTAINER);
+        return this;
+    }
+
+    public ApplicationDetailsPath address() {
+        fields.add(FIELD_ADDRESS);
+        return this;
+    }
+
+    public ApplicationDetailsPath homepage() {
+        fields.add(FIELD_HOMEPAGE);
+        return this;
+    }
+
+    public ApplicationDetailsPath email() {
+        fields.add(FIELD_EMAIL);
+        return this;
+    }
+
+    public ApplicationDetailsPath architecture() {
+        fields.add(FIELD_ARCHITECTURE);
+        return this;
+    }
+
+    public ApplicationDetailsPath variant() {
+        fields.add(FIELD_VARIANT);
+        return this;
+    }
+
+    public ApplicationDetailsPath os() {
+        fields.add(FIELD_OS);
+        return this;
+    }
+
+    public ApplicationDetailsPath dmips() {
+        fields.add(FIELD_DMIPS);
+        return this;
+    }
+
+    public ApplicationDetailsPath image() {
+        fields.add(FIELD_IMAGE);
+        return this;
+    }
+
+    public ApplicationDetailsPath persistent() {
+        fields.add(FIELD_PERSISTENT);
+        return this;
+    }
+
+    public ApplicationDetailsPath ram() {
+        fields.add(FIELD_RAM);
+        return this;
+    }
+
+    public ApplicationDetailsPath cache() {
+        fields.add(FIELD_CACHE);
+        return this;
+    }
+
+    public ApplicationDetailsPath required() {
+        fields.add(FIELD_REQUIRED);
+        return this;
+    }
+
+    public ApplicationDetailsPath dependencies() {
+        fields.add(FIELD_DEPENDENCIES);
+        return this;
+    }
+
+    public ApplicationDetailsPath features() {
+        fields.add(FIELD_FEATURES);
+        return this;
+    }
+
+    public ApplicationDetailsPath hardware() {
+        fields.add(FIELD_HARDWARE);
+        return this;
+    }
+
+    public ApplicationDetailsPath platform() {
+        fields.add(FIELD_PLATFORM);
         return this;
     }
 

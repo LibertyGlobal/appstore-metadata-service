@@ -22,11 +22,16 @@ package com.lgi.appstore.metadata.api.testing.functional.framework.model.request
 import com.lgi.appstore.metadata.api.testing.functional.framework.model.response.ApplicationDetailsPath;
 import com.lgi.appstore.metadata.model.Application;
 import com.lgi.appstore.metadata.model.Category;
+import com.lgi.appstore.metadata.model.Dependency;
+import com.lgi.appstore.metadata.model.Feature;
+import com.lgi.appstore.metadata.model.Hardware;
 import com.lgi.appstore.metadata.model.MaintainerApplicationHeader;
 import com.lgi.appstore.metadata.model.Platform;
 import com.lgi.appstore.metadata.model.Requirements;
 import org.testcontainers.shaded.org.apache.commons.lang.NotImplementedException;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -41,23 +46,19 @@ public final class ApplicationBuilder {
     private Boolean headerVisible;
     private Category headerCategory;
     private Platform platform;
+    private List<Dependency> dependencies;
+    private List<Feature> features;
+    private Hardware hardware;
 
-    private final Boolean defaultHeaderVisible = Boolean.TRUE;
-    private final Category defaultHeaderCategory = Category.APPLICATION;
-    private final String defaultHeaderUrl = String.format("AppUrl_%s", UUID.randomUUID().toString()); // some random default for mandatory field
-    private final String defaultHeaderType = String.format("AppType_%s", UUID.randomUUID().toString()); // some random default for mandatory field
-    private final String defaultHeaderIcon = String.format("AppIcon_%s", UUID.randomUUID().toString()); // some random default for mandatory field
-    private final String defaultHeaderName = String.format("AppName_%s", UUID.randomUUID().toString()); // some random default for mandatory field
-    private final String defaultHeaderDescription = String.format("AppDescription_%s", UUID.randomUUID().toString()); // some random default for mandatory field
 
     private ApplicationBuilder() {
-        this.headerName = defaultHeaderName;
-        this.headerDescription = defaultHeaderDescription;
-        this.headerUrl = defaultHeaderUrl;
-        this.headerType = defaultHeaderType;
-        this.headerIcon = defaultHeaderIcon;
-        this.headerVisible = defaultHeaderVisible;
-        this.headerCategory = defaultHeaderCategory;
+        this.headerName = String.format("AppName_%s", UUID.randomUUID().toString());
+        this.headerDescription = String.format("AppDescription_%s", UUID.randomUUID().toString());
+        this.headerUrl = String.format("AppUrl_%s", UUID.randomUUID().toString());
+        this.headerType = String.format("AppType_%s", UUID.randomUUID().toString());
+        this.headerIcon = String.format("AppIcon_%s", UUID.randomUUID().toString());
+        this.headerVisible = Boolean.TRUE;
+        this.headerCategory = Category.APPLICATION;
     }
 
     public ApplicationBuilder withId(String headerId) {
@@ -110,6 +111,27 @@ public final class ApplicationBuilder {
         return this;
     }
 
+    public ApplicationBuilder withDependency(String id, String version) {
+        if (dependencies == null) {
+            dependencies = new ArrayList<>();
+        }
+        dependencies.add(new Dependency().id(id).version(version));
+        return this;
+    }
+
+    public ApplicationBuilder withFeature(String name, String version, Boolean required) {
+        if (features == null) {
+            features = new ArrayList<>();
+        }
+        features.add(new Feature().name(name).version(version).required(required));
+        return this;
+    }
+
+    public ApplicationBuilder withHardware(String cache, String dmpis, String persistent, String ram, String image) {
+        this.hardware = new Hardware().cache(cache).dmips(dmpis).persistent(persistent).ram(ram).image(image);
+        return this;
+    }
+
     public ApplicationBuilder with(String field, Object value) {
         switch (field) {
             case ApplicationDetailsPath.FIELD_VISIBLE:
@@ -157,6 +179,9 @@ public final class ApplicationBuilder {
 
         Requirements requirements = new Requirements();
         Optional.ofNullable(platform).ifPresent(requirements::platform);
+        Optional.ofNullable(dependencies).ifPresent(requirements::dependencies);
+        Optional.ofNullable(features).ifPresent(requirements::features);
+        Optional.ofNullable(hardware).ifPresent(requirements::setHardware);
 
         return new Application()
                 .header(appHeader)
