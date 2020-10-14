@@ -26,6 +26,11 @@
         <junit-version>5.6.2</junit-version>
         <maven-surefire-version>2.22.2</maven-surefire-version>
         <skipUTs>false</skipUTs>
+        <registry.url>set_for_pushing_docker_image</registry.url>
+        <registry.namespace>set_for_pushing_docker_image</registry.namespace>
+        <jar.repository.url>set_for_pushing_jar_image</jar.repository.url>
+        <jar.repository.name>set_for_pushing_jar_image</jar.repository.name>
+        <jar.repository.id>set_for_pushing_jar_image</jar.repository.id>
         <license.failOnMissing>true</license.failOnMissing>
         <license.failOnBlacklist>true</license.failOnBlacklist>
         <license.outputDirectory>${project.basedir}</license.outputDirectory>
@@ -58,6 +63,19 @@
             The MIT License (MIT)
         </license.includedLicenses>
     </properties>
+
+    <distributionManagement>
+        <repository>
+            <id>${jar.repository.id}</id>
+            <name>${jar.repository.name} releases</name>
+            <url>${jar.repository.url/releases</url>
+        </repository>
+        <snapshotRepository>
+            <id>${jar.repository.id}</id>
+            <name>${jar.repository.name} snapshots</name>
+            <url>${jar.repository.url}/snapshots</url>
+        </snapshotRepository>
+    </distributionManagement>
 
     <dependencies>
         <dependency>

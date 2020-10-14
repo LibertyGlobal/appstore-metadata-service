@@ -17,12 +17,13 @@
         <db.password>postgres</db.password>
         <db.name>postgres</db.name>
         <db.host>localhost</db.host>
+        <db.port>46576</db.port>
         <db.schema>appstore_metadata_service</db.schema>
-        <!--suppress UnresolvedMavenProperty -->
         <db.url>jdbc:postgresql://${db.host}:${db.port}/${db.name}</db.url>
         <db.driver>org.postgresql.Driver</db.driver>
         <start-class>com.lgi.appstore.metadata.Application</start-class>
         <generated.source.package>com.lgi.appstore.metadata</generated.source.package>
+        <maven.jib.plugin.version>2.2.0</maven.jib.plugin.version>
     </properties>
 
     <dependencies>
@@ -136,7 +137,36 @@
                     </execution>
                 </executions>
             </plugin>
-
+            <plugin>
+                <groupId>com.google.cloud.tools</groupId>
+                <artifactId>jib-maven-plugin</artifactId>
+                <version>${maven.jib.plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>docker-build-and-push</id>
+                        <phase>deploy</phase>
+                        <goals>
+                            <goal>build</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <from>
+                        <image>adoptopenjdk/openjdk13:alpine-jre</image>
+                    </from>
+                    <to>
+                        <image>${registry.url}/${registry.namespace}/${project.artifactId}:${project.version}</image>
+                    </to>
+                    <container>
+                        <ports>
+                            <port>8080</port>
+                            <port>8081</port>
+                        </ports>
+                        <filesModificationTime>${maven.build.timestamp}</filesModificationTime>
+                        <creationTime>USE_CURRENT_TIMESTAMP</creationTime>
+                    </container>
+                </configuration>
+            </plugin>
             <plugin>
                 <groupId>org.flywaydb</groupId>
                 <artifactId>flyway-maven-plugin</artifactId>
