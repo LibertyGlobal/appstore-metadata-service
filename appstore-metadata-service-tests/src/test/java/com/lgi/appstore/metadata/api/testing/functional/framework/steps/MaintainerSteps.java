@@ -38,6 +38,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Component
 public class MaintainerSteps {
     public static final String DEFAULT_DEV_CODE = "lgi";
+    public static final String DEFAULT_DEV_NAME = "Liberty Global Inc.";
+    public static final String DEFAULT_DEV_ADDRESS = "Amsterdam";
+    public static final String DEFAULT_DEV_HOMEPAGE = "http://www.lgi.com";
+    public static final String DEFAULT_DEV_EMAIL = "email@lgi.com";
 
     @Autowired
     private MaintainerPerspectiveAsmsClient maintainerPerspectiveAsmsClient;
