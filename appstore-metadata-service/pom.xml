@@ -19,7 +19,6 @@
         <db.host>localhost</db.host>
         <db.port>46576</db.port>
         <db.schema>appstore_metadata_service</db.schema>
-        <!--suppress UnresolvedMavenProperty -->
         <db.url>jdbc:postgresql://${db.host}:${db.port}/${db.name}</db.url>
         <db.driver>org.postgresql.Driver</db.driver>
         <start-class>com.lgi.appstore.metadata.Application</start-class>

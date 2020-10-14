@@ -28,7 +28,7 @@ In order to dockerize the service a plugin jib-maven-plugin is provided, which c
 mvn compile jib:dockerBuild -Djib.to.image=appstore-metadata-service:0.0.1-SNAPSHOT
 ```
 
-Because service need a database to connect, next step is to create a docker network and run database inside it: 
+Because service needs a database to connect, next step is to create a docker network and run database inside it: 
 
 ```
 docker network create asms_network
