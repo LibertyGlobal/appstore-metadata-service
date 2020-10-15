@@ -24,12 +24,19 @@
         <start-class>com.lgi.appstore.metadata.Application</start-class>
         <generated.source.package>com.lgi.appstore.metadata</generated.source.package>
         <maven.jib.plugin.version>2.2.0</maven.jib.plugin.version>
+        <scmBranch>current</scmBranch>
+        <scmCommit>latest</scmCommit>
     </properties>
 
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
 
         <dependency>
@@ -162,6 +169,13 @@
                             <port>8080</port>
                             <port>8081</port>
                         </ports>
+                        <environment>
+                            <APP_NAME>${project.artifactId}</APP_NAME>
+                            <APP_VERSION>${project.version}</APP_VERSION>
+                            <APP_REVISION>${scmCommit}</APP_REVISION><!-- specified at build level -->
+                            <APP_BRANCH>${scmBranch}</APP_BRANCH><!-- specified at build level -->
+                            <APP_BUILD_TIME>${maven.build.timestamp}</APP_BUILD_TIME>
+                        </environment>
                         <filesModificationTime>${maven.build.timestamp}</filesModificationTime>
                         <creationTime>USE_CURRENT_TIMESTAMP</creationTime>
                     </container>
