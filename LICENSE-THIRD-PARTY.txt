@@ -1,5 +1,5 @@
 
-Lists of 144 third-party dependencies.
+Lists of 150 third-party dependencies.
      (Eclipse Public License - v 1.0) (GNU Lesser General Public License) Logback Classic Module (ch.qos.logback:logback-classic:1.2.3 - http://logback.qos.ch/logback-classic)
      (Eclipse Public License - v 1.0) (GNU Lesser General Public License) Logback Core Module (ch.qos.logback:logback-core:1.2.3 - http://logback.qos.ch/logback-core)
      (Apache License, Version 2.0) ClassMate (com.fasterxml:classmate:1.5.1 - https://github.com/FasterXML/java-classmate)
@@ -22,6 +22,7 @@ Lists of 144 third-party dependencies.
      (Apache License, Version 2.0) Apache Commons Collections (commons-collections:commons-collections:3.2.2 - http://commons.apache.org/collections/)
      (The Apache Software License, Version 2.0) Apache Commons Logging (commons-logging:commons-logging:1.2 - http://commons.apache.org/proper/commons-logging/)
      (The MIT License (MIT)) ClassGraph (io.github.classgraph:classgraph:4.8.69 - https://github.com/classgraph/classgraph)
+     (The Apache Software License, Version 2.0) micrometer-core (io.micrometer:micrometer-core:1.5.5 - https://github.com/micrometer-metrics/micrometer)
      (The Apache Software License, Version 2.0) Allure Attachments (io.qameta.allure:allure-attachments:2.13.6 - https://github.com/allure-framework/allure-java)
      (The Apache Software License, Version 2.0) Allure Java Commons (io.qameta.allure:allure-java-commons:2.13.6 - https://github.com/allure-framework/allure-java)
      (The Apache Software License, Version 2.0) Allure JUnit Platform Integration (io.qameta.allure:allure-junit-platform:2.13.6 - https://github.com/allure-framework/allure-java)
@@ -80,6 +81,7 @@ Lists of 144 third-party dependencies.
      (BSD License 3) Hamcrest (org.hamcrest:hamcrest:2.2 - http://hamcrest.org/JavaHamcrest/)
      (BSD License 3) Hamcrest Core (org.hamcrest:hamcrest-core:2.2 - http://hamcrest.org/JavaHamcrest/)
      (BSD License 3) Hamcrest Library (org.hamcrest:hamcrest-library:2.2 - http://hamcrest.org/JavaHamcrest/)
+     (BSD-2-Clause) (Public Domain, per Creative Commons CC0) HdrHistogram (org.hdrhistogram:HdrHistogram:2.1.12 - http://hdrhistogram.github.io/HdrHistogram/)
      (Apache License 2.0) Hibernate Validator Engine (org.hibernate.validator:hibernate-validator:6.1.5.Final - http://hibernate.org/validator/hibernate-validator)
      (Apache License, version 2.0) JBoss Logging 3 (org.jboss.logging:jboss-logging:3.4.1.Final - http://www.jboss.org)
      (The Apache Software License, Version 2.0) JetBrains Java Annotations (org.jetbrains:annotations:19.0.0 - https://github.com/JetBrains/java-annotations)
@@ -92,6 +94,7 @@ Lists of 144 third-party dependencies.
      (Eclipse Public License v2.0) JUnit Platform Commons (org.junit.platform:junit-platform-commons:1.6.2 - https://junit.org/junit5/)
      (Eclipse Public License v2.0) JUnit Platform Engine API (org.junit.platform:junit-platform-engine:1.6.2 - https://junit.org/junit5/)
      (Eclipse Public License v2.0) JUnit Vintage Engine (org.junit.vintage:junit-vintage-engine:5.6.2 - https://junit.org/junit5/)
+     (Public Domain, per Creative Commons CC0) LatencyUtils (org.latencyutils:LatencyUtils:2.0.3 - http://latencyutils.github.io/LatencyUtils/)
      (The MIT License) mockito-core (org.mockito:mockito-core:3.3.3 - https://github.com/mockito/mockito)
      (The MIT License) mockito-junit-jupiter (org.mockito:mockito-junit-jupiter:3.3.3 - https://github.com/mockito/mockito)
      (Apache 2) Objenesis (org.objenesis:objenesis:2.6 - http://objenesis.org)
@@ -123,9 +126,12 @@ Lists of 144 third-party dependencies.
      (Apache License, Version 2.0) Spring Web (org.springframework:spring-web:5.2.9.RELEASE - https://github.com/spring-projects/spring-framework)
      (Apache License, Version 2.0) Spring Web MVC (org.springframework:spring-webmvc:5.2.9.RELEASE - https://github.com/spring-projects/spring-framework)
      (Apache License, Version 2.0) spring-boot (org.springframework.boot:spring-boot:2.3.4.RELEASE - https://spring.io/projects/spring-boot)
+     (Apache License, Version 2.0) spring-boot-actuator (org.springframework.boot:spring-boot-actuator:2.3.4.RELEASE - https://spring.io/projects/spring-boot)
+     (Apache License, Version 2.0) spring-boot-actuator-autoconfigure (org.springframework.boot:spring-boot-actuator-autoconfigure:2.3.4.RELEASE - https://spring.io/projects/spring-boot)
      (Apache License, Version 2.0) spring-boot-autoconfigure (org.springframework.boot:spring-boot-autoconfigure:2.3.4.RELEASE - https://spring.io/projects/spring-boot)
      (Apache License, Version 2.0) spring-boot-devtools (org.springframework.boot:spring-boot-devtools:2.3.4.RELEASE - https://spring.io/projects/spring-boot)
      (Apache License, Version 2.0) spring-boot-starter (org.springframework.boot:spring-boot-starter:2.3.4.RELEASE - https://spring.io/projects/spring-boot)
+     (Apache License, Version 2.0) spring-boot-starter-actuator (org.springframework.boot:spring-boot-starter-actuator:2.3.4.RELEASE - https://spring.io/projects/spring-boot)
      (Apache License, Version 2.0) spring-boot-starter-jdbc (org.springframework.boot:spring-boot-starter-jdbc:2.3.4.RELEASE - https://spring.io/projects/spring-boot)
      (Apache License, Version 2.0) spring-boot-starter-jooq (org.springframework.boot:spring-boot-starter-jooq:2.3.4.RELEASE - https://spring.io/projects/spring-boot)
      (Apache License, Version 2.0) spring-boot-starter-json (org.springframework.boot:spring-boot-starter-json:2.3.4.RELEASE - https://spring.io/projects/spring-boot)
