@@ -19,7 +19,7 @@
 
 package com.lgi.appstore.metadata.api.testing.functional.scenarios
 
-import com.lgi.appstore.metadata.api.testing.functional.AsmsMaintainerSpecBase
+import com.lgi.appstore.metadata.api.testing.functional.AsmsSpecBase
 import com.lgi.appstore.metadata.api.testing.functional.framework.model.response.ApplicationsPath
 import com.lgi.appstore.metadata.model.Application
 import com.lgi.appstore.metadata.model.ApplicationForUpdate
@@ -29,9 +29,16 @@ import io.restassured.response.ExtractableResponse
 import io.restassured.response.Response
 import spock.lang.Unroll
 
-import static com.lgi.appstore.metadata.api.testing.functional.framework.model.ModelUtils.pickRandomCategory
+import java.util.stream.Collectors
+
+import static com.lgi.appstore.metadata.api.testing.functional.framework.model.request.ApiMaintainerApplicationsQueryParams.CATEGORY
+import static com.lgi.appstore.metadata.api.testing.functional.framework.model.request.ApiMaintainerApplicationsQueryParams.DESCRIPTION
 import static com.lgi.appstore.metadata.api.testing.functional.framework.model.request.ApiMaintainerApplicationsQueryParams.LIMIT
+import static com.lgi.appstore.metadata.api.testing.functional.framework.model.request.ApiMaintainerApplicationsQueryParams.NAME
 import static com.lgi.appstore.metadata.api.testing.functional.framework.model.request.ApiMaintainerApplicationsQueryParams.OFFSET
+import static com.lgi.appstore.metadata.api.testing.functional.framework.model.request.ApiMaintainerApplicationsQueryParams.PLATFORM
+import static com.lgi.appstore.metadata.api.testing.functional.framework.model.request.ApiMaintainerApplicationsQueryParams.TYPE
+import static com.lgi.appstore.metadata.api.testing.functional.framework.model.request.ApiMaintainerApplicationsQueryParams.VERSION
 import static com.lgi.appstore.metadata.api.testing.functional.framework.model.request.ApplicationBuilder.newApplication
 import static com.lgi.appstore.metadata.api.testing.functional.framework.model.request.ApplicationForUpdateBuilder.basedOnApplication
 import static com.lgi.appstore.metadata.api.testing.functional.framework.model.request.QueryParams.mapping
@@ -51,6 +58,10 @@ import static com.lgi.appstore.metadata.api.testing.functional.framework.steps.M
 import static com.lgi.appstore.metadata.api.testing.functional.framework.steps.MaintainerSteps.DEFAULT_DEV_EMAIL
 import static com.lgi.appstore.metadata.api.testing.functional.framework.steps.MaintainerSteps.DEFAULT_DEV_HOMEPAGE
 import static com.lgi.appstore.metadata.api.testing.functional.framework.steps.MaintainerSteps.DEFAULT_DEV_NAME
+import static com.lgi.appstore.metadata.api.testing.functional.framework.utils.DataUtils.assembleSearchCriteria
+import static com.lgi.appstore.metadata.api.testing.functional.framework.utils.DataUtils.mapAppsToKeys
+import static com.lgi.appstore.metadata.api.testing.functional.framework.utils.DataUtils.pickRandomCategory
+import static com.lgi.appstore.metadata.api.testing.functional.framework.utils.DataUtils.randId
 import static org.apache.http.HttpStatus.SC_BAD_REQUEST
 import static org.apache.http.HttpStatus.SC_CREATED
 import static org.apache.http.HttpStatus.SC_NOT_FOUND
@@ -58,7 +69,7 @@ import static org.apache.http.HttpStatus.SC_NO_CONTENT
 import static org.apache.http.HttpStatus.SC_OK
 import static org.assertj.core.api.Assertions.assertThat
 
-class MaintainerApiFTSpec extends AsmsMaintainerSpecBase {
+class MaintainerApiFTSpec extends AsmsSpecBase {
     def static final IGNORE_THIS_ASSERTION = true
     public static final int DEFAULT_LIMIT = 10
 
@@ -465,5 +476,63 @@ class MaintainerApiFTSpec extends AsmsMaintainerSpecBase {
         "lgi2" | randId() | "2_" + id1 | "3_" + id1 | 1     | 0      | "0.11.1" | "1.0.1" | "2.0.1" | DEFAULT_DEV_CODE || [id1, id2]  | [v1, v2]  | 1     | 2     | limit
         "lgi2" | randId() | "2_" + id1 | "3_" + id1 | 1     | 1      | "0.1.1"  | "0.0.1" | "1.0.1" | DEFAULT_DEV_CODE || [id1, id2]  | [v1, v2]  | 1     | 2     | limit
         "lgi2" | randId() | "2_" + id1 | "3_" + id1 | 1     | 2      | "0.1.1"  | "0.0.1" | "1.0.1" | DEFAULT_DEV_CODE || _           | _         | 0     | 2     | limit
+    }
+
+    @Unroll
+    def "queries for applications list returns apps for #behavior"() {
+        given: "developer create 3 application: first creates 2 incl. multi-versioned and second only 1"
+
+        Application app1v1 = newApplication().withId(id1).withVersion(v1)
+                .withName("Awesome Application")
+                .withCategory(Category.DEV)
+                .withPlatform("pc", "win", "v1")
+                .build()
+        Application app1v2 = newApplication().withId(id1).withVersion(v2).withVisible(false)
+                .withCategory(Category.RESOURCE)
+                .withPlatform("arm", "linux", "v2")
+                .build()
+        Application app2v1 = newApplication().withId(id2).withVersion(v1)
+                .withCategory(Category.PLUGIN)
+                .withPlatform("plug-in", "any", "v3")
+                .build()
+        Application app2v2 = newApplication().withId(id2).withVersion(v2)
+                .withCategory(Category.PLUGIN)
+                .withPlatform("custom001", "confidential", "v4")
+                .build()
+        Application app3v1 = newApplication().withId(id3).withVersion(v1)
+                .withCategory(Category.SERVICE)
+                .withPlatform("mac", "macOs", "v5")
+                .build()
+        Map<String, Application> apps = mapAppsToKeys([app1v1, app1v2, app2v1, app2v2, app3v1])
+        def maintainerMappings = apps.values().stream().collect(Collectors.toMap({ a -> a }, { a -> DEFAULT_DEV_NAME }))
+        def matchingApp = apps.get(sourceOfCriteria)
+
+        apps.values().stream().forEach({ app -> maintainerSteps.createNewApplication_expectSuccess(DEFAULT_DEV_CODE, app) })
+
+        when: "dev asks for list of his applications specifying filtering criteria"
+        ExtractableResponse<Response> response = maintainerSteps.getApplicationsList(DEFAULT_DEV_CODE, assembleSearchCriteria(fields, matchingApp, maintainerMappings)).extract()
+        JsonPath jsonBody = response.jsonPath()
+        def receivedStatus = response.statusCode()
+
+        then: "he gets positive response"
+        receivedStatus == SC_OK
+
+        and: "the amount of items is as desired"
+        ApplicationsPath.field().meta().resultSet().count().from(jsonBody) == count
+
+        and: "applications returned are in versions that match given filters"
+        assertThat(ApplicationsPath.field().applications().id().from(jsonBody)).asList().containsExactlyInAnyOrder(possibleIds.toArray())
+        assertThat(ApplicationsPath.field().applications().version().from(jsonBody)).asList().containsExactlyInAnyOrder(possibleV.toArray())
+
+        where:
+        fields                 | behavior                          | id1      | id2        | id3        | v1       | v2      | sourceOfCriteria || possibleIds | possibleV | count
+        [NAME]                 | "search by ${fields} not latest"  | randId() | "2_" + id1 | "3_" + id1 | "0.0.11" | "0.1.0" | id1 + ":" + v1   || []          | []        | 0 // search is performed only among latest versions
+        [NAME]                 | "search by ${fields} latest"      | randId() | "2_" + id1 | "3_" + id1 | "0.0.11" | "0.1.0" | id1 + ":" + v2   || [id1]       | [v2]      | 1
+        [NAME, VERSION]        | "search by ${fields} combination" | randId() | "2_" + id1 | "3_" + id1 | "0.0.11" | "0.1.0" | id1 + ":" + v1   || [id1]       | [v1]      | 1 // old name can be found when version is specified alongside
+        [VERSION]              | "search by ${fields}"             | randId() | "2_" + id1 | "3_" + id1 | "0.11.1" | "1.0.1" | id1 + ":" + v2   || [id1, id2]  | [v2, v2]  | 2 // hidden app1v2 should be exposed too
+        [TYPE]                 | "search by ${fields}"             | randId() | "2_" + id1 | "3_" + id1 | "0.1.9"  | "0.0.1" | id1 + ":" + v1   || [id1]       | [v1]      | 1
+        [DESCRIPTION]          | "search by ${fields}"             | randId() | "2_" + id1 | "3_" + id1 | "0.1.1"  | "0.0.1" | id2 + ":" + v1   || [id2]       | [v1]      | 1
+        [PLATFORM]             | "search by ${fields}"             | randId() | "2_" + id1 | "3_" + id1 | "0.1.9"  | "0.0.1" | id2 + ":" + v1   || [id2]       | [v1]      | 1
+        [CATEGORY, NAME, TYPE] | "search by ${fields} combination" | randId() | "2_" + id1 | "3_" + id1 | "0.1.9"  | "0.0.1" | id3 + ":" + v1   || [id3]       | [v1]      | 1
     }
 }
