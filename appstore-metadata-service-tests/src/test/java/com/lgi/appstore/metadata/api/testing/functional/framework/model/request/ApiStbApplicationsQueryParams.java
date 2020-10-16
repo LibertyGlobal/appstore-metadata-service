@@ -17,10 +17,16 @@
  * limitations under the License.
  */
 
-package com.lgi.appstore.metadata.api.testing.functional
+package com.lgi.appstore.metadata.api.testing.functional.framework.model.request;
 
-class AsmsMaintainerSpecBase extends AsmsSpecBase {
-    protected static String randId() {
-        return String.format("appId_%s", UUID.randomUUID())
-    }
+public class ApiStbApplicationsQueryParams extends QueryParams {
+    public static final String LIMIT = "limit";
+    public static final String OFFSET = "offset";
+    public static final String NAME = "name";
+    public static final String DESCRIPTION = "description";
+    public static final String VERSION = "version";
+    public static final String TYPE = "type";
+    public static final String CATEGORY = "category";
+    public static final String PLATFORM = "platform";
+    public static final String MAINTAINER_NAME = "maintainerName";
 }

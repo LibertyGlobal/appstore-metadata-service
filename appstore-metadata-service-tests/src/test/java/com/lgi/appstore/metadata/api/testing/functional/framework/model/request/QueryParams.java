@@ -20,9 +20,11 @@
 package com.lgi.appstore.metadata.api.testing.functional.framework.model.request;
 
 import java.util.AbstractMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toMap;
@@ -30,7 +32,11 @@ import static java.util.stream.Collectors.toMap;
 public class QueryParams {
     @SafeVarargs
     public static Map<String, Object> queryParams(AbstractMap.SimpleEntry<String, Object>... mappings) {
-        return Stream.of(mappings).filter(Objects::nonNull).collect(toMap(Map.Entry::getKey, Map.Entry::getValue));
+        return queryParams(Stream.of(mappings).collect(Collectors.toList()));
+    }
+
+    public static Map<String, Object> queryParams(List<AbstractMap.SimpleEntry<String, Object>> mappings) {
+        return mappings.stream().filter(Objects::nonNull).collect(toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
     public static AbstractMap.SimpleEntry<String, Object> mapping(String key, Object value) {

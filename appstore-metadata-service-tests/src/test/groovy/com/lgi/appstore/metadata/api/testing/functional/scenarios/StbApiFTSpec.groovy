@@ -19,7 +19,7 @@
 
 package com.lgi.appstore.metadata.api.testing.functional.scenarios
 
-import com.lgi.appstore.metadata.api.testing.functional.AsmsStbSpecBase
+import com.lgi.appstore.metadata.api.testing.functional.AsmsSpecBase
 import com.lgi.appstore.metadata.api.testing.functional.framework.model.response.ApplicationsPath
 import com.lgi.appstore.metadata.model.Application
 import com.lgi.appstore.metadata.model.Category
@@ -28,9 +28,15 @@ import io.restassured.response.ExtractableResponse
 import io.restassured.response.Response
 import spock.lang.Unroll
 
-import static com.lgi.appstore.metadata.api.testing.functional.framework.model.ModelUtils.pickRandomCategory
-import static com.lgi.appstore.metadata.api.testing.functional.framework.model.request.ApiMaintainerApplicationsQueryParams.LIMIT
-import static com.lgi.appstore.metadata.api.testing.functional.framework.model.request.ApiMaintainerApplicationsQueryParams.OFFSET
+import static com.lgi.appstore.metadata.api.testing.functional.framework.model.request.ApiStbApplicationsQueryParams.CATEGORY
+import static com.lgi.appstore.metadata.api.testing.functional.framework.model.request.ApiStbApplicationsQueryParams.DESCRIPTION
+import static com.lgi.appstore.metadata.api.testing.functional.framework.model.request.ApiStbApplicationsQueryParams.LIMIT
+import static com.lgi.appstore.metadata.api.testing.functional.framework.model.request.ApiStbApplicationsQueryParams.MAINTAINER_NAME
+import static com.lgi.appstore.metadata.api.testing.functional.framework.model.request.ApiStbApplicationsQueryParams.NAME
+import static com.lgi.appstore.metadata.api.testing.functional.framework.model.request.ApiStbApplicationsQueryParams.OFFSET
+import static com.lgi.appstore.metadata.api.testing.functional.framework.model.request.ApiStbApplicationsQueryParams.PLATFORM
+import static com.lgi.appstore.metadata.api.testing.functional.framework.model.request.ApiStbApplicationsQueryParams.TYPE
+import static com.lgi.appstore.metadata.api.testing.functional.framework.model.request.ApiStbApplicationsQueryParams.VERSION
 import static com.lgi.appstore.metadata.api.testing.functional.framework.model.request.ApplicationBuilder.newApplication
 import static com.lgi.appstore.metadata.api.testing.functional.framework.model.request.QueryParams.mapping
 import static com.lgi.appstore.metadata.api.testing.functional.framework.model.request.QueryParams.queryParams
@@ -44,11 +50,15 @@ import static com.lgi.appstore.metadata.api.testing.functional.framework.model.r
 import static com.lgi.appstore.metadata.api.testing.functional.framework.model.response.ApplicationDetailsPath.field
 import static com.lgi.appstore.metadata.api.testing.functional.framework.model.response.PathBase.anyOf
 import static com.lgi.appstore.metadata.api.testing.functional.framework.steps.MaintainerSteps.DEFAULT_DEV_CODE
+import static com.lgi.appstore.metadata.api.testing.functional.framework.utils.DataUtils.getFieldValueFromApplication
+import static com.lgi.appstore.metadata.api.testing.functional.framework.utils.DataUtils.mapAppsToKeys
+import static com.lgi.appstore.metadata.api.testing.functional.framework.utils.DataUtils.pickRandomCategory
+import static com.lgi.appstore.metadata.api.testing.functional.framework.utils.DataUtils.randId
 import static org.apache.http.HttpStatus.SC_NOT_FOUND
 import static org.apache.http.HttpStatus.SC_OK
 import static org.assertj.core.api.Assertions.assertThat
 
-class StbApiFTSpec extends AsmsStbSpecBase {
+class StbApiFTSpec extends AsmsSpecBase {
     public static final int DEFAULT_LIMIT = 10
     private static final boolean IGNORE_THIS_ASSERTION = true
 
@@ -145,7 +155,7 @@ class StbApiFTSpec extends AsmsStbSpecBase {
                 app3v1, dev3Name,
         )
         def matchingApp = apps.get(sourceOfCriteria)
-        def criteria = getFieldValueFromApplication(field, matchingApp, maintainerMappings)
+        def criteria = getFieldValueFromApplication(queryParam, matchingApp, maintainerMappings)
 
         maintainerSteps.createNewApplication_expectSuccess(dev2, app1v1)
         maintainerSteps.createNewApplication_expectSuccess(dev2, app1v2)
@@ -154,32 +164,30 @@ class StbApiFTSpec extends AsmsStbSpecBase {
         maintainerSteps.createNewApplication_expectSuccess(dev3, app3v1)
 
         when: "stb asks for list of his applications specifying limit and offset"
-        Map<String, Object> queryParams = queryParams(mapping(field, criteria))
+        Map<String, Object> queryParams = queryParams(mapping(queryParam, criteria))
         ExtractableResponse<Response> response = stbSteps.getApplicationsList(queryParams).extract()
         JsonPath jsonBody = response.jsonPath()
         def receivedStatus = response.statusCode()
 
-        then: "it gets response #response"
+        then: "it gets positive response"
         receivedStatus == SC_OK
 
         and: "the amount of items is as desired"
         ApplicationsPath.field().meta().resultSet().count().from(jsonBody) == count
 
-        and: "in case he gets response with applications count > 0 then it should be latest visible version of applications (hidden versions not exposed)"
-        if (ApplicationsPath.field().applications().at(0).id().isPresentIn(jsonBody)) {
-            assertThat(ApplicationsPath.field().applications().at(0).id().from(jsonBody)).matches(anyOf(possibleIds), "received ID matches any of: " + possibleIds.toString())
-            assertThat(ApplicationsPath.field().applications().at(0).version().from(jsonBody)).matches(anyOf(possibleV), "received version matches any of: " + possibleV.toString())
-        }
+        and: "in case it gets response with applications count > 0 then it should app(s) in version(s) matching given filters"
+        assertThat(ApplicationsPath.field().applications().at(0).id().from(jsonBody)).matches(anyOf(possibleIds), "received ID matches any of: " + possibleIds.toString())
+        assertThat(ApplicationsPath.field().applications().at(0).version().from(jsonBody)).matches(anyOf(possibleV), "received version matches any of: " + possibleV.toString())
 
         where:
-        field            | id1      | id2        | id3        | v1       | v2      | sourceOfCriteria || possibleIds | possibleV | count
-        "name"           | randId() | "2_" + id1 | "3_" + id1 | "0.0.11" | "0.1.0" | id1 + ":" + v1   || [id1]       | [v1]      | 1
-        "description"    | randId() | "2_" + id1 | "3_" + id1 | "0.1.1"  | "0.0.1" | id2 + ":" + v1   || [id2]       | [v1]      | 1
-        "version"        | randId() | "2_" + id1 | "3_" + id1 | "0.11.1" | "1.0.1" | id2 + ":" + v2   || [id2]       | [v2]      | 1 // hidden app1v2 should not be exposed
-        "type"           | randId() | "2_" + id1 | "3_" + id1 | "0.1.9"  | "0.0.1" | id1 + ":" + v1   || [id1]       | [v1]      | 1
-        "category"       | randId() | "2_" + id1 | "3_" + id1 | "0.1.9"  | "0.0.1" | id3 + ":" + v1   || [id3]       | [v1]      | 1
-        "platform"       | randId() | "2_" + id1 | "3_" + id1 | "0.1.9"  | "0.0.1" | id2 + ":" + v1   || [id2]       | [v1]      | 1
-        "maintainerName" | randId() | "2_" + id1 | "3_" + id1 | "0.1.9"  | "0.0.1" | id1 + ":" + v1   || [id1, id2]  | [v1]      | 2
+        queryParam      | id1      | id2        | id3        | v1       | v2      | sourceOfCriteria || possibleIds | possibleV | count
+        NAME            | randId() | "2_" + id1 | "3_" + id1 | "0.0.11" | "0.1.0" | id1 + ":" + v1   || [id1]       | [v1]      | 1
+        DESCRIPTION     | randId() | "2_" + id1 | "3_" + id1 | "0.1.1"  | "0.0.1" | id2 + ":" + v1   || [id2]       | [v1]      | 1
+        VERSION         | randId() | "2_" + id1 | "3_" + id1 | "0.11.1" | "1.0.1" | id2 + ":" + v2   || [id2]       | [v2]      | 1 // hidden app1v2 should not be exposed
+        TYPE            | randId() | "2_" + id1 | "3_" + id1 | "0.1.9"  | "0.0.1" | id1 + ":" + v1   || [id1]       | [v1]      | 1
+        CATEGORY        | randId() | "2_" + id1 | "3_" + id1 | "0.1.9"  | "0.0.1" | id3 + ":" + v1   || [id3]       | [v1]      | 1
+        PLATFORM        | randId() | "2_" + id1 | "3_" + id1 | "0.1.9"  | "0.0.1" | id2 + ":" + v1   || [id2]       | [v1]      | 1
+        MAINTAINER_NAME | randId() | "2_" + id1 | "3_" + id1 | "0.1.9"  | "0.0.1" | id1 + ":" + v1   || [id1, id2]  | [v1]      | 2
     }
 
     @Unroll
@@ -221,7 +229,7 @@ class StbApiFTSpec extends AsmsStbSpecBase {
 
     @Unroll
     def "stb can get application details"() {
-        given: "developer creates an application with #field value #valueBefore"
+        given: "developer creates an application with basic header values set"
         def appId = randId()
         def fieldName = "SomeAppName"
         def fieldDescription = "Some Description €\\€\\€\\€\\"
@@ -244,7 +252,7 @@ class StbApiFTSpec extends AsmsStbSpecBase {
         when: "stb gets details of application"
         JsonPath appDetails = stbSteps.getApplicationDetails_expectSuccess(DEFAULT_DEV_CODE, appId)
 
-        then: "application details expose #field with value #valueAfter"
+        then: "application details expose basic header values"
         extract(FIELD_NAME).from(appDetails) == fieldName
         extract(FIELD_DESCRIPTION).from(appDetails) == fieldDescription
         extract(FIELD_CATEGORY).from(appDetails) == String.valueOf(fieldCategory)
