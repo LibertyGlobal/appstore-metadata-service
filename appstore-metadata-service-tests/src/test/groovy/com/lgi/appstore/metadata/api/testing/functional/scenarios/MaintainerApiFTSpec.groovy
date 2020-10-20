@@ -58,6 +58,7 @@ import static com.lgi.appstore.metadata.api.testing.functional.framework.steps.M
 import static com.lgi.appstore.metadata.api.testing.functional.framework.steps.MaintainerSteps.DEFAULT_DEV_EMAIL
 import static com.lgi.appstore.metadata.api.testing.functional.framework.steps.MaintainerSteps.DEFAULT_DEV_HOMEPAGE
 import static com.lgi.appstore.metadata.api.testing.functional.framework.steps.MaintainerSteps.DEFAULT_DEV_NAME
+import static com.lgi.appstore.metadata.api.testing.functional.framework.utils.DataUtils.appKeyFor
 import static com.lgi.appstore.metadata.api.testing.functional.framework.utils.DataUtils.assembleSearchCriteria
 import static com.lgi.appstore.metadata.api.testing.functional.framework.utils.DataUtils.mapAppsToKeys
 import static com.lgi.appstore.metadata.api.testing.functional.framework.utils.DataUtils.pickRandomCategory
@@ -313,40 +314,99 @@ class MaintainerApiFTSpec extends AsmsSpecBase {
     }
 
     @Unroll
-    def "update application details for #behavior - PUT operation does complete overwrite"() {
+    def "update application details for #behavior - PUT operation does complete overwrite of latest version (by ID alone)"() {
         given: "developer creates an application with #field value #valueBefore"
         def appId = randId()
         Application app = newApplication()
                 .withId(appId).withVersion("0.0.1").with(field, valueBefore).build()
         maintainerSteps.createNewApplication_expectSuccess(DEFAULT_DEV_CODE, app)
 
-        and: "developer gets details of updated application"
+        and: "developer gets details of application"
         JsonPath bodyBefore = maintainerSteps.getApplicationDetails_expectSuccess(DEFAULT_DEV_CODE, app.getHeader().getId())
         assertThat(extract(field).from(bodyBefore)).describedAs("$field value before update").isEqualTo(valueBefore)
 
         when: "developer updates application"
         ApplicationForUpdate updatedApp = basedOnApplication(app).with(field, valueAfter).build()
-        def responseUpdate = maintainerSteps.updateApplication(DEFAULT_DEV_CODE, app.getHeader().getId() + ":" + app.getHeader().getVersion(), updatedApp).extract()
+        def responseUpdate = maintainerSteps.updateApplication(DEFAULT_DEV_CODE, app.getHeader().getId(), updatedApp).extract()
         def receivedStatusUpdate = responseUpdate.statusCode()
 
-        then: "expected response HTTP status should be #httpStatus"
-        receivedStatusUpdate == httpStatus
+        then: "expected response HTTP status should be success"
+        receivedStatusUpdate == SC_NO_CONTENT
 
-        and: "developer gets details of updated application"
+        when: "developer gets details of updated application"
         JsonPath bodyAfter = maintainerSteps.getApplicationDetails_expectSuccess(DEFAULT_DEV_CODE, app.getHeader().getId())
 
-        and: "application has #field updated with value #valueAfter"
+        then: "application has #field updated with value #valueAfter"
         receivedStatusUpdate == SC_NO_CONTENT ? extract(field).from(bodyAfter) == valueAfter : IGNORE_THIS_ASSERTION
 
         where:
-        behavior                   | field             | valueBefore                   | valueAfter                           || httpStatus
-        "update field visible"     | FIELD_VISIBLE     | Boolean.FALSE                 | Boolean.TRUE                         || SC_NO_CONTENT
-        "update field name"        | FIELD_NAME        | "appNameBefore"               | "appNameAfter"                       || SC_NO_CONTENT
-        "update field description" | FIELD_DESCRIPTION | "Description Before ąćęłóśżź" | "Description After €\\€\\€\\€\\"     || SC_NO_CONTENT
-        "update field category"    | FIELD_CATEGORY    | String.valueOf(Category.DEV)  | String.valueOf(pickRandomCategory()) || SC_NO_CONTENT
-        "update field type"        | FIELD_TYPE        | "typeBefore"                  | "typeAfter"                          || SC_NO_CONTENT
-        "update field url"         | FIELD_URL         | "url://before"                | "url://after"                        || SC_NO_CONTENT
-        "update field icon"        | FIELD_ICON        | "c:\\Icon.before.png"         | "//home/alwi/Icon.after"             || SC_NO_CONTENT
+        behavior                   | field             | valueBefore                   || valueAfter
+        "update field visible"     | FIELD_VISIBLE     | Boolean.FALSE                 || Boolean.TRUE
+        "update field name"        | FIELD_NAME        | "appNameBefore"               || "appNameAfter"
+        "update field description" | FIELD_DESCRIPTION | "Description Before ąćęłóśżź" || "Description After €\\€\\€\\€\\"
+        "update field category"    | FIELD_CATEGORY    | String.valueOf(Category.DEV)  || String.valueOf(pickRandomCategory())
+        "update field type"        | FIELD_TYPE        | "typeBefore"                  || "typeAfter"
+        "update field url"         | FIELD_URL         | "url://before"                || "url://after"
+        "update field icon"        | FIELD_ICON        | "c:\\Icon.before.png"         || "//home/alwi/Icon.after"
+    }
+
+    @Unroll
+    def "update application details value of #field for specific version (non-latest)"() {
+        given: "developer creates an application with multiple versions"
+        def appId = randId()
+        def v1 = "0.0.100"
+        def v2 = "0.20.0"
+        def v3 = "3.0.0"
+        Application appV1 = newApplication()
+                .withId(appId).withVersion(v1).with(field, valueV1Before).build()
+        Application appV2 = newApplication().withVisible(true)
+                .withId(appId).withVersion(v2).build()
+        Application appV3 = newApplication().withVisible(true)
+                .withId(appId).withVersion(v3).build()
+
+        maintainerSteps.createNewApplication_expectSuccess(DEFAULT_DEV_CODE, appV1)
+        maintainerSteps.createNewApplication_expectSuccess(DEFAULT_DEV_CODE, appV2)
+        maintainerSteps.createNewApplication_expectSuccess(DEFAULT_DEV_CODE, appV3)
+
+        and: "developer gets specific version details"
+        JsonPath bodyV1Before = maintainerSteps.getApplicationDetails_expectSuccess(DEFAULT_DEV_CODE, appKeyFor(appV1))
+        assertThat(extract(field).from(bodyV1Before)).describedAs("$field value before update").isEqualTo(valueV1Before)
+
+        when: "developer updates application"
+        ApplicationForUpdate updatedApp = basedOnApplication(appV1).with(field, valueV1After).build()
+        def responseUpdate = maintainerSteps.updateApplication(DEFAULT_DEV_CODE, appKeyFor(appV1), updatedApp).extract()
+        def receivedStatusUpdate = responseUpdate.statusCode()
+
+        then: "expected response HTTP status should be success"
+        receivedStatusUpdate == SC_NO_CONTENT
+
+        when: "developer gets latest version details"
+        JsonPath bodyV3After = maintainerSteps.getApplicationDetails_expectSuccess(DEFAULT_DEV_CODE, appKeyFor(appV3))
+
+        then:
+        assertThat(extract(field).from(bodyV3After)).describedAs("latest version $field value after is different than for updated v1").isNotEqualTo(valueV1After)
+
+        when: "developer gets middle version details"
+        JsonPath bodyV2After = maintainerSteps.getApplicationDetails_expectSuccess(DEFAULT_DEV_CODE, appKeyFor(appV2))
+
+        then:
+        assertThat(extract(field).from(bodyV2After)).describedAs("middle version $field value after is different than for updated v1").isNotEqualTo(valueV1After)
+
+        when: "developer gets details of updated application"
+        JsonPath bodyV1After = maintainerSteps.getApplicationDetails_expectSuccess(DEFAULT_DEV_CODE, appKeyFor(appV1))
+
+        then: "application has #field updated with value #valueV1After"
+        extract(field).from(bodyV1After) == valueV1After
+
+        where:
+        behavior                   | field             | valueV1Before                 || valueV1After // must be different than the defaults
+        "update field visible"     | FIELD_VISIBLE     | Boolean.TRUE                  || Boolean.FALSE
+        "update field name"        | FIELD_NAME        | "appNameBefore"               || "appNameAfter"
+        "update field description" | FIELD_DESCRIPTION | "Description Before ąćęłóśżź" || "Description After €\\€\\€\\€\\"
+        "update field category"    | FIELD_CATEGORY    | String.valueOf(Category.DEV)  || String.valueOf(Category.RESOURCE)
+        "update field type"        | FIELD_TYPE        | "typeBefore"                  || "typeAfter"
+        "update field url"         | FIELD_URL         | "url://before"                || "url://after"
+        "update field icon"        | FIELD_ICON        | "c:\\Icon.before.png"         || "//home/alwi/Icon.after"
     }
 
     @Unroll
