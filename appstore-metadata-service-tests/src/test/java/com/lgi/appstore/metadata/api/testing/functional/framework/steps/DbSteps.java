@@ -82,6 +82,12 @@ public class DbSteps {
         listAllFromTable(ASMS_TABLE_NAME_MAINTAINER);
     }
 
+    public void checkConfigurationForMaxConnections() throws SQLException { // this is utility method for debug/info
+        LOG.info("Get max_connection from Postgres config");
+        Optional<RowSetDynaClass> rowSet = DB.performQuery("SHOW max_connections");
+        rowSet.ifPresent(this::logRows);
+    }
+
     private void logRows(RowSetDynaClass rowSet) {
         List<DynaBean> rows = rowSet.getRows();
         rows.forEach(row -> Stream.of(rowSet.getDynaProperties())

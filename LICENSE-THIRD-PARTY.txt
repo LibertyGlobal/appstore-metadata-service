@@ -2,6 +2,7 @@
 Lists of 150 third-party dependencies.
      (Eclipse Public License - v 1.0) (GNU Lesser General Public License) Logback Classic Module (ch.qos.logback:logback-classic:1.2.3 - http://logback.qos.ch/logback-classic)
      (Eclipse Public License - v 1.0) (GNU Lesser General Public License) Logback Core Module (ch.qos.logback:logback-core:1.2.3 - http://logback.qos.ch/logback-core)
+     (The Apache License, Version 2.0) spock-reports (com.athaydes:spock-reports:1.7.1 - https://github.com/renatoathaydes/spock-reports)
      (Apache License, Version 2.0) ClassMate (com.fasterxml:classmate:1.5.1 - https://github.com/FasterXML/java-classmate)
      (The Apache Software License, Version 2.0) Jackson-annotations (com.fasterxml.jackson.core:jackson-annotations:2.11.2 - http://github.com/FasterXML/jackson)
      (The Apache Software License, Version 2.0) Jackson-core (com.fasterxml.jackson.core:jackson-core:2.11.1 - https://github.com/FasterXML/jackson-core)
@@ -26,7 +27,6 @@ Lists of 150 third-party dependencies.
      (The Apache Software License, Version 2.0) Allure Attachments (io.qameta.allure:allure-attachments:2.13.6 - https://github.com/allure-framework/allure-java)
      (The Apache Software License, Version 2.0) Allure Java Commons (io.qameta.allure:allure-java-commons:2.13.6 - https://github.com/allure-framework/allure-java)
      (The Apache Software License, Version 2.0) Allure JUnit Platform Integration (io.qameta.allure:allure-junit-platform:2.13.6 - https://github.com/allure-framework/allure-java)
-     (The Apache Software License, Version 2.0) Allure JUnit 5 Integration (io.qameta.allure:allure-junit5:2.13.6 - https://github.com/allure-framework/allure-java)
      (The Apache Software License, Version 2.0) Allure Model Integration (io.qameta.allure:allure-model:2.13.6 - https://github.com/allure-framework/allure-java)
      (The Apache Software License, Version 2.0) Allure Rest-Assured Integration (io.qameta.allure:allure-rest-assured:2.13.6 - https://github.com/allure-framework/allure-java)
      (Apache 2.0) json-path (io.rest-assured:json-path:3.3.0 - http://maven.apache.org)
