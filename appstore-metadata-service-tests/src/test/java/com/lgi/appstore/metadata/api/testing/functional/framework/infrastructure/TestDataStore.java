@@ -39,9 +39,9 @@ public class TestDataStore extends PostgreSQLContainer<TestDataStore> {
     public static final String DB_SCHEMA_NAME = "appstore_metadata_service";
 
     private static final String DB_IMAGE_NAME = "postgres:11.1";
-    private static final String DB_NAME = "asms";
-    private static final String DB_USER = "asms";
-    private static final String DB_PASSWORD = "asms";
+    private static final String DB_NAME = "postgres";
+    private static final String DB_USER = "postgres";
+    private static final String DB_PASSWORD = "postgres";
 
     private static TestDataStore singleton;
 
@@ -97,13 +97,17 @@ public class TestDataStore extends PostgreSQLContainer<TestDataStore> {
     }
 
     private static DataSource initDataSource() {
+        String jdbcUrl = singleton.getJdbcUrl();
+        LOG.info("JDBC url={}", jdbcUrl);
         HikariConfig poolConfig = new HikariConfig();
-        poolConfig.setJdbcUrl(singleton.getJdbcUrl());
+        poolConfig.setJdbcUrl(jdbcUrl);
         poolConfig.setUsername(singleton.getUsername());
         poolConfig.setPassword(singleton.getPassword());
         poolConfig.setDriverClassName(singleton.getDriverClassName());
         poolConfig.setIdleTimeout(5000);
-        poolConfig.setMaximumPoolSize(100);
-        return new HikariDataSource(poolConfig);
+        poolConfig.setMaximumPoolSize(40);
+        HikariDataSource hikariDataSource = new HikariDataSource(poolConfig);
+        LOG.info("Datasource for tests created.");
+        return hikariDataSource;
     }
 }

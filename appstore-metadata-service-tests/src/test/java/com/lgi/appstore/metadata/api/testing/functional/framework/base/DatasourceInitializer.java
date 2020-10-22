@@ -33,7 +33,9 @@ public class DatasourceInitializer implements ApplicationContextInitializer<Conf
                 "spring.datasource.url=" + dbTestContainer.withUrlParam("currentSchema", DB_SCHEMA_NAME).getJdbcUrl(),
                 "spring.datasource.username=" + dbTestContainer.getUsername(),
                 "spring.datasource.password=" + dbTestContainer.getPassword(),
-                "spring.datasource.driver-class-name" + dbTestContainer.getDriverClassName()
+                "spring.datasource.driver-class-name" + dbTestContainer.getDriverClassName(),
+                "spring.datasource.hikari.maximum-pool-size=40",
+                "spring.datasource.hikari.minimum-idle=5"
         ).applyTo(configurableApplicationContext.getEnvironment());
     }
 }

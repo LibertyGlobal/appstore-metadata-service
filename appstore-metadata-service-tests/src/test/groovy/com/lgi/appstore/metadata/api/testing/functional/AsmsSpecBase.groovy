@@ -45,8 +45,13 @@ class AsmsSpecBase extends Specification {
     @Autowired
     protected StbSteps stbSteps
 
-    void cleanup() throws Exception {
-        LOG.info("Test cleanup")
+    void setup() {
+        LOG.info("Starting tests -> setup.")
+        dbSteps.checkConfigurationForMaxConnections();
+    }
+
+    void cleanup() {
+        LOG.info("Finishing tests -> cleanup.")
         dbSteps.dbCleanup()
     }
 }
