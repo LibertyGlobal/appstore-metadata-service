@@ -40,7 +40,7 @@ public class StbSteps {
     private StbPerspectiveAsmsClient stbPerspectiveAsmsClient;
 
     @Step
-    public JsonPath getApplicationDetails_expectSuccess(String maintainerCode, String applicationKey) {
+    public JsonPath getApplicationDetails_expectSuccess(String applicationKey) {
         ValidatableResponse response = getApplicationDetails(applicationKey);
         ExtractableResponse<Response> responseExtract = response.extract();
         int statusCode = responseExtract.statusCode();

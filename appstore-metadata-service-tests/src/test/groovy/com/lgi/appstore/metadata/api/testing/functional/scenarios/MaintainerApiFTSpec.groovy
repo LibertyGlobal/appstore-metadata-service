@@ -123,8 +123,8 @@ class MaintainerApiFTSpec extends AsmsSpecBase {
 
         where:
         behavior                                       | appId    | v1       | v2       | isV2Visible | queryAppKey       || httpStatus   | returnedV
-        "no version specified - fallback to highest v" | randId() | "1.0.0"  | "0.10.0" | true        | appId             || SC_OK        | v1
-        "accepting 'latest' keyword"                   | randId() | "0.0.10" | "0.1.0"  | true        | appId + ":latest" || SC_OK        | v2
+        "no version specified - fallback to highest v" | randId() | "0.10.0" | "1.1.0"  | true        | appId             || SC_OK        | v2
+        "accepting 'latest' keyword"                   | randId() | "1.0.0"  | "0.10.0" | true        | appId + ":latest" || SC_OK        | v1
         "query for specific version"                   | randId() | "0.1.0"  | "1.0.0"  | true        | appId + ":" + v1  || SC_OK        | v1
         "fallback to latest that is hidden"            | randId() | "1.0.0"  | "2.0.0"  | false       | appId             || SC_OK        | v2
         "not existing id"                              | randId() | "10.0.0" | "0.1.0"  | true        | "App3"            || SC_NOT_FOUND | _
@@ -137,8 +137,6 @@ class MaintainerApiFTSpec extends AsmsSpecBase {
         def appId = randId()
         def v1 = "1.0.0"
         def v2 = "1.2.0"
-        def v1QueryAppKey = appId + ":" + v1
-        def v2QueryAppKey = appId + ":" + v2
 
         and: "application has v1 with some metadata"
         def v1Visible = false
@@ -164,7 +162,7 @@ class MaintainerApiFTSpec extends AsmsSpecBase {
         def v1Feature2Name = "v1Feature2Name"
         def v1Feature2Version = "v1Feature2Version"
         def v1Feature2Required = false
-        Application app1v1 = newApplication().withId(appId).withVersion(v1).withVisible(v1Visible)
+        Application appV1 = newApplication().withId(appId).withVersion(v1).withVisible(v1Visible)
                 .withVisible(v1Visible)
                 .withName(v1Name)
                 .withDescription(v1Description)
@@ -202,7 +200,7 @@ class MaintainerApiFTSpec extends AsmsSpecBase {
         def v2Feature2Name = "v2Feature2Name"
         def v2Feature2Version = "v2Feature2Version"
         def v2Feature2Required = true
-        Application app1v2 = newApplication().withId(appId).withVersion(v2).withVisible(v2Visible)
+        Application appV2 = newApplication().withId(appId).withVersion(v2).withVisible(v2Visible)
                 .withVisible(v2Visible)
                 .withName(v2Name)
                 .withDescription(v2Description)
@@ -217,11 +215,11 @@ class MaintainerApiFTSpec extends AsmsSpecBase {
                 .build()
 
         and: "developers creates application in these 2 versions"
-        maintainerSteps.createNewApplication_expectSuccess(DEFAULT_DEV_CODE, app1v1)
-        maintainerSteps.createNewApplication_expectSuccess(DEFAULT_DEV_CODE, app1v2)
+        maintainerSteps.createNewApplication_expectSuccess(DEFAULT_DEV_CODE, appV1)
+        maintainerSteps.createNewApplication_expectSuccess(DEFAULT_DEV_CODE, appV2)
 
-        when: "developer asks for details of application #v1QueryAppKey"
-        ExtractableResponse<Response> response1 = maintainerSteps.getApplicationDetails(DEFAULT_DEV_CODE, v1QueryAppKey).extract()
+        when: "developer asks for details of application #v1"
+        ExtractableResponse<Response> response1 = maintainerSteps.getApplicationDetails(DEFAULT_DEV_CODE, appKeyFor(appV1)).extract()
         def receivedStatus1 = response1.statusCode()
 
         then: "expected response HTTP status should be success/200"
@@ -266,8 +264,8 @@ class MaintainerApiFTSpec extends AsmsSpecBase {
         field().requirements().platform().variant().from(theBody1) == v1PlatformVariant
         field().requirements().platform().os().from(theBody1) == v1PlatformOs
 
-        when: "developer asks for details of application #v2QueryAppKey"
-        ExtractableResponse<Response> response2 = maintainerSteps.getApplicationDetails(DEFAULT_DEV_CODE, v2QueryAppKey).extract()
+        when: "developer asks for details of application #v2"
+        ExtractableResponse<Response> response2 = maintainerSteps.getApplicationDetails(DEFAULT_DEV_CODE, appKeyFor(appV2)).extract()
         def receivedStatus2 = response2.statusCode()
 
         then: "expected response HTTP status should be success/200"
@@ -425,7 +423,7 @@ class MaintainerApiFTSpec extends AsmsSpecBase {
         def responseDelete = maintainerSteps.deleteApplication(DEFAULT_DEV_CODE, deleteAppKey).extract()
         def responseStatusDelete = responseDelete.statusCode()
 
-        then: "expected response HTTP status should be #httpStatus"
+        then: "expected response HTTP status should be SC_NO_CONTENT"
         responseStatusDelete == SC_NO_CONTENT
 
         when:
@@ -465,11 +463,11 @@ class MaintainerApiFTSpec extends AsmsSpecBase {
         assertThat(field().header().version().from(bodyBefore)).describedAs("Version value before delete").isEqualTo(v2)
 
         when: "developer calls delete application v1"
-        def responseDeleteV1 = maintainerSteps.deleteApplication(DEFAULT_DEV_CODE, appId + ":" + v1).extract()
+        def responseDeleteV1 = maintainerSteps.deleteApplication(DEFAULT_DEV_CODE, appKeyFor(appV1)).extract()
         def responseStatusDeleteV1 = responseDeleteV1.statusCode()
 
         and: "developer calls delete application v2"
-        def responseDeleteV2 = maintainerSteps.deleteApplication(DEFAULT_DEV_CODE, appId + ":" + v2).extract()
+        def responseDeleteV2 = maintainerSteps.deleteApplication(DEFAULT_DEV_CODE, appKeyFor(appV2)).extract()
         def responseStatusDeleteV2 = responseDeleteV2.statusCode()
 
         then: "expected response HTTP status should success with no content returned"
