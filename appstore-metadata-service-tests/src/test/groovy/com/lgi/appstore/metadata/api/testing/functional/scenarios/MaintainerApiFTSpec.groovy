@@ -20,6 +20,7 @@
 package com.lgi.appstore.metadata.api.testing.functional.scenarios
 
 import com.lgi.appstore.metadata.api.testing.functional.AsmsSpecBase
+import com.lgi.appstore.metadata.api.testing.functional.framework.model.response.ApplicationDetailsPath
 import com.lgi.appstore.metadata.api.testing.functional.framework.model.response.ApplicationsPath
 import com.lgi.appstore.metadata.model.Application
 import com.lgi.appstore.metadata.model.ApplicationForUpdate
@@ -96,7 +97,7 @@ class MaintainerApiFTSpec extends AsmsSpecBase {
 
     @Unroll
     def "create non-existing app and view details for #behavior"() {
-        given: "2 developers create 2 applications: first with 2 versions (incl. hidden latest) and second with only one version"
+        given: "developer create 2 applications: first with 2 versions (incl. hidden latest) and second with only one version"
         Application app1v1 = newApplication()
                 .withId(appId).withVersion(v1).build()
         Application app1v2 = newApplication()
@@ -129,6 +130,48 @@ class MaintainerApiFTSpec extends AsmsSpecBase {
         "fallback to latest that is hidden"            | randId() | "1.0.0"  | "2.0.0"  | false       | appId             || SC_OK        | v2
         "not existing id"                              | randId() | "10.0.0" | "0.1.0"  | true        | "App3"            || SC_NOT_FOUND | _
         "not existing version"                         | randId() | "10.0.0" | "0.1.0"  | true        | appId + ":3.0"    || SC_NOT_FOUND | _
+    }
+
+    @Unroll
+    def "developer cannot access other developer application (GET/POST/DELETE)"() {
+        given: "2 developers create 2 applications"
+        def dev2 = "lgi-wannabe"
+        dbSteps.createNewMaintainer(dev2)
+        dbSteps.listMaintainers()
+
+        def app1Id = randId()
+        def app2Id = randId()
+
+        Application app1 = newApplication()
+                .withId(app1Id).withVersion("1.1.1").build()
+        ApplicationForUpdate app1forUpdate = basedOnApplication(app1)
+                .with(ApplicationDetailsPath.FIELD_VERSION, "1.1.1").build()
+        Application app2 = newApplication()
+                .withId(app2Id).withVersion("2.2.2").build()
+
+        maintainerSteps.createNewApplication_expectSuccess(DEFAULT_DEV_CODE, app1)
+        maintainerSteps.createNewApplication_expectSuccess(dev2, app2)
+
+        when: "default developer asks for another developer's application details"
+        ExtractableResponse<Response> response = maintainerSteps.getApplicationDetails(DEFAULT_DEV_CODE, appKeyFor(app2)).extract()
+        def receivedStatus = response.statusCode()
+
+        then: "expected response HTTP status should be SC_NOT_FOUND"
+        receivedStatus == SC_NOT_FOUND
+
+        when: "default developer tries to update another developer's application details"
+        def responseUpdate = maintainerSteps.updateApplication(DEFAULT_DEV_CODE, appKeyFor(app2), app1forUpdate).extract()
+        def receivedStatusUpdate = responseUpdate.statusCode()
+
+        then: "expected response HTTP status should be SC_NOT_FOUND"
+        receivedStatusUpdate == SC_NOT_FOUND
+
+        when: "default developer calls delete another developer's application"
+        def responseDelete = maintainerSteps.deleteApplication(DEFAULT_DEV_CODE, appKeyFor(app2)).extract()
+        def responseStatusDelete = responseDelete.statusCode()
+
+        then: "expected response HTTP status should be SC_NOT_FOUND"
+        responseStatusDelete == SC_NOT_FOUND
     }
 
     @Unroll
@@ -218,7 +261,7 @@ class MaintainerApiFTSpec extends AsmsSpecBase {
         maintainerSteps.createNewApplication_expectSuccess(DEFAULT_DEV_CODE, appV1)
         maintainerSteps.createNewApplication_expectSuccess(DEFAULT_DEV_CODE, appV2)
 
-        when: "developer asks for details of application #v1"
+        when: "developer asks for details of application v1"
         ExtractableResponse<Response> response1 = maintainerSteps.getApplicationDetails(DEFAULT_DEV_CODE, appKeyFor(appV1)).extract()
         def receivedStatus1 = response1.statusCode()
 
@@ -264,7 +307,7 @@ class MaintainerApiFTSpec extends AsmsSpecBase {
         field().requirements().platform().variant().from(theBody1) == v1PlatformVariant
         field().requirements().platform().os().from(theBody1) == v1PlatformOs
 
-        when: "developer asks for details of application #v2"
+        when: "developer asks for details of application v2"
         ExtractableResponse<Response> response2 = maintainerSteps.getApplicationDetails(DEFAULT_DEV_CODE, appKeyFor(appV2)).extract()
         def receivedStatus2 = response2.statusCode()
 
@@ -538,7 +581,7 @@ class MaintainerApiFTSpec extends AsmsSpecBase {
 
     @Unroll
     def "queries for applications list returns apps for #behavior"() {
-        given: "developer create 3 application: first creates 2 incl. multi-versioned and second only 1"
+        given: "developer creates 3 application: first creates 2 incl. multi-versioned and second only 1"
 
         Application app1v1 = newApplication().withId(id1).withVersion(v1)
                 .withName("Awesome Application")
@@ -572,7 +615,7 @@ class MaintainerApiFTSpec extends AsmsSpecBase {
         JsonPath jsonBody = response.jsonPath()
         def receivedStatus = response.statusCode()
 
-        then: "he gets positive response"
+        then: "he gets positive response SC_OK"
         receivedStatus == SC_OK
 
         and: "the amount of items is as desired"

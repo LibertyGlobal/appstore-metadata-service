@@ -40,6 +40,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public final class ApplicationForUpdateBuilder {
+    private String headerVersion;
     private Boolean headerVisible;
     private String headerName;
     private String headerUrl;
@@ -120,6 +121,9 @@ public final class ApplicationForUpdateBuilder {
 
     public ApplicationForUpdateBuilder with(String field, Object value) {
         switch (field) {
+            case ApplicationDetailsPath.FIELD_VERSION:
+                headerVersion = String.valueOf(value);
+            break;
             case ApplicationDetailsPath.FIELD_VISIBLE:
                 headerVisible = Boolean.valueOf(String.valueOf(value));
                 break;
@@ -153,6 +157,7 @@ public final class ApplicationForUpdateBuilder {
 
     public ApplicationForUpdate build() {
         final ApplicationHeaderForUpdate header = new ApplicationHeaderForUpdate()
+                .name(headerVersion)
                 .type(headerType)
                 .category(headerCategory)
                 .name(headerName)
