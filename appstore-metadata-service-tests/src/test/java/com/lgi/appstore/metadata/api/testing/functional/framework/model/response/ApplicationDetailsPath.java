@@ -25,7 +25,7 @@ public class ApplicationDetailsPath extends PathBase {
     private static final String FIELD_HEADER = "header";
 
     private static final String FIELD_ID = "id";
-    private static final String FIELD_VERSION = "version";
+    public static final String FIELD_VERSION = "version";
     public static final String FIELD_VISIBLE = "visible";
     public static final String FIELD_NAME = "name";
     public static final String FIELD_DESCRIPTION = "description";

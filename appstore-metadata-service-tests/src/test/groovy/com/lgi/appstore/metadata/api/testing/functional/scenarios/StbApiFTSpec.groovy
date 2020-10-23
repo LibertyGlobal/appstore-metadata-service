@@ -93,7 +93,7 @@ class StbApiFTSpec extends AsmsSpecBase {
         JsonPath jsonBody = response.jsonPath()
         def receivedStatus = response.statusCode()
 
-        then: "it gets response #response"
+        then: "it gets response SC_OK"
         receivedStatus == SC_OK
         assertThat(ApplicationsPath.field().applications().from(jsonBody)).asList().hasSizeLessThanOrEqualTo(returnedLimit)
 
@@ -329,7 +329,7 @@ class StbApiFTSpec extends AsmsSpecBase {
         maintainerSteps.createNewApplication_expectSuccess(DEFAULT_DEV_CODE, appV2)
         maintainerSteps.createNewApplication_expectSuccess(DEFAULT_DEV_CODE, appV3)
 
-        when: "developer gets details of application #v1"
+        when: "developer gets details of application v1"
         JsonPath theBody1 = stbSteps.getApplicationDetails_expectSuccess(appKeyFor(appV1))
 
         then: "the body exposes requested version details with correct header values"
@@ -375,7 +375,7 @@ class StbApiFTSpec extends AsmsSpecBase {
         field().requirements().platform().variant().from(theBody1) == v1PlatformVariant
         field().requirements().platform().os().from(theBody1) == v1PlatformOs
 
-        when: "developer gets details of application #v1"
+        when: "developer gets details of application v1"
         JsonPath theBody2 = stbSteps.getApplicationDetails_expectSuccess(appKeyFor(appV2))
 
         then: "the body exposes requested version details"
