@@ -159,12 +159,17 @@
                 </executions>
                 <configuration>
                     <from>
-                        <image>adoptopenjdk/openjdk13:alpine-jre</image>
+                        <image>openjdk:13.0.2-jdk-slim</image>
                     </from>
                     <to>
                         <image>${registry.url}/${registry.namespace}/${project.artifactId}:${project.version}</image>
                     </to>
                     <container>
+                        <entrypoint>
+                            <shell>sh</shell>
+                            <option>-c</option>
+                            <arg>/run.sh</arg>
+                        </entrypoint>
                         <ports>
                             <port>8080</port>
                             <port>8081</port>
@@ -179,6 +184,14 @@
                         <filesModificationTime>${maven.build.timestamp}</filesModificationTime>
                         <creationTime>USE_CURRENT_TIMESTAMP</creationTime>
                     </container>
+                    <extraDirectories>
+                        <permissions>
+                            <permission>
+                                <file>/run.sh</file>
+                                <mode>777</mode>
+                            </permission>
+                        </permissions>
+                    </extraDirectories>
                 </configuration>
             </plugin>
             <plugin>
