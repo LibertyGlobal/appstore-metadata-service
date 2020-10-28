@@ -42,10 +42,16 @@ import static com.lgi.appstore.metadata.api.testing.functional.framework.model.r
  */
 public class DataUtils {
     public static Category pickRandomCategory() {
-        List<Category> possibleCategories = Arrays.asList(Category.values());
+        return pickRandomCategoryExcluding(null);
+    }
+
+    public static Category pickRandomCategoryExcluding(Category excludingThisOne) {
+        List<Category> possibleCategories = Arrays.stream(Category.values())
+                .filter(c -> !c.equals(excludingThisOne))
+                .collect(Collectors.toList());
         Collections.shuffle(possibleCategories);
         Optional<Category> category = possibleCategories.stream().findFirst();
-        Assertions.assertTrue(category.isPresent(), "At least 1 category present in the model.");
+        Assertions.assertTrue(category.isPresent(), "At least 1 category should be present in the model.");
         return category.get();
     }
 

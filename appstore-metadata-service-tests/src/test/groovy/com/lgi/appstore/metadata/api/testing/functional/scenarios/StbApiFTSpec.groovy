@@ -37,7 +37,7 @@ import static com.lgi.appstore.metadata.api.testing.functional.framework.model.r
 import static com.lgi.appstore.metadata.api.testing.functional.framework.model.request.ApiStbApplicationsQueryParams.PLATFORM
 import static com.lgi.appstore.metadata.api.testing.functional.framework.model.request.ApiStbApplicationsQueryParams.TYPE
 import static com.lgi.appstore.metadata.api.testing.functional.framework.model.request.ApiStbApplicationsQueryParams.VERSION
-import static com.lgi.appstore.metadata.api.testing.functional.framework.model.request.ApplicationBuilder.newApplication
+import static com.lgi.appstore.metadata.api.testing.functional.framework.model.request.ApplicationMetadataBuilder.builder
 import static com.lgi.appstore.metadata.api.testing.functional.framework.model.request.QueryParams.mapping
 import static com.lgi.appstore.metadata.api.testing.functional.framework.model.request.QueryParams.queryParams
 import static com.lgi.appstore.metadata.api.testing.functional.framework.model.response.ApplicationDetailsPath.FIELD_CATEGORY
@@ -74,10 +74,10 @@ class StbApiFTSpec extends AsmsSpecBase {
         dbSteps.createNewMaintainer(dev2)
         dbSteps.listMaintainers()
 
-        Application app1v1 = newApplication().withId(id1).withVersion(v1).build()
-        Application app1v2 = newApplication().withId(id1).withVersion(v2).withVisible(false).build()
-        Application app2v1 = newApplication().withId(id2).withVersion(v1).build()
-        Application app3v1 = newApplication().withId(id3).withVersion(v1).build()
+        Application app1v1 = builder().fromDefaults().withId(id1).withVersion(v1).forCreate()
+        Application app1v2 = builder().fromDefaults().withId(id1).withVersion(v2).withVisible(false).forCreate()
+        Application app2v1 = builder().fromDefaults().withId(id2).withVersion(v1).forCreate()
+        Application app3v1 = builder().fromDefaults().withId(id3).withVersion(v1).forCreate()
 
         maintainerSteps.createNewApplication_expectSuccess(DEFAULT_DEV_CODE, app1v1)
         maintainerSteps.createNewApplication_expectSuccess(DEFAULT_DEV_CODE, app1v2)
@@ -131,26 +131,26 @@ class StbApiFTSpec extends AsmsSpecBase {
         dbSteps.createNewMaintainer(dev3, dev3Name)
         dbSteps.listMaintainers()
 
-        Application app1v1 = newApplication().withId(id1).withVersion(v1)
+        Application app1v1 = builder().fromDefaults().withId(id1).withVersion(v1)
                 .withCategory(Category.DEV)
                 .withPlatform("pc", "win", "v1")
-                .build()
-        Application app1v2 = newApplication().withId(id1).withVersion(v2).withVisible(false)
+                .forCreate()
+        Application app1v2 = builder().fromDefaults().withId(id1).withVersion(v2).withVisible(false)
                 .withCategory(Category.RESOURCE)
                 .withPlatform("arm", "linux", "v2")
-                .build()
-        Application app2v1 = newApplication().withId(id2).withVersion(v1)
+                .forCreate()
+        Application app2v1 = builder().fromDefaults().withId(id2).withVersion(v1)
                 .withCategory(Category.PLUGIN)
                 .withPlatform("plug-in", "any", "v3")
-                .build()
-        Application app2v2 = newApplication().withId(id2).withVersion(v2)
+                .forCreate()
+        Application app2v2 = builder().fromDefaults().withId(id2).withVersion(v2)
                 .withCategory(Category.PLUGIN)
                 .withPlatform("custom001", "confidential", "v4")
-                .build()
-        Application app3v1 = newApplication().withId(id3).withVersion(v1)
+                .forCreate()
+        Application app3v1 = builder().fromDefaults().withId(id3).withVersion(v1)
                 .withCategory(Category.SERVICE)
                 .withPlatform("mac", "macOs", "v5")
-                .build()
+                .forCreate()
         Map<String, Application> apps = mapAppsToKeys([app1v1, app1v2, app2v1, app2v2, app3v1])
         def maintainerMappings = Map.of(
                 app1v1, dev2Name,
@@ -198,12 +198,12 @@ class StbApiFTSpec extends AsmsSpecBase {
     @Unroll
     def "developer creates new app and stb view details for #behavior"() {
         given: "developer create 2 applications: first with 2 versions (incl. hidden latest) and second with only one version"
-        Application app1v1 = newApplication()
-                .withId(appId).withVersion(v1).build()
-        Application app1v2 = newApplication()
-                .withId(appId).withVersion(v2).withVisible(isV2Visible).build()
-        Application app2v1 = newApplication()
-                .withId("someOther_$appId").withVersion(v1) build()
+        Application app1v1 = builder().fromDefaults()
+                .withId(appId).withVersion(v1).forCreate()
+        Application app1v2 = builder().fromDefaults()
+                .withId(appId).withVersion(v2).withVisible(isV2Visible).forCreate()
+        Application app2v1 = builder().fromDefaults()
+                .withId("someOther_$appId").withVersion(v1) forCreate()
 
         maintainerSteps.createNewApplication_expectSuccess(DEFAULT_DEV_CODE, app1v1)
         maintainerSteps.createNewApplication_expectSuccess(DEFAULT_DEV_CODE, app1v2)
@@ -266,7 +266,7 @@ class StbApiFTSpec extends AsmsSpecBase {
         def v1Feature2Name = "v1Feature2Name"
         def v1Feature2Version = "v1Feature2Version"
         def v1Feature2Required = false
-        Application appV1 = newApplication().withId(appId).withVersion(v1)
+        Application appV1 = builder().fromDefaults().withId(appId).withVersion(v1)
                 .withName(v1Name)
                 .withDescription(v1Description)
                 .withCategory(v1Category)
@@ -279,7 +279,7 @@ class StbApiFTSpec extends AsmsSpecBase {
                 .withDependency(v1Dependency2Id, v1Dependency2Version)
                 .withFeature(v1Feature1Name, v1Feature1Version, v1Feature1Required)
                 .withFeature(v1Feature2Name, v1Feature2Version, v1Feature2Required)
-                .build()
+                .forCreate()
 
         and: "application has v2 with completely different metadata"
         def v2Name = "v2Name"
@@ -304,7 +304,7 @@ class StbApiFTSpec extends AsmsSpecBase {
         def v2Feature2Name = "v2Feature2Name"
         def v2Feature2Version = "v2Feature2Version"
         def v2Feature2Required = true
-        Application appV2 = newApplication().withId(appId).withVersion(v2)
+        Application appV2 = builder().fromDefaults().withId(appId).withVersion(v2)
                 .withName(v2Name)
                 .withDescription(v2Description)
                 .withIcon(v2Icon)
@@ -315,14 +315,14 @@ class StbApiFTSpec extends AsmsSpecBase {
                 .withDependency(v2Dependency2Id, v2Dependency2Version)
                 .withFeature(v2Feature1Name, v2Feature1Version, v2Feature1Required)
                 .withFeature(v2Feature2Name, v2Feature2Version, v2Feature2Required)
-                .build()
+                .forCreate()
 
         and: "application has v3 that is hidden"
-        Application appV3 = newApplication()
+        Application appV3 = builder().fromDefaults()
                 .withId(appId)
                 .withVersion(v3)
                 .withVisible(false)
-                .build()
+                .forCreate()
 
         and: "developers creates application in these 3 versions"
         maintainerSteps.createNewApplication_expectSuccess(DEFAULT_DEV_CODE, appV1)

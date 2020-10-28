@@ -33,6 +33,7 @@ public class ApplicationDetailsPath extends PathBase {
     public static final String FIELD_TYPE = "type";
     public static final String FIELD_ICON = "icon";
     public static final String FIELD_CATEGORY = "category";
+    public static final String FIELD_LANGUAGE_CODE = "languageCode";
     private static final String FIELD_LOCALISATIONS = "localisations";
     private static final String FIELD_REQUIREMENTS = "requirements";
     private static final String FIELD_DEPENDENCIES = "dependencies";
@@ -82,28 +83,33 @@ public class ApplicationDetailsPath extends PathBase {
         return this;
     }
 
-    private ApplicationDetailsPath description() {
+    public ApplicationDetailsPath description() {
         fields.add(FIELD_DESCRIPTION);
         return this;
     }
 
-    private ApplicationDetailsPath url() {
+    public ApplicationDetailsPath url() {
         fields.add(FIELD_URL);
         return this;
     }
 
-    private ApplicationDetailsPath type() {
+    public ApplicationDetailsPath type() {
         fields.add(FIELD_TYPE);
         return this;
     }
 
-    private ApplicationDetailsPath icon() {
+    public ApplicationDetailsPath icon() {
         fields.add(FIELD_ICON);
         return this;
     }
 
-    private ApplicationDetailsPath category() {
+    public ApplicationDetailsPath category() {
         fields.add(FIELD_CATEGORY);
+        return this;
+    }
+
+    public ApplicationDetailsPath languageCode() {
+        fields.add(FIELD_LANGUAGE_CODE);
         return this;
     }
 

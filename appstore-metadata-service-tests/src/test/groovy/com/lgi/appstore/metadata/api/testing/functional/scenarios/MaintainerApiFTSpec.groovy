@@ -20,6 +20,7 @@
 package com.lgi.appstore.metadata.api.testing.functional.scenarios
 
 import com.lgi.appstore.metadata.api.testing.functional.AsmsSpecBase
+import com.lgi.appstore.metadata.api.testing.functional.framework.model.request.ApplicationMetadataBuilder
 import com.lgi.appstore.metadata.api.testing.functional.framework.model.response.ApplicationDetailsPath
 import com.lgi.appstore.metadata.api.testing.functional.framework.model.response.ApplicationsPath
 import com.lgi.appstore.metadata.model.Application
@@ -40,8 +41,6 @@ import static com.lgi.appstore.metadata.api.testing.functional.framework.model.r
 import static com.lgi.appstore.metadata.api.testing.functional.framework.model.request.ApiMaintainerApplicationsQueryParams.PLATFORM
 import static com.lgi.appstore.metadata.api.testing.functional.framework.model.request.ApiMaintainerApplicationsQueryParams.TYPE
 import static com.lgi.appstore.metadata.api.testing.functional.framework.model.request.ApiMaintainerApplicationsQueryParams.VERSION
-import static com.lgi.appstore.metadata.api.testing.functional.framework.model.request.ApplicationBuilder.newApplication
-import static com.lgi.appstore.metadata.api.testing.functional.framework.model.request.ApplicationForUpdateBuilder.basedOnApplication
 import static com.lgi.appstore.metadata.api.testing.functional.framework.model.request.QueryParams.mapping
 import static com.lgi.appstore.metadata.api.testing.functional.framework.model.request.QueryParams.queryParams
 import static com.lgi.appstore.metadata.api.testing.functional.framework.model.response.ApplicationDetailsPath.FIELD_CATEGORY
@@ -63,6 +62,7 @@ import static com.lgi.appstore.metadata.api.testing.functional.framework.utils.D
 import static com.lgi.appstore.metadata.api.testing.functional.framework.utils.DataUtils.assembleSearchCriteria
 import static com.lgi.appstore.metadata.api.testing.functional.framework.utils.DataUtils.mapAppsToKeys
 import static com.lgi.appstore.metadata.api.testing.functional.framework.utils.DataUtils.pickRandomCategory
+import static com.lgi.appstore.metadata.api.testing.functional.framework.utils.DataUtils.pickRandomCategoryExcluding
 import static com.lgi.appstore.metadata.api.testing.functional.framework.utils.DataUtils.randId
 import static org.apache.http.HttpStatus.SC_BAD_REQUEST
 import static org.apache.http.HttpStatus.SC_CREATED
@@ -78,8 +78,8 @@ class MaintainerApiFTSpec extends AsmsSpecBase {
     @Unroll
     def "create application very basic validation for #behavior"() {
         given:
-        Application app = newApplication()
-                .withId(appId).withVersion(v1).withVisible(visible).build()
+        Application app = ApplicationMetadataBuilder.builder().fromDefaults()
+                .withId(appId).withVersion(v1).withVisible(visible).forCreate()
 
         when: "developer attempts to create application with incorrect data with #behavior"
         def response = maintainerSteps.createNewApplication(DEFAULT_DEV_CODE, app)
@@ -98,12 +98,12 @@ class MaintainerApiFTSpec extends AsmsSpecBase {
     @Unroll
     def "create non-existing app and view details for #behavior"() {
         given: "developer create 2 applications: first with 2 versions (incl. hidden latest) and second with only one version"
-        Application app1v1 = newApplication()
-                .withId(appId).withVersion(v1).build()
-        Application app1v2 = newApplication()
-                .withId(appId).withVersion(v2).withVisible(isV2Visible).build()
-        Application app2v1 = newApplication()
-                .withId("someOther_$appId").withVersion(v1) build()
+        Application app1v1 = ApplicationMetadataBuilder.builder().fromDefaults()
+                .withId(appId).withVersion(v1).forCreate()
+        Application app1v2 = ApplicationMetadataBuilder.builder().fromDefaults()
+                .withId(appId).withVersion(v2).withVisible(isV2Visible).forCreate()
+        Application app2v1 = ApplicationMetadataBuilder.builder().fromDefaults()
+                .withId("someOther_$appId").withVersion(v1) forCreate()
 
         maintainerSteps.createNewApplication_expectSuccess(DEFAULT_DEV_CODE, app1v1)
         maintainerSteps.createNewApplication_expectSuccess(DEFAULT_DEV_CODE, app1v2)
@@ -142,12 +142,12 @@ class MaintainerApiFTSpec extends AsmsSpecBase {
         def app1Id = randId()
         def app2Id = randId()
 
-        Application app1 = newApplication()
-                .withId(app1Id).withVersion("1.1.1").build()
-        ApplicationForUpdate app1forUpdate = basedOnApplication(app1)
-                .with(ApplicationDetailsPath.FIELD_VERSION, "1.1.1").build()
-        Application app2 = newApplication()
-                .withId(app2Id).withVersion("2.2.2").build()
+        Application app1 = ApplicationMetadataBuilder.builder().fromDefaults()
+                .withId(app1Id).withVersion("1.1.1").forCreate()
+        ApplicationForUpdate app1forUpdate = ApplicationMetadataBuilder.builder().fromExisting(app1)
+                .with(ApplicationDetailsPath.FIELD_VERSION, "1.1.1").forUpdate()
+        Application app2 = ApplicationMetadataBuilder.builder().fromDefaults()
+                .withId(app2Id).withVersion("2.2.2").forCreate()
 
         maintainerSteps.createNewApplication_expectSuccess(DEFAULT_DEV_CODE, app1)
         maintainerSteps.createNewApplication_expectSuccess(dev2, app2)
@@ -187,6 +187,8 @@ class MaintainerApiFTSpec extends AsmsSpecBase {
         def v1Description = "v1Description"
         def v1Icon = "v1Icon"
         def v1Type = "v1Type"
+        def v1Category = pickRandomCategory()
+        def v1Url = "url://app.great"
         def v1PlatformArch = "v1PlatformArch"
         def v1PlatformOs = "v1PlatformOs"
         def v1PlatformVariant = "v1PlatformVariant"
@@ -205,26 +207,32 @@ class MaintainerApiFTSpec extends AsmsSpecBase {
         def v1Feature2Name = "v1Feature2Name"
         def v1Feature2Version = "v1Feature2Version"
         def v1Feature2Required = false
-        Application appV1 = newApplication().withId(appId).withVersion(v1).withVisible(v1Visible)
+        Application appV1 = ApplicationMetadataBuilder.builder().fromDefaults()
+                .withId(appId)
+                .withVersion(v1)
                 .withVisible(v1Visible)
                 .withName(v1Name)
                 .withDescription(v1Description)
                 .withIcon(v1Icon)
                 .withType(v1Type)
+                .withCategory(v1Category)
+                .withUrl(v1Url)
                 .withPlatform(v1PlatformArch, v1PlatformOs, v1PlatformVariant)
                 .withHardware(v1HardwareCache, v1HardwareDmips, v1HardwarePersistent, v1HardwareRam, v1HardwareImage)
                 .withDependency(v1Dependency1Id, v1Dependency1Version)
                 .withDependency(v1Dependency2Id, v1Dependency2Version)
                 .withFeature(v1Feature1Name, v1Feature1Version, v1Feature1Required)
                 .withFeature(v1Feature2Name, v1Feature2Version, v1Feature2Required)
-                .build()
+                .forCreate()
 
         and: "application has v2 with completely different metadata"
         def v2Visible = true
-        def v2Name = "v2Name"
-        def v2Description = "v2Description"
-        def v2Icon = "v2Icon"
-        def v2Type = "v2Type"
+        def v2Name = "v2NewName"
+        def v2Description = "v2NewDescription"
+        def v2Icon = "v2NewIcon"
+        def v2Type = "v2NewType"
+        def v2Category = pickRandomCategoryExcluding(v1Category)
+        def v2Url = "url://app.greater"
         def v2PlatformArch = "v2PlatformArch"
         def v2PlatformOs = "v2PlatformOs"
         def v2PlatformVariant = "v2PlatformVariant"
@@ -243,19 +251,22 @@ class MaintainerApiFTSpec extends AsmsSpecBase {
         def v2Feature2Name = "v2Feature2Name"
         def v2Feature2Version = "v2Feature2Version"
         def v2Feature2Required = true
-        Application appV2 = newApplication().withId(appId).withVersion(v2).withVisible(v2Visible)
+        Application appV2 = ApplicationMetadataBuilder.builder().fromDefaults().withId(appId)
+                .withVersion(v2)
                 .withVisible(v2Visible)
                 .withName(v2Name)
                 .withDescription(v2Description)
                 .withIcon(v2Icon)
                 .withType(v2Type)
+                .withCategory(v2Category)
+                .withUrl(v2Url)
                 .withPlatform(v2PlatformArch, v2PlatformOs, v2PlatformVariant)
                 .withHardware(v2HardwareCache, v2HardwareDmips, v2HardwarePersistent, v2HardwareRam, v2HardwareImage)
                 .withDependency(v2Dependency1Id, v2Dependency1Version)
                 .withDependency(v2Dependency2Id, v2Dependency2Version)
                 .withFeature(v2Feature1Name, v2Feature1Version, v2Feature1Required)
                 .withFeature(v2Feature2Name, v2Feature2Version, v2Feature2Required)
-                .build()
+                .forCreate()
 
         and: "developers creates application in these 2 versions"
         maintainerSteps.createNewApplication_expectSuccess(DEFAULT_DEV_CODE, appV1)
@@ -273,6 +284,12 @@ class MaintainerApiFTSpec extends AsmsSpecBase {
         field().header().id().from(theBody1) == appId
         field().header().version().from(theBody1) == v1
         field().header().visible().from(theBody1) == v1Visible
+        field().header().name().from(theBody1) == v1Name
+        field().header().category().from(theBody1) == String.valueOf(v1Category)
+        field().header().url().from(theBody1) == v1Url
+        field().header().description().from(theBody1) == v1Description
+        field().header().type().from(theBody1) == v1Type
+        field().header().icon().from(theBody1) == v1Icon
 
         and: "the body exposes maintainer section with his details"
         field().maintainer().name().from(theBody1) == DEFAULT_DEV_NAME
@@ -281,6 +298,7 @@ class MaintainerApiFTSpec extends AsmsSpecBase {
         field().maintainer().email().from(theBody1) == DEFAULT_DEV_EMAIL
 
         and: "the body exposes version section with all versions and visibility information"
+        assertThat(field().versions().from(theBody1)).asList().hasSize(2)
         field().versions().at(0).version().from(theBody1) == v1
         field().versions().at(0).visible().from(theBody1) == v1Visible
         field().versions().at(1).version().from(theBody1) == v2
@@ -319,6 +337,12 @@ class MaintainerApiFTSpec extends AsmsSpecBase {
         field().header().id().from(theBody2) == appId
         field().header().version().from(theBody2) == v2
         field().header().visible().from(theBody2) == v2Visible
+        field().header().category().from(theBody2) == String.valueOf(v2Category)
+        field().header().name().from(theBody2) == v2Name
+        field().header().description().from(theBody2) == v2Description
+        field().header().url().from(theBody2) == v2Url
+        field().header().type().from(theBody2) == v2Type
+        field().header().icon().from(theBody2) == v2Icon
 
         and: "the body exposes maintainer section with his details"
         field().maintainer().name().from(theBody2) == DEFAULT_DEV_NAME
@@ -327,6 +351,7 @@ class MaintainerApiFTSpec extends AsmsSpecBase {
         field().maintainer().email().from(theBody2) == DEFAULT_DEV_EMAIL
 
         and: "the body exposes version section with all versions and visibility information"
+        assertThat(field().versions().from(theBody2)).asList().hasSize(2)
         field().versions().at(0).version().from(theBody2) == v1
         field().versions().at(0).visible().from(theBody2) == v1Visible
         field().versions().at(1).version().from(theBody2) == v2
@@ -355,11 +380,11 @@ class MaintainerApiFTSpec extends AsmsSpecBase {
     }
 
     @Unroll
-    def "update application details for #behavior - PUT operation does complete overwrite of latest version (by ID alone)"() {
+    def "update application details for #field - PUT operation does complete overwrite of latest version (by ID alone)"() {
         given: "developer creates an application with #field value #valueBefore"
         def appId = randId()
-        Application app = newApplication()
-                .withId(appId).withVersion("0.0.1").with(field, valueBefore).build()
+        Application app = ApplicationMetadataBuilder.builder().fromDefaults()
+                .withId(appId).withVersion("0.0.1").with(field, valueBefore).forCreate()
         maintainerSteps.createNewApplication_expectSuccess(DEFAULT_DEV_CODE, app)
 
         and: "developer gets details of application"
@@ -367,7 +392,7 @@ class MaintainerApiFTSpec extends AsmsSpecBase {
         assertThat(extract(field).from(bodyBefore)).describedAs("$field value before update").isEqualTo(valueBefore)
 
         when: "developer updates application"
-        ApplicationForUpdate updatedApp = basedOnApplication(app).with(field, valueAfter).build()
+        ApplicationForUpdate updatedApp = ApplicationMetadataBuilder.builder().fromExisting(app).with(field, valueAfter).forUpdate()
         def responseUpdate = maintainerSteps.updateApplication(DEFAULT_DEV_CODE, app.getHeader().getId(), updatedApp).extract()
         def receivedStatusUpdate = responseUpdate.statusCode()
 
@@ -381,14 +406,14 @@ class MaintainerApiFTSpec extends AsmsSpecBase {
         receivedStatusUpdate == SC_NO_CONTENT ? extract(field).from(bodyAfter) == valueAfter : IGNORE_THIS_ASSERTION
 
         where:
-        behavior                   | field             | valueBefore                   || valueAfter
-        "update field visible"     | FIELD_VISIBLE     | Boolean.FALSE                 || Boolean.TRUE
-        "update field name"        | FIELD_NAME        | "appNameBefore"               || "appNameAfter"
-        "update field description" | FIELD_DESCRIPTION | "Description Before ąćęłóśżź" || "Description After €\\€\\€\\€\\"
-        "update field category"    | FIELD_CATEGORY    | String.valueOf(Category.DEV)  || String.valueOf(pickRandomCategory())
-        "update field type"        | FIELD_TYPE        | "typeBefore"                  || "typeAfter"
-        "update field url"         | FIELD_URL         | "url://before"                || "url://after"
-        "update field icon"        | FIELD_ICON        | "c:\\Icon.before.png"         || "//home/alwi/Icon.after"
+        field             | valueBefore                   || valueAfter
+        FIELD_VISIBLE     | Boolean.FALSE                 || Boolean.TRUE
+        FIELD_NAME        | "appNameBefore"               || "appNameAfter"
+        FIELD_DESCRIPTION | "Description Before ąćęłóśżź" || "Description After €\\€\\€\\€\\"
+        FIELD_CATEGORY    | String.valueOf(Category.DEV)  || String.valueOf(pickRandomCategory())
+        FIELD_TYPE        | "typeBefore"                  || "typeAfter"
+        FIELD_URL         | "url://before"                || "url://after"
+        FIELD_ICON        | "c:\\Icon.before.png"         || "//home/alwi/Icon.after"
     }
 
     @Unroll
@@ -398,12 +423,12 @@ class MaintainerApiFTSpec extends AsmsSpecBase {
         def v1 = "0.0.100"
         def v2 = "0.20.0"
         def v3 = "3.0.0"
-        Application appV1 = newApplication()
-                .withId(appId).withVersion(v1).with(field, valueV1Before).build()
-        Application appV2 = newApplication().withVisible(true)
-                .withId(appId).withVersion(v2).build()
-        Application appV3 = newApplication().withVisible(true)
-                .withId(appId).withVersion(v3).build()
+        Application appV1 = ApplicationMetadataBuilder.builder().fromDefaults()
+                .withId(appId).withVersion(v1).with(field, valueV1Before).forCreate()
+        Application appV2 = ApplicationMetadataBuilder.builder().fromDefaults().withVisible(true)
+                .withId(appId).withVersion(v2).forCreate()
+        Application appV3 = ApplicationMetadataBuilder.builder().fromDefaults().withVisible(true)
+                .withId(appId).withVersion(v3).forCreate()
 
         maintainerSteps.createNewApplication_expectSuccess(DEFAULT_DEV_CODE, appV1)
         maintainerSteps.createNewApplication_expectSuccess(DEFAULT_DEV_CODE, appV2)
@@ -414,7 +439,7 @@ class MaintainerApiFTSpec extends AsmsSpecBase {
         assertThat(extract(field).from(bodyV1Before)).describedAs("$field value before update").isEqualTo(valueV1Before)
 
         when: "developer updates application"
-        ApplicationForUpdate updatedApp = basedOnApplication(appV1).with(field, valueV1After).build()
+        ApplicationForUpdate updatedApp = ApplicationMetadataBuilder.builder().fromExisting(appV1).with(field, valueV1After).forUpdate()
         def responseUpdate = maintainerSteps.updateApplication(DEFAULT_DEV_CODE, appKeyFor(appV1), updatedApp).extract()
         def receivedStatusUpdate = responseUpdate.statusCode()
 
@@ -440,21 +465,249 @@ class MaintainerApiFTSpec extends AsmsSpecBase {
         extract(field).from(bodyV1After) == valueV1After
 
         where:
-        behavior                   | field             | valueV1Before                 || valueV1After // must be different than the defaults
-        "update field visible"     | FIELD_VISIBLE     | Boolean.TRUE                  || Boolean.FALSE
-        "update field name"        | FIELD_NAME        | "appNameBefore"               || "appNameAfter"
-        "update field description" | FIELD_DESCRIPTION | "Description Before ąćęłóśżź" || "Description After €\\€\\€\\€\\"
-        "update field category"    | FIELD_CATEGORY    | String.valueOf(Category.DEV)  || String.valueOf(Category.RESOURCE)
-        "update field type"        | FIELD_TYPE        | "typeBefore"                  || "typeAfter"
-        "update field url"         | FIELD_URL         | "url://before"                || "url://after"
-        "update field icon"        | FIELD_ICON        | "c:\\Icon.before.png"         || "//home/alwi/Icon.after"
+        field             | valueV1Before                 || valueV1After // must be different than the defaults
+        FIELD_VISIBLE     | Boolean.TRUE                  || Boolean.FALSE
+        FIELD_NAME        | "appNameBefore"               || "appNameAfter"
+        FIELD_DESCRIPTION | "Description Before ąćęłóśżź" || "Description After €\\€\\€\\€\\"
+        FIELD_CATEGORY    | String.valueOf(Category.DEV)  || String.valueOf(Category.RESOURCE)
+        FIELD_TYPE        | "typeBefore"                  || "typeAfter"
+        FIELD_URL         | "url://before"                || "url://after"
+        FIELD_ICON        | "c:\\Icon.before.png"         || "//home/alwi/Icon.after"
+    }
+
+    @Unroll
+    def "create and update all fields of the application"() {
+        given:
+        def appId = randId()
+        def v1 = "1.0.1"
+
+        and: "application has v1 with some metadata"
+        def v1Visible = false
+        def v1Name = "v1Name"
+        def v1Description = "v1Description"
+        def v1Icon = "v1Icon"
+        def v1Type = "v1Type"
+        def v1Category = pickRandomCategory()
+        def v1Url = "url://app.great"
+        def v1PlatformArch = "v1PlatformArch"
+        def v1PlatformOs = "v1PlatformOs"
+        def v1PlatformVariant = "v1PlatformVariant"
+        def v1HardwareCache = "v1HardwareCache"
+        def v1HardwareDmips = "v1HardwareDmips"
+        def v1HardwarePersistent = "v1HardwarePersistent"
+        def v1HardwareImage = "v1HardwareImage"
+        def v1HardwareRam = "v1HardwareRam"
+        def v1Dependency1Id = "v1Dependency1Id"
+        def v1Dependency1Version = "v1Dependency1Version"
+        def v1Dependency2Id = "v1Dependency2Id"
+        def v1Dependency2Version = "v1Dependency2Version"
+        def v1Feature1Name = "v1Feature1Name"
+        def v1Feature1Version = "v1Feature1Version"
+        def v1Feature1Required = true
+        def v1Feature2Name = "v1Feature2Name"
+        def v1Feature2Version = "v1Feature2Version"
+        def v1Feature2Required = false
+        def v1Localisation1Name = "US"
+        def v1Localisation1Lang = "en"
+        def v1Localisation1Description = "Description for en localisation"
+        def v1Localisation2Name = "Polska"
+        def v1Localisation2Lang = "pl"
+        def v1Localisation2Description = "Opis lokalizacji dla pl"
+        Application appV1 = ApplicationMetadataBuilder.builder().fromDefaults()
+                .withId(appId)
+                .withVersion(v1)
+                .withVisible(v1Visible)
+                .withName(v1Name)
+                .withDescription(v1Description)
+                .withIcon(v1Icon)
+                .withType(v1Type)
+                .withCategory(v1Category)
+                .withUrl(v1Url)
+                .withLocalisation(v1Localisation1Name, v1Localisation1Lang, v1Localisation1Description)
+                .withLocalisation(v1Localisation2Name, v1Localisation2Lang, v1Localisation2Description)
+                .withPlatform(v1PlatformArch, v1PlatformOs, v1PlatformVariant)
+                .withHardware(v1HardwareCache, v1HardwareDmips, v1HardwarePersistent, v1HardwareRam, v1HardwareImage)
+                .withDependency(v1Dependency1Id, v1Dependency1Version)
+                .withDependency(v1Dependency2Id, v1Dependency2Version)
+                .withFeature(v1Feature1Name, v1Feature1Version, v1Feature1Required)
+                .withFeature(v1Feature2Name, v1Feature2Version, v1Feature2Required)
+                .forCreate()
+
+        and: "application has v2 with completely different metadata"
+        def v2Visible = true
+        def v2Name = "v2NewName"
+        def v2Description = "v2NewDescription"
+        def v2Icon = "v2NewIcon"
+        def v2Type = "v2NewType"
+        def v2Category = pickRandomCategoryExcluding(v1Category)
+        def v2Url = "url://app.greater"
+        def v2PlatformArch = "v2PlatformArch"
+        def v2PlatformOs = "v2PlatformOs"
+        def v2PlatformVariant = "v2PlatformVariant"
+        def v2HardwareCache = "v2HardwareCache"
+        def v2HardwareDmips = "v2HardwareDmips"
+        def v2HardwarePersistent = "v2HardwarePersistent"
+        def v2HardwareImage = "v2HardwareImage"
+        def v2HardwareRam = "v2HardwareRam"
+        def v2Dependency1Id = "v2Dependency1Id"
+        def v2Dependency1Version = "v2Dependency1Version"
+        def v2Dependency2Id = "v2Dependency2Id"
+        def v2Dependency2Version = "v2Dependency2Version"
+        def v2Feature1Name = "v2Feature1Name"
+        def v2Feature1Version = "v2Feature1Version"
+        def v2Feature1Required = false
+        def v2Feature2Name = "v2Feature2Name"
+        def v2Feature2Version = "v2Feature2Version"
+        def v2Feature2Required = true
+        def v2Localisation1Name = "Deuchland"
+        def v2Localisation1Lang = "de"
+        def v2Localisation1Description = "Beschreibung der Lokalisierung"
+        def v2Localisation2Name = "Россия"
+        def v2Localisation2Lang = "де"
+        def v2Localisation2Description = "Описание де локализации"
+        ApplicationForUpdate appV2 = ApplicationMetadataBuilder.builder().fromDefaults()
+                .withId(appId)
+                .withVisible(v2Visible)
+                .withName(v2Name)
+                .withDescription(v2Description)
+                .withIcon(v2Icon)
+                .withType(v2Type)
+                .withCategory(v2Category)
+                .withUrl(v2Url)
+                .withLocalisation(v2Localisation1Name, v2Localisation1Lang, v2Localisation1Description)
+                .withLocalisation(v2Localisation2Name, v2Localisation2Lang, v2Localisation2Description)
+                .withPlatform(v2PlatformArch, v2PlatformOs, v2PlatformVariant)
+                .withHardware(v2HardwareCache, v2HardwareDmips, v2HardwarePersistent, v2HardwareRam, v2HardwareImage)
+                .withDependency(v2Dependency1Id, v2Dependency1Version)
+                .withDependency(v2Dependency2Id, v2Dependency2Version)
+                .withFeature(v2Feature1Name, v2Feature1Version, v2Feature1Required)
+                .withFeature(v2Feature2Name, v2Feature2Version, v2Feature2Required)
+                .forUpdate()
+
+        and: "developers creates application v1 with v2 that in fact is a lower number than current"
+        maintainerSteps.createNewApplication_expectSuccess(DEFAULT_DEV_CODE, appV1)
+
+        when: "developer asks for details of application without specifying the version"
+        ExtractableResponse<Response> response1 = maintainerSteps.getApplicationDetails(DEFAULT_DEV_CODE, appId).extract()
+        def receivedStatus1 = response1.statusCode()
+
+        then: "expected response HTTP status should be success/200"
+        receivedStatus1 == SC_OK
+
+        and: "the body exposes requested version details"
+        JsonPath theBody1 = response1.jsonPath()
+        field().header().id().from(theBody1) == appId
+        field().header().version().from(theBody1) == v1
+        field().header().visible().from(theBody1) == v1Visible
+        field().header().name().from(theBody1) == v1Name
+        field().header().category().from(theBody1) == String.valueOf(v1Category)
+        field().header().url().from(theBody1) == v1Url
+        field().header().description().from(theBody1) == v1Description
+        field().header().type().from(theBody1) == v1Type
+        field().header().icon().from(theBody1) == v1Icon
+
+        and: "the body exposes localisations section with his details-header"
+        assertThat(field().header().localisations().name().from(theBody1)).asList().containsExactlyInAnyOrder(v1Localisation1Name, v1Localisation2Name)
+        assertThat(field().header().localisations().languageCode().from(theBody1)).asList().containsExactlyInAnyOrder(v1Localisation1Lang, v1Localisation2Lang)
+        assertThat(field().header().localisations().description().from(theBody1)).asList().containsExactlyInAnyOrder(v1Localisation1Description, v1Localisation2Description)
+
+        and: "the body exposes maintainer section with his details"
+        field().maintainer().name().from(theBody1) == DEFAULT_DEV_NAME
+        field().maintainer().address().from(theBody1) == DEFAULT_DEV_ADDRESS
+        field().maintainer().homepage().from(theBody1) == DEFAULT_DEV_HOMEPAGE
+        field().maintainer().email().from(theBody1) == DEFAULT_DEV_EMAIL
+
+        and: "the body exposes version section with all versions and visibility information"
+        assertThat(field().versions().from(theBody1)).asList().hasSize(1)
+        field().versions().at(0).version().from(theBody1) == v1
+        field().versions().at(0).visible().from(theBody1) == v1Visible
+
+        and: "the body exposes requirements section with dependencies information"
+        assertThat(field().requirements().dependencies().id().from(theBody1)).asList().containsExactlyInAnyOrder(v1Dependency1Id, v1Dependency2Id)
+        assertThat(field().requirements().dependencies().version().from(theBody1)).asList().containsExactlyInAnyOrder(v1Dependency1Version, v1Dependency2Version)
+
+        and: "the body exposes requirements section with features information"
+        assertThat(field().requirements().features().name().from(theBody1)).asList().containsExactlyInAnyOrder(v1Feature1Name, v1Feature2Name)
+        assertThat(field().requirements().features().version().from(theBody1)).asList().containsExactlyInAnyOrder(v1Feature1Version, v1Feature2Version)
+        assertThat(field().requirements().features().required().from(theBody1)).asList().containsExactlyInAnyOrder(v1Feature1Required, v1Feature2Required)
+
+        and: "the body exposes requirements section with hardware information"
+        field().requirements().hardware().cache().from(theBody1) == v1HardwareCache
+        field().requirements().hardware().dmips().from(theBody1) == v1HardwareDmips
+        field().requirements().hardware().image().from(theBody1) == v1HardwareImage
+        field().requirements().hardware().ram().from(theBody1) == v1HardwareRam
+        field().requirements().hardware().persistent().from(theBody1) == v1HardwarePersistent
+
+        and: "the body exposes requirements section with platform information"
+        field().requirements().platform().architecture().from(theBody1) == v1PlatformArch
+        field().requirements().platform().variant().from(theBody1) == v1PlatformVariant
+        field().requirements().platform().os().from(theBody1) == v1PlatformOs
+
+        and: "developers creates application v2 which should completely override v1"
+        maintainerSteps.updateApplication(DEFAULT_DEV_CODE, appV1.getHeader().getId(), appV2)
+
+        when: "developer asks for details of application v2"
+        ExtractableResponse<Response> response2 = maintainerSteps.getApplicationDetails(DEFAULT_DEV_CODE, appV1.getHeader().getId()).extract()
+        def receivedStatus2 = response2.statusCode()
+
+        then: "expected response HTTP status should be success/200"
+        receivedStatus2 == SC_OK
+
+        and: "the body exposes requested version details"
+        JsonPath theBody2 = response2.jsonPath()
+        field().header().id().from(theBody2) == appId
+        field().header().version().from(theBody2) == v1
+        field().header().visible().from(theBody2) == v2Visible
+        field().header().category().from(theBody2) == String.valueOf(v2Category)
+        field().header().name().from(theBody2) == v2Name
+        field().header().description().from(theBody2) == v2Description
+        field().header().url().from(theBody2) == v2Url
+        field().header().type().from(theBody2) == v2Type
+        field().header().icon().from(theBody2) == v2Icon
+
+        and: "the body exposes localisations section with his details-header"
+        assertThat(field().header().localisations().name().from(theBody2)).asList().containsExactlyInAnyOrder(v2Localisation1Name, v2Localisation2Name)
+        assertThat(field().header().localisations().languageCode().from(theBody2)).asList().containsExactlyInAnyOrder(v2Localisation1Lang, v2Localisation2Lang)
+        assertThat(field().header().localisations().description().from(theBody2)).asList().containsExactlyInAnyOrder(v2Localisation1Description, v2Localisation2Description)
+
+        and: "the body exposes maintainer section with his details"
+        field().maintainer().name().from(theBody2) == DEFAULT_DEV_NAME
+        field().maintainer().address().from(theBody2) == DEFAULT_DEV_ADDRESS
+        field().maintainer().homepage().from(theBody2) == DEFAULT_DEV_HOMEPAGE
+        field().maintainer().email().from(theBody2) == DEFAULT_DEV_EMAIL
+
+        and: "the body exposes version section with all versions and visibility information"
+        assertThat(field().versions().from(theBody2)).asList().hasSize(1)
+        field().versions().at(0).version().from(theBody2) == v1
+        field().versions().at(0).visible().from(theBody2) == v2Visible
+
+        and: "the body exposes requirements section with dependencies information"
+        assertThat(field().requirements().dependencies().id().from(theBody2)).asList().containsExactlyInAnyOrder(v2Dependency1Id, v2Dependency2Id)
+        assertThat(field().requirements().dependencies().version().from(theBody2)).asList().containsExactlyInAnyOrder(v2Dependency1Version, v2Dependency2Version)
+
+        and: "the body exposes requirements section with features information"
+        assertThat(field().requirements().features().name().from(theBody2)).asList().containsExactlyInAnyOrder(v2Feature1Name, v2Feature2Name)
+        assertThat(field().requirements().features().version().from(theBody2)).asList().containsExactlyInAnyOrder(v2Feature1Version, v2Feature2Version)
+        assertThat(field().requirements().features().required().from(theBody2)).asList().containsExactlyInAnyOrder(v2Feature1Required, v2Feature2Required)
+
+        and: "the body exposes requirements section with hardware information"
+        field().requirements().hardware().cache().from(theBody2) == v2HardwareCache
+        field().requirements().hardware().dmips().from(theBody2) == v2HardwareDmips
+        field().requirements().hardware().image().from(theBody2) == v2HardwareImage
+        field().requirements().hardware().ram().from(theBody2) == v2HardwareRam
+        field().requirements().hardware().persistent().from(theBody2) == v2HardwarePersistent
+
+        and: "the body exposes requirements section with platform information"
+        field().requirements().platform().architecture().from(theBody2) == v2PlatformArch
+        field().requirements().platform().variant().from(theBody2) == v2PlatformVariant
+        field().requirements().platform().os().from(theBody2) == v2PlatformOs
     }
 
     @Unroll
     def "deletes application with #behavior"() {
         given: "developer creates an application with 2 versions"
-        Application appV1 = newApplication().withId(appId).withVersion(v1).build()
-        Application appV2 = newApplication().withId(appId).withVersion(v2).build()
+        Application appV1 = ApplicationMetadataBuilder.builder().fromDefaults().withId(appId).withVersion(v1).forCreate()
+        Application appV2 = ApplicationMetadataBuilder.builder().fromDefaults().withId(appId).withVersion(v2).forCreate()
         maintainerSteps.createNewApplication_expectSuccess(DEFAULT_DEV_CODE, appV1)
         maintainerSteps.createNewApplication_expectSuccess(DEFAULT_DEV_CODE, appV2)
 
@@ -496,8 +749,8 @@ class MaintainerApiFTSpec extends AsmsSpecBase {
         def appId = randId()
         def v1 = "1.0.0"
         def v2 = "2.0.0"
-        Application appV1 = newApplication().withId(appId).withVersion(v1).build()
-        Application appV2 = newApplication().withId(appId).withVersion(v2).build()
+        Application appV1 = ApplicationMetadataBuilder.builder().fromDefaults().withId(appId).withVersion(v1).forCreate()
+        Application appV2 = ApplicationMetadataBuilder.builder().fromDefaults().withId(appId).withVersion(v2).forCreate()
         maintainerSteps.createNewApplication_expectSuccess(DEFAULT_DEV_CODE, appV1)
         maintainerSteps.createNewApplication_expectSuccess(DEFAULT_DEV_CODE, appV2)
 
@@ -531,14 +784,14 @@ class MaintainerApiFTSpec extends AsmsSpecBase {
         dbSteps.createNewMaintainer(dev2)
         dbSteps.listMaintainers()
 
-        Application app1v1 = newApplication()
-                .withId(id1).withVersion(v1).build()
-        Application app1v2 = newApplication()
-                .withId(id1).withVersion(v2).build()
-        Application app2v1 = newApplication()
-                .withId(id2).withVersion(v1).build()
-        Application app3v1 = newApplication()
-                .withId(id3).withVersion(v3).withVisible(false).build()
+        Application app1v1 = ApplicationMetadataBuilder.builder().fromDefaults()
+                .withId(id1).withVersion(v1).forCreate()
+        Application app1v2 = ApplicationMetadataBuilder.builder().fromDefaults()
+                .withId(id1).withVersion(v2).forCreate()
+        Application app2v1 = ApplicationMetadataBuilder.builder().fromDefaults()
+                .withId(id2).withVersion(v1).forCreate()
+        Application app3v1 = ApplicationMetadataBuilder.builder().fromDefaults()
+                .withId(id3).withVersion(v3).withVisible(false).forCreate()
 
         maintainerSteps.createNewApplication_expectSuccess(DEFAULT_DEV_CODE, app1v1)
         maintainerSteps.createNewApplication_expectSuccess(DEFAULT_DEV_CODE, app1v2)
@@ -583,27 +836,27 @@ class MaintainerApiFTSpec extends AsmsSpecBase {
     def "queries for applications list returns apps for #behavior"() {
         given: "developer creates 3 application: first creates 2 incl. multi-versioned and second only 1"
 
-        Application app1v1 = newApplication().withId(id1).withVersion(v1)
+        Application app1v1 = ApplicationMetadataBuilder.builder().fromDefaults().withId(id1).withVersion(v1)
                 .withName("Awesome Application")
                 .withCategory(Category.DEV)
                 .withPlatform("pc", "win", "v1")
-                .build()
-        Application app1v2 = newApplication().withId(id1).withVersion(v2).withVisible(false)
+                .forCreate()
+        Application app1v2 = ApplicationMetadataBuilder.builder().fromDefaults().withId(id1).withVersion(v2).withVisible(false)
                 .withCategory(Category.RESOURCE)
                 .withPlatform("arm", "linux", "v2")
-                .build()
-        Application app2v1 = newApplication().withId(id2).withVersion(v1)
+                .forCreate()
+        Application app2v1 = ApplicationMetadataBuilder.builder().fromDefaults().withId(id2).withVersion(v1)
                 .withCategory(Category.PLUGIN)
                 .withPlatform("plug-in", "any", "v3")
-                .build()
-        Application app2v2 = newApplication().withId(id2).withVersion(v2)
+                .forCreate()
+        Application app2v2 = ApplicationMetadataBuilder.builder().fromDefaults().withId(id2).withVersion(v2)
                 .withCategory(Category.PLUGIN)
                 .withPlatform("custom001", "confidential", "v4")
-                .build()
-        Application app3v1 = newApplication().withId(id3).withVersion(v1)
+                .forCreate()
+        Application app3v1 = ApplicationMetadataBuilder.builder().fromDefaults().withId(id3).withVersion(v1)
                 .withCategory(Category.SERVICE)
                 .withPlatform("mac", "macOs", "v5")
-                .build()
+                .forCreate()
         Map<String, Application> apps = mapAppsToKeys([app1v1, app1v2, app2v1, app2v2, app3v1])
         def maintainerMappings = apps.values().stream().collect(Collectors.toMap({ a -> a }, { a -> DEFAULT_DEV_NAME }))
         def matchingApp = apps.get(sourceOfCriteria)
