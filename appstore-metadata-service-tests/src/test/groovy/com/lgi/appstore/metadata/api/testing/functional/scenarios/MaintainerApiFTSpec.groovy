@@ -93,14 +93,14 @@ class MaintainerApiFTSpec extends AsmsSpecBase {
         behavior              | appId    | v1      | visible || httpStatus
         "missing id"          | null     | "1.0.0" | false   || SC_BAD_REQUEST
         "missing version"     | randId() | null    | false   || SC_BAD_REQUEST
-        "only mandatory data" | randId() | "1.0.0" | null    || SC_CREATED // is header: id, version, type, category, name, icon, url, requirements (even if only empty)
+        "only mandatory data" | randId() | "1.0.0" | null    || SC_CREATED // mandatory is header having: id, version, type, category, name, icon, url, requirements (even if only empty)
     }
 
     @Unroll
     def "second attempt to create same application should be rejected"() {
         given:
         Application app = builder().fromDefaults()
-                .withId(randId()).withVersion("1").forCreate()
+                .withId(randId()).withVersion("9999.9999.9999").forCreate()
 
         when: "developer attempts to create application with some basic data"
         def responseCreate = maintainerSteps.createNewApplication(DEFAULT_DEV_CODE, app).extract()
@@ -155,7 +155,7 @@ class MaintainerApiFTSpec extends AsmsSpecBase {
     }
 
     @Unroll
-    def "developer cannot access other developer application (GET/POST/DELETE)"() {
+    def "developer cannot access other developer application (GET/PUT/DELETE)"() {
         given: "2 developers create 2 applications"
         def dev2 = "lgi-wannabe"
         dbSteps.createNewMaintainer(dev2)
@@ -762,6 +762,33 @@ class MaintainerApiFTSpec extends AsmsSpecBase {
     }
 
     @Unroll
+    def "delete by not existing version or id"() {
+        given: "developer creates an application with 2 versions"
+        def appId = randId()
+        def v1 = "3.0.333"
+        Application appV1 = builder().fromDefaults().withId(appId).withVersion(v1).forCreate()
+        maintainerSteps.createNewApplication_expectSuccess(DEFAULT_DEV_CODE, appV1)
+
+        and: "developer gets details of application"
+        JsonPath bodyBefore = maintainerSteps.getApplicationDetails_expectSuccess(DEFAULT_DEV_CODE, appKeyFor(appV1))
+        assertThat(field().header().version().from(bodyBefore)).describedAs("Version value before delete").isEqualTo(v1)
+
+        when: "developer calls delete application id and wrong version"
+        def responseDeleteWrongVersion = maintainerSteps.deleteApplication(DEFAULT_DEV_CODE, String.format("%s:%s", appId, "3.0.666")).extract()
+        def responseStatusDeleteWrongVersion = responseDeleteWrongVersion.statusCode()
+
+        and: "developer calls delete application with not existing id"
+        def responseDeleteNotExistingId = maintainerSteps.deleteApplication(DEFAULT_DEV_CODE, String.format("wrong_%s:%s", appId, v1)).extract()
+        def responseStatusDeleteNotExistingId = responseDeleteNotExistingId.statusCode()
+
+        then: "expected response HTTP status should be SC_NOT_FOUND in both cases"
+        verifyAll {
+            responseStatusDeleteWrongVersion == SC_NOT_FOUND
+            responseStatusDeleteNotExistingId == SC_NOT_FOUND
+        }
+    }
+
+    @Unroll
     def "consecutive deletes of application versions"() {
         given: "developer creates an application with 2 versions"
         def appId = randId()
@@ -841,7 +868,7 @@ class MaintainerApiFTSpec extends AsmsSpecBase {
             assertThat(ApplicationsPath.field().applications().at(0).version().from(jsonBody)).matches(anyOf(possibleV), "received version matches any of: " + possibleV.toString())
         }
 
-         where:
+        where:
         dev2   | id1      | id2        | id3        | limit | offset | v1       | v2      | v3      | queryDevCode     || possibleIds | possibleV | count | total | returnedLimit
         "lgi2" | randId() | "2_" + id1 | "3_" + id1 | 3     | 0      | "0.0.11" | "0.1.0" | "1.1.0" | DEFAULT_DEV_CODE || [id1, id2]  | [v1, v2]  | 2     | 2     | limit
         "lgi2" | randId() | "2_" + id1 | "3_" + id1 | null  | 0      | "0.1.1"  | "0.0.1" | "1.0.1" | dev2             || [id3]       | [v3]      | 1     | 1     | DEFAULT_LIMIT
