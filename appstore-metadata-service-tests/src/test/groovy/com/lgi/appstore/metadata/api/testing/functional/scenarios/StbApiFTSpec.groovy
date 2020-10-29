@@ -350,9 +350,8 @@ class StbApiFTSpec extends AsmsSpecBase {
 
         and: "the body exposes version section with all versions and visibility information"
         assertThat(field().versions().from(theBody1)).asList().hasSize(2) // 3rd hidden version should not be exposed
-        field().versions().at(0).version().from(theBody1) == v1
-        field().versions().at(0).visible().from(theBody1) == null // version field should not be exposed
-        field().versions().at(1).version().from(theBody1) == v2
+        assertThat(field().versions().version().from(theBody1)).asList().containsExactlyInAnyOrder(v1, v2)
+        assertThat(field().versions().visible().from(theBody1)).asList().containsExactly(null, null) // 'visible' field should not be exposed
 
         and: "the body exposes requirements section with dependencies information"
         assertThat(field().requirements().dependencies().id().from(theBody1)).asList().containsExactlyInAnyOrder(v1Dependency1Id, v1Dependency2Id)
@@ -390,9 +389,8 @@ class StbApiFTSpec extends AsmsSpecBase {
 
         and: "the body exposes version section with all versions and visibility information"
         assertThat(field().versions().from(theBody2)).asList().hasSize(2) // 3rd hidden version should not be exposed
-        field().versions().at(0).version().from(theBody2) == v1
-        field().versions().at(0).visible().from(theBody2) == null // version field should not be exposed
-        field().versions().at(1).version().from(theBody2) == v2
+        assertThat(field().versions().version().from(theBody2)).asList().containsExactlyInAnyOrder(v1, v2)
+        assertThat(field().versions().visible().from(theBody2)).asList().containsExactly(null, null) // 'visible' field should not be exposed
 
         and: "the body exposes requirements section with dependencies information"
         assertThat(field().requirements().dependencies().id().from(theBody2)).asList().containsExactlyInAnyOrder(v2Dependency1Id, v2Dependency2Id)

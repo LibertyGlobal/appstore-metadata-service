@@ -20,7 +20,6 @@
 package com.lgi.appstore.metadata.api.testing.functional.scenarios
 
 import com.lgi.appstore.metadata.api.testing.functional.AsmsSpecBase
-import com.lgi.appstore.metadata.api.testing.functional.framework.model.request.ApplicationMetadataBuilder
 import com.lgi.appstore.metadata.api.testing.functional.framework.model.response.ApplicationDetailsPath
 import com.lgi.appstore.metadata.api.testing.functional.framework.model.response.ApplicationsPath
 import com.lgi.appstore.metadata.model.Application
@@ -41,6 +40,7 @@ import static com.lgi.appstore.metadata.api.testing.functional.framework.model.r
 import static com.lgi.appstore.metadata.api.testing.functional.framework.model.request.ApiMaintainerApplicationsQueryParams.PLATFORM
 import static com.lgi.appstore.metadata.api.testing.functional.framework.model.request.ApiMaintainerApplicationsQueryParams.TYPE
 import static com.lgi.appstore.metadata.api.testing.functional.framework.model.request.ApiMaintainerApplicationsQueryParams.VERSION
+import static com.lgi.appstore.metadata.api.testing.functional.framework.model.request.ApplicationMetadataBuilder.builder
 import static com.lgi.appstore.metadata.api.testing.functional.framework.model.request.QueryParams.mapping
 import static com.lgi.appstore.metadata.api.testing.functional.framework.model.request.QueryParams.queryParams
 import static com.lgi.appstore.metadata.api.testing.functional.framework.model.response.ApplicationDetailsPath.FIELD_CATEGORY
@@ -65,6 +65,7 @@ import static com.lgi.appstore.metadata.api.testing.functional.framework.utils.D
 import static com.lgi.appstore.metadata.api.testing.functional.framework.utils.DataUtils.pickRandomCategoryExcluding
 import static com.lgi.appstore.metadata.api.testing.functional.framework.utils.DataUtils.randId
 import static org.apache.http.HttpStatus.SC_BAD_REQUEST
+import static org.apache.http.HttpStatus.SC_CONFLICT
 import static org.apache.http.HttpStatus.SC_CREATED
 import static org.apache.http.HttpStatus.SC_NOT_FOUND
 import static org.apache.http.HttpStatus.SC_NO_CONTENT
@@ -78,7 +79,7 @@ class MaintainerApiFTSpec extends AsmsSpecBase {
     @Unroll
     def "create application very basic validation for #behavior"() {
         given:
-        Application app = ApplicationMetadataBuilder.builder().fromDefaults()
+        Application app = builder().fromDefaults()
                 .withId(appId).withVersion(v1).withVisible(visible).forCreate()
 
         when: "developer attempts to create application with incorrect data with #behavior"
@@ -96,13 +97,34 @@ class MaintainerApiFTSpec extends AsmsSpecBase {
     }
 
     @Unroll
+    def "second attempt to create same application should be rejected"() {
+        given:
+        Application app = builder().fromDefaults()
+                .withId(randId()).withVersion("1").forCreate()
+
+        when: "developer attempts to create application with some basic data"
+        def responseCreate = maintainerSteps.createNewApplication(DEFAULT_DEV_CODE, app).extract()
+        def receivedCreateStatus = responseCreate.statusCode()
+
+        then: "expected response HTTP status should be SC_CREATED"
+        receivedCreateStatus == SC_CREATED
+
+        when: "developer attempts to create same application again"
+        def responseUpdate = maintainerSteps.createNewApplication(DEFAULT_DEV_CODE, app).extract()
+        def receivedUpdateStatus = responseUpdate.statusCode()
+
+        then: "expected response HTTP status should be SC_CONFLICT"
+        receivedUpdateStatus == SC_CONFLICT
+    }
+
+    @Unroll
     def "create non-existing app and view details for #behavior"() {
         given: "developer create 2 applications: first with 2 versions (incl. hidden latest) and second with only one version"
-        Application app1v1 = ApplicationMetadataBuilder.builder().fromDefaults()
+        Application app1v1 = builder().fromDefaults()
                 .withId(appId).withVersion(v1).forCreate()
-        Application app1v2 = ApplicationMetadataBuilder.builder().fromDefaults()
+        Application app1v2 = builder().fromDefaults()
                 .withId(appId).withVersion(v2).withVisible(isV2Visible).forCreate()
-        Application app2v1 = ApplicationMetadataBuilder.builder().fromDefaults()
+        Application app2v1 = builder().fromDefaults()
                 .withId("someOther_$appId").withVersion(v1) forCreate()
 
         maintainerSteps.createNewApplication_expectSuccess(DEFAULT_DEV_CODE, app1v1)
@@ -142,11 +164,11 @@ class MaintainerApiFTSpec extends AsmsSpecBase {
         def app1Id = randId()
         def app2Id = randId()
 
-        Application app1 = ApplicationMetadataBuilder.builder().fromDefaults()
+        Application app1 = builder().fromDefaults()
                 .withId(app1Id).withVersion("1.1.1").forCreate()
-        ApplicationForUpdate app1forUpdate = ApplicationMetadataBuilder.builder().fromExisting(app1)
+        ApplicationForUpdate app1forUpdate = builder().fromExisting(app1)
                 .with(ApplicationDetailsPath.FIELD_VERSION, "1.1.1").forUpdate()
-        Application app2 = ApplicationMetadataBuilder.builder().fromDefaults()
+        Application app2 = builder().fromDefaults()
                 .withId(app2Id).withVersion("2.2.2").forCreate()
 
         maintainerSteps.createNewApplication_expectSuccess(DEFAULT_DEV_CODE, app1)
@@ -207,7 +229,7 @@ class MaintainerApiFTSpec extends AsmsSpecBase {
         def v1Feature2Name = "v1Feature2Name"
         def v1Feature2Version = "v1Feature2Version"
         def v1Feature2Required = false
-        Application appV1 = ApplicationMetadataBuilder.builder().fromDefaults()
+        Application appV1 = builder().fromDefaults()
                 .withId(appId)
                 .withVersion(v1)
                 .withVisible(v1Visible)
@@ -251,7 +273,7 @@ class MaintainerApiFTSpec extends AsmsSpecBase {
         def v2Feature2Name = "v2Feature2Name"
         def v2Feature2Version = "v2Feature2Version"
         def v2Feature2Required = true
-        Application appV2 = ApplicationMetadataBuilder.builder().fromDefaults().withId(appId)
+        Application appV2 = builder().fromDefaults().withId(appId)
                 .withVersion(v2)
                 .withVisible(v2Visible)
                 .withName(v2Name)
@@ -299,10 +321,8 @@ class MaintainerApiFTSpec extends AsmsSpecBase {
 
         and: "the body exposes version section with all versions and visibility information"
         assertThat(field().versions().from(theBody1)).asList().hasSize(2)
-        field().versions().at(0).version().from(theBody1) == v1
-        field().versions().at(0).visible().from(theBody1) == v1Visible
-        field().versions().at(1).version().from(theBody1) == v2
-        field().versions().at(1).visible().from(theBody1) == v2Visible
+        assertThat(field().versions().version().from(theBody1)).asList().containsExactlyInAnyOrder(v1, v2)
+        assertThat(field().versions().visible().from(theBody1)).asList().containsExactlyInAnyOrder(v1Visible, v2Visible)
 
         and: "the body exposes requirements section with dependencies information"
         assertThat(field().requirements().dependencies().id().from(theBody1)).asList().containsExactlyInAnyOrder(v1Dependency1Id, v1Dependency2Id)
@@ -352,10 +372,8 @@ class MaintainerApiFTSpec extends AsmsSpecBase {
 
         and: "the body exposes version section with all versions and visibility information"
         assertThat(field().versions().from(theBody2)).asList().hasSize(2)
-        field().versions().at(0).version().from(theBody2) == v1
-        field().versions().at(0).visible().from(theBody2) == v1Visible
-        field().versions().at(1).version().from(theBody2) == v2
-        field().versions().at(1).visible().from(theBody2) == v2Visible
+        assertThat(field().versions().version().from(theBody2)).asList().containsExactlyInAnyOrder(v1, v2)
+        assertThat(field().versions().visible().from(theBody2)).asList().containsExactlyInAnyOrder(v1Visible, v2Visible)
 
         and: "the body exposes requirements section with dependencies information"
         assertThat(field().requirements().dependencies().id().from(theBody2)).asList().containsExactlyInAnyOrder(v2Dependency1Id, v2Dependency2Id)
@@ -383,7 +401,7 @@ class MaintainerApiFTSpec extends AsmsSpecBase {
     def "update application details for #field - PUT operation does complete overwrite of latest version (by ID alone)"() {
         given: "developer creates an application with #field value #valueBefore"
         def appId = randId()
-        Application app = ApplicationMetadataBuilder.builder().fromDefaults()
+        Application app = builder().fromDefaults()
                 .withId(appId).withVersion("0.0.1").with(field, valueBefore).forCreate()
         maintainerSteps.createNewApplication_expectSuccess(DEFAULT_DEV_CODE, app)
 
@@ -392,7 +410,7 @@ class MaintainerApiFTSpec extends AsmsSpecBase {
         assertThat(extract(field).from(bodyBefore)).describedAs("$field value before update").isEqualTo(valueBefore)
 
         when: "developer updates application"
-        ApplicationForUpdate updatedApp = ApplicationMetadataBuilder.builder().fromExisting(app).with(field, valueAfter).forUpdate()
+        ApplicationForUpdate updatedApp = builder().fromExisting(app).with(field, valueAfter).forUpdate()
         def responseUpdate = maintainerSteps.updateApplication(DEFAULT_DEV_CODE, app.getHeader().getId(), updatedApp).extract()
         def receivedStatusUpdate = responseUpdate.statusCode()
 
@@ -423,11 +441,11 @@ class MaintainerApiFTSpec extends AsmsSpecBase {
         def v1 = "0.0.100"
         def v2 = "0.20.0"
         def v3 = "3.0.0"
-        Application appV1 = ApplicationMetadataBuilder.builder().fromDefaults()
+        Application appV1 = builder().fromDefaults()
                 .withId(appId).withVersion(v1).with(field, valueV1Before).forCreate()
-        Application appV2 = ApplicationMetadataBuilder.builder().fromDefaults().withVisible(true)
+        Application appV2 = builder().fromDefaults().withVisible(true)
                 .withId(appId).withVersion(v2).forCreate()
-        Application appV3 = ApplicationMetadataBuilder.builder().fromDefaults().withVisible(true)
+        Application appV3 = builder().fromDefaults().withVisible(true)
                 .withId(appId).withVersion(v3).forCreate()
 
         maintainerSteps.createNewApplication_expectSuccess(DEFAULT_DEV_CODE, appV1)
@@ -439,7 +457,7 @@ class MaintainerApiFTSpec extends AsmsSpecBase {
         assertThat(extract(field).from(bodyV1Before)).describedAs("$field value before update").isEqualTo(valueV1Before)
 
         when: "developer updates application"
-        ApplicationForUpdate updatedApp = ApplicationMetadataBuilder.builder().fromExisting(appV1).with(field, valueV1After).forUpdate()
+        ApplicationForUpdate updatedApp = builder().fromExisting(appV1).with(field, valueV1After).forUpdate()
         def responseUpdate = maintainerSteps.updateApplication(DEFAULT_DEV_CODE, appKeyFor(appV1), updatedApp).extract()
         def receivedStatusUpdate = responseUpdate.statusCode()
 
@@ -513,7 +531,7 @@ class MaintainerApiFTSpec extends AsmsSpecBase {
         def v1Localisation2Name = "Polska"
         def v1Localisation2Lang = "pl"
         def v1Localisation2Description = "Opis lokalizacji dla pl"
-        Application appV1 = ApplicationMetadataBuilder.builder().fromDefaults()
+        Application appV1 = builder().fromDefaults()
                 .withId(appId)
                 .withVersion(v1)
                 .withVisible(v1Visible)
@@ -565,7 +583,7 @@ class MaintainerApiFTSpec extends AsmsSpecBase {
         def v2Localisation2Name = "Россия"
         def v2Localisation2Lang = "де"
         def v2Localisation2Description = "Описание де локализации"
-        ApplicationForUpdate appV2 = ApplicationMetadataBuilder.builder().fromDefaults()
+        ApplicationForUpdate appV2 = builder().fromDefaults()
                 .withId(appId)
                 .withVisible(v2Visible)
                 .withName(v2Name)
@@ -706,8 +724,8 @@ class MaintainerApiFTSpec extends AsmsSpecBase {
     @Unroll
     def "deletes application with #behavior"() {
         given: "developer creates an application with 2 versions"
-        Application appV1 = ApplicationMetadataBuilder.builder().fromDefaults().withId(appId).withVersion(v1).forCreate()
-        Application appV2 = ApplicationMetadataBuilder.builder().fromDefaults().withId(appId).withVersion(v2).forCreate()
+        Application appV1 = builder().fromDefaults().withId(appId).withVersion(v1).forCreate()
+        Application appV2 = builder().fromDefaults().withId(appId).withVersion(v2).forCreate()
         maintainerSteps.createNewApplication_expectSuccess(DEFAULT_DEV_CODE, appV1)
         maintainerSteps.createNewApplication_expectSuccess(DEFAULT_DEV_CODE, appV2)
 
@@ -749,8 +767,8 @@ class MaintainerApiFTSpec extends AsmsSpecBase {
         def appId = randId()
         def v1 = "1.0.0"
         def v2 = "2.0.0"
-        Application appV1 = ApplicationMetadataBuilder.builder().fromDefaults().withId(appId).withVersion(v1).forCreate()
-        Application appV2 = ApplicationMetadataBuilder.builder().fromDefaults().withId(appId).withVersion(v2).forCreate()
+        Application appV1 = builder().fromDefaults().withId(appId).withVersion(v1).forCreate()
+        Application appV2 = builder().fromDefaults().withId(appId).withVersion(v2).forCreate()
         maintainerSteps.createNewApplication_expectSuccess(DEFAULT_DEV_CODE, appV1)
         maintainerSteps.createNewApplication_expectSuccess(DEFAULT_DEV_CODE, appV2)
 
@@ -784,13 +802,13 @@ class MaintainerApiFTSpec extends AsmsSpecBase {
         dbSteps.createNewMaintainer(dev2)
         dbSteps.listMaintainers()
 
-        Application app1v1 = ApplicationMetadataBuilder.builder().fromDefaults()
+        Application app1v1 = builder().fromDefaults()
                 .withId(id1).withVersion(v1).forCreate()
-        Application app1v2 = ApplicationMetadataBuilder.builder().fromDefaults()
+        Application app1v2 = builder().fromDefaults()
                 .withId(id1).withVersion(v2).forCreate()
-        Application app2v1 = ApplicationMetadataBuilder.builder().fromDefaults()
+        Application app2v1 = builder().fromDefaults()
                 .withId(id2).withVersion(v1).forCreate()
-        Application app3v1 = ApplicationMetadataBuilder.builder().fromDefaults()
+        Application app3v1 = builder().fromDefaults()
                 .withId(id3).withVersion(v3).withVisible(false).forCreate()
 
         maintainerSteps.createNewApplication_expectSuccess(DEFAULT_DEV_CODE, app1v1)
@@ -836,24 +854,24 @@ class MaintainerApiFTSpec extends AsmsSpecBase {
     def "queries for applications list returns apps for #behavior"() {
         given: "developer creates 3 application: first creates 2 incl. multi-versioned and second only 1"
 
-        Application app1v1 = ApplicationMetadataBuilder.builder().fromDefaults().withId(id1).withVersion(v1)
+        Application app1v1 = builder().fromDefaults().withId(id1).withVersion(v1)
                 .withName("Awesome Application")
                 .withCategory(Category.DEV)
                 .withPlatform("pc", "win", "v1")
                 .forCreate()
-        Application app1v2 = ApplicationMetadataBuilder.builder().fromDefaults().withId(id1).withVersion(v2).withVisible(false)
+        Application app1v2 = builder().fromDefaults().withId(id1).withVersion(v2).withVisible(false)
                 .withCategory(Category.RESOURCE)
                 .withPlatform("arm", "linux", "v2")
                 .forCreate()
-        Application app2v1 = ApplicationMetadataBuilder.builder().fromDefaults().withId(id2).withVersion(v1)
+        Application app2v1 = builder().fromDefaults().withId(id2).withVersion(v1)
                 .withCategory(Category.PLUGIN)
                 .withPlatform("plug-in", "any", "v3")
                 .forCreate()
-        Application app2v2 = ApplicationMetadataBuilder.builder().fromDefaults().withId(id2).withVersion(v2)
+        Application app2v2 = builder().fromDefaults().withId(id2).withVersion(v2)
                 .withCategory(Category.PLUGIN)
                 .withPlatform("custom001", "confidential", "v4")
                 .forCreate()
-        Application app3v1 = ApplicationMetadataBuilder.builder().fromDefaults().withId(id3).withVersion(v1)
+        Application app3v1 = builder().fromDefaults().withId(id3).withVersion(v1)
                 .withCategory(Category.SERVICE)
                 .withPlatform("mac", "macOs", "v5")
                 .forCreate()
