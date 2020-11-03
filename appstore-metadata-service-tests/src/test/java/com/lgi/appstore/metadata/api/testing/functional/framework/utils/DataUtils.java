@@ -19,6 +19,7 @@
 
 package com.lgi.appstore.metadata.api.testing.functional.framework.utils;
 
+import com.github.javafaker.Faker;
 import com.lgi.appstore.metadata.api.testing.functional.framework.model.request.QueryParams;
 import com.lgi.appstore.metadata.model.Application;
 import com.lgi.appstore.metadata.model.Category;
@@ -31,9 +32,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.UUID;
+import java.util.Random;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static com.lgi.appstore.metadata.api.testing.functional.framework.model.request.QueryParams.mapping;
 
@@ -41,6 +43,9 @@ import static com.lgi.appstore.metadata.api.testing.functional.framework.model.r
  * @noinspection WeakerAccess as this is utility class
  */
 public class DataUtils {
+    private static final Random RANDOM = new Random();
+    private static final Faker FAKER = new Faker();
+
     public static Category pickRandomCategory() {
         return pickRandomCategoryExcluding(null);
     }
@@ -56,7 +61,31 @@ public class DataUtils {
     }
 
     public static String randId() {
-        return String.format("appId_%s", UUID.randomUUID());
+        return randomReversedDomainName();
+    }
+
+    public static String randomAppHeaderIcon() {
+        return FAKER.avatar().image();
+    }
+
+    public static String randomAppHeaderType() {
+        return String.format("%s.rdk-app.dac.native", FAKER.file().mimeType());
+    }
+
+    public static String randomAppUrl() {
+        return FAKER.internet().url();
+    }
+
+    public static String randomAppVersion() {
+        return FAKER.app().version();
+    }
+
+    public static String randomAppName() {
+        return FAKER.app().name();
+    }
+
+    public static String randomAppDescription() {
+        return String.format("All rights reserved by %s", FAKER.app().author());
     }
 
     public static String getFieldValueFromApplication(String field, Application app, Map<Application, String> maintainerNamesForApps) {
@@ -101,5 +130,13 @@ public class DataUtils {
         var platform = app.getRequirements().getPlatform();
         var platformProperties = List.of(platform.getArchitecture(), platform.getVariant(), platform.getOs());
         return String.join(":", platformProperties.subList(0, RandomUtils.nextInt(1, platformProperties.size()))); // architecture is mandatory
+    }
+
+    private static String randomReversedDomainName() {
+        int domainFirstWordIdx = 1;
+        int domainMaxWords = 2 + RANDOM.nextInt(3); // min 2, max 5
+        return FAKER.internet().domainSuffix() + "." + IntStream.range(domainFirstWordIdx, domainMaxWords).boxed()
+                .map(i -> FAKER.internet().domainWord())
+                .collect(Collectors.joining("."));
     }
 }
