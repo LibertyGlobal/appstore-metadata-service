@@ -20,6 +20,7 @@
 package com.lgi.appstore.metadata.api.testing.functional.framework.model.request;
 
 import com.lgi.appstore.metadata.api.testing.functional.framework.model.response.ApplicationDetailsPath;
+import com.lgi.appstore.metadata.api.testing.functional.framework.utils.DataUtils;
 import com.lgi.appstore.metadata.model.Application;
 import com.lgi.appstore.metadata.model.ApplicationForUpdate;
 import com.lgi.appstore.metadata.model.ApplicationHeaderForUpdate;
@@ -31,13 +32,11 @@ import com.lgi.appstore.metadata.model.Localisation;
 import com.lgi.appstore.metadata.model.MaintainerApplicationHeader;
 import com.lgi.appstore.metadata.model.Platform;
 import com.lgi.appstore.metadata.model.Requirements;
-import org.jetbrains.annotations.NotNull;
 import org.testcontainers.shaded.org.apache.commons.lang.NotImplementedException;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -175,11 +174,12 @@ public class ApplicationMetadataBuilder {
     }
 
     public ApplicationMetadataBuilder fromDefaults() {
-        this.headerName = String.format("AppName_%s", UUID.randomUUID().toString());
-        this.headerDescription = String.format("AppDescription_%s", UUID.randomUUID().toString());
-        this.headerUrl = String.format("AppUrl_%s", UUID.randomUUID().toString());
-        this.headerType = String.format("AppType_%s", UUID.randomUUID().toString());
-        this.headerIcon = String.format("AppIcon_%s", UUID.randomUUID().toString());
+        this.headerName = DataUtils.randomAppName();
+        this.headerVersion = DataUtils.randomAppVersion();
+        this.headerDescription = DataUtils.randomAppDescription();
+        this.headerUrl = DataUtils.randomAppUrl();
+        this.headerType = DataUtils.randomAppHeaderType();
+        this.headerIcon = DataUtils.randomAppHeaderIcon();
         this.headerVisible = Boolean.TRUE;
         this.headerCategory = Category.APPLICATION;
 
@@ -242,7 +242,6 @@ public class ApplicationMetadataBuilder {
                 .requirements(Optional.ofNullable(requirements).orElse(assembleRequirements()));
     }
 
-    @NotNull
     private Requirements assembleRequirements() {
         Requirements requirements = new Requirements();
         Optional.ofNullable(platform).ifPresent(requirements::platform);
