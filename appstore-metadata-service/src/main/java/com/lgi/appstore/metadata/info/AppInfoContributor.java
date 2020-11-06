@@ -33,10 +33,10 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.TimeZone;
 
+import static com.lgi.appstore.metadata.api.constants.AppConstants.MISSING_DETAIL_VALUE;
+
 @Component
 public class AppInfoContributor implements InfoContributor {
-
-    private static final String MISSING_DETAIL_VALUE = "not specified";
     private static final Map<String, Object> DETAILS = new HashMap<>();
 
     private final Environment environment;
@@ -70,7 +70,7 @@ public class AppInfoContributor implements InfoContributor {
         DETAILS.put(appProperty.toString(), value);
     }
 
-    private Object getAppPropertyValueFromEnvironment(AppProperty appProperty) {
+    private Object getAppPropertyValueFromEnvironment(final AppProperty appProperty) {
         return Optional.ofNullable(environment.getProperty(appProperty.toString()))
                 .orElse(MISSING_DETAIL_VALUE);
     }
