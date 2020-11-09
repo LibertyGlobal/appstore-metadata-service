@@ -114,7 +114,7 @@ class StbApiFTSpec extends AsmsSpecBase {
         where:
         limit | offset | id1      | id2        | id3        | v1       | v2      || count | total | returnedLimit
         3     | 0      | randId() | "2_" + id1 | "3_" + id1 | "0.0.11" | "0.1.0" || 3     | 3     | limit
-        null  | 0      | randId() | "2_" + id1 | "3_" + id1 | "0.1.1"  | "0.0.1" || 3     | 3     | DEFAULT_LIMIT
+        null  | 0      | randId() | "2_" + id1 | "3_" + id1 | "0.1.1"  | "0.0.1" || 3     | 4     | DEFAULT_LIMIT
         1     | 0      | randId() | "2_" + id1 | "3_" + id1 | "0.11.1" | "1.0.1" || 1     | 3     | limit
         1     | 1      | randId() | "2_" + id1 | "3_" + id1 | "0.1.1"  | "0.0.1" || 1     | 3     | limit
         1     | 3      | randId() | "2_" + id1 | "3_" + id1 | "0.1.1"  | "0.0.1" || 0     | 3     | limit
