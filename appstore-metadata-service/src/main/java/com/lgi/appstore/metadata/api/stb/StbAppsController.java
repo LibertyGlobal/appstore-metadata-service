@@ -38,7 +38,6 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.validation.Valid;
 import java.util.Optional;
 
-//@Timed
 @RestController
 @RequestMapping("/apps")
 public class StbAppsController {
