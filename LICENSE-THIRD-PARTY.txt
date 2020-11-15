@@ -1,5 +1,5 @@
 
-Lists of 151 third-party dependencies.
+Lists of 154 third-party dependencies.
      (Eclipse Public License - v 1.0) (GNU Lesser General Public License) Logback Classic Module (ch.qos.logback:logback-classic:1.2.3 - http://logback.qos.ch/logback-classic)
      (Eclipse Public License - v 1.0) (GNU Lesser General Public License) Logback Core Module (ch.qos.logback:logback-core:1.2.3 - http://logback.qos.ch/logback-core)
      (The Apache License, Version 2.0) spock-reports (com.athaydes:spock-reports:1.7.1 - https://github.com/renatoathaydes/spock-reports)
@@ -28,6 +28,9 @@ Lists of 151 third-party dependencies.
      (BSD) Automaton (dk.brics.automaton:automaton:1.11-8 - http://www.brics.dk/automaton/)
      (The MIT License (MIT)) ClassGraph (io.github.classgraph:classgraph:4.8.69 - https://github.com/classgraph/classgraph)
      (The Apache Software License, Version 2.0) micrometer-core (io.micrometer:micrometer-core:1.5.5 - https://github.com/micrometer-metrics/micrometer)
+     (The Apache Software License, Version 2.0) micrometer-registry-prometheus (io.micrometer:micrometer-registry-prometheus:1.5.5 - https://github.com/micrometer-metrics/micrometer)
+     (The Apache Software License, Version 2.0) Prometheus Java Simpleclient (io.prometheus:simpleclient:0.8.1 - http://github.com/prometheus/client_java/simpleclient)
+     (The Apache Software License, Version 2.0) Prometheus Java Simpleclient Common (io.prometheus:simpleclient_common:0.8.1 - http://github.com/prometheus/client_java/simpleclient_common)
      (The Apache Software License, Version 2.0) Allure Attachments (io.qameta.allure:allure-attachments:2.13.6 - https://github.com/allure-framework/allure-java)
      (The Apache Software License, Version 2.0) Allure Java Commons (io.qameta.allure:allure-java-commons:2.13.6 - https://github.com/allure-framework/allure-java)
      (The Apache Software License, Version 2.0) Allure JUnit Platform Integration (io.qameta.allure:allure-junit-platform:2.13.6 - https://github.com/allure-framework/allure-java)
@@ -149,4 +152,5 @@ Lists of 151 third-party dependencies.
      (Apache 2.0) Swagger UI (org.webjars:swagger-ui:3.28.0 - http://webjars.org)
      (MIT) webjars-locator-core (org.webjars:webjars-locator-core:0.45 - http://webjars.org)
      (The Apache Software License, Version 2.0) org.xmlunit:xmlunit-core (org.xmlunit:xmlunit-core:2.7.0 - https://www.xmlunit.org/)
+     (Apache License, Version 2.0) SnakeYAML (org.yaml:snakeyaml:1.23 - http://www.snakeyaml.org)
      (Apache License, Version 2.0) SnakeYAML (org.yaml:snakeyaml:1.26 - http://www.snakeyaml.org)
