@@ -8,7 +8,9 @@ BDD and DDT approaches are applied for scenarios design.
 Build and execution from Maven level
 ---
 
-Local build and execution requires running the following command:
+Local build and execution requires running the following command
+from inside of the module: ```appstore-metadata-service-tests```
+
 
 ```
 mvn clean verify -P tests-for-development
@@ -53,8 +55,8 @@ Reports generating and viewing
 Reports need to be generated from test output and published as HTTP:
 
 ```
-allure generate target\allure-results -o target\allure-report
-allure open target\allure-report
+allure generate target/allure-results -o target/allure-report
+allure open target/allure-report
 ```
 
 e.g.:
