@@ -24,7 +24,6 @@ import com.lgi.appstore.metadata.model.Category;
 import com.lgi.appstore.metadata.model.Platform;
 import com.lgi.appstore.metadata.model.StbApplicationDetails;
 import com.lgi.appstore.metadata.model.StbApplicationsList;
-import io.micrometer.core.annotation.Timed;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
