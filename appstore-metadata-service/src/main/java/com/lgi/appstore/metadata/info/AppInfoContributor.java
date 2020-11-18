@@ -70,7 +70,7 @@ public class AppInfoContributor implements InfoContributor {
         DETAILS.put(appProperty.toString(), value);
     }
 
-    private Object getAppPropertyValueFromEnvironment(final AppProperty appProperty) {
+    private Object getAppPropertyValueFromEnvironment(AppProperty appProperty) {
         return Optional.ofNullable(environment.getProperty(appProperty.toString()))
                 .orElse(MISSING_DETAIL_VALUE);
     }

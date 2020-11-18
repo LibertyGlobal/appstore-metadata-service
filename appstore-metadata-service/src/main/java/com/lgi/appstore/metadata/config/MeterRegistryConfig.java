@@ -34,7 +34,7 @@ import static com.lgi.appstore.metadata.api.constants.AppConstants.MISSING_DETAI
 public class MeterRegistryConfig {
     private final Environment environment;
 
-    public MeterRegistryConfig(final Environment environment) {
+    public MeterRegistryConfig(Environment environment) {
         this.environment = environment;
     }
 
