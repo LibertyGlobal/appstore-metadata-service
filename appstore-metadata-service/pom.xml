@@ -18,6 +18,7 @@
         <db.name>postgres</db.name>
         <db.host>localhost</db.host>
         <db.port>46576</db.port>
+        <ryuk.port>46577</ryuk.port>
         <db.schema>appstore_metadata_service</db.schema>
         <db.url>jdbc:postgresql://${db.host}:${db.port}/${db.name}</db.url>
         <db.driver>org.postgresql.Driver</db.driver>
@@ -26,9 +27,21 @@
         <maven.jib.plugin.version>2.2.0</maven.jib.plugin.version>
         <scmBranch>current</scmBranch>
         <scmCommit>latest</scmCommit>
+        <sock-dir-docker-host>/var/run/docker.sock</sock-dir-docker-host>
     </properties>
 
     <profiles>
+        <profile>
+            <id>windows-specific-settings</id>
+            <activation>
+                <os>
+                    <family>Windows</family>
+                </os>
+            </activation>
+            <properties>
+                <sock-dir-docker-host>//var/run/docker.sock</sock-dir-docker-host>
+            </properties>
+        </profile>
         <profile>
             <id>dev</id>
             <properties>
@@ -143,11 +156,47 @@
                 </executions>
             </plugin>
             <plugin>
+                <groupId>com.lgi.common.maven</groupId>
+                <artifactId>tcp-msg-maven-plugin</artifactId>
+                <version>0.0.1-SNAPSHOT</version>
+                <executions>
+                    <execution>
+                        <id>write-death-note-for-postgres</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>tcpmsg</goal>
+                        </goals>
+                        <configuration>
+                            <port>${ryuk.port}</port>
+                            <msg>label=killme</msg>
+                            <repeatAmount>6</repeatAmount>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
                 <groupId>io.fabric8</groupId>
                 <artifactId>docker-maven-plugin</artifactId>
                 <version>0.34.0</version>
                 <configuration>
+                    <logStdout>true</logStdout>
+                    <verbose>true</verbose>
                     <images>
+                        <image>
+                            <alias>ryuk-summoned</alias>
+                            <name>testcontainers/ryuk:0.3.0</name>
+                            <run>
+                                <ports>
+                                    <port>ryuk.port:8080</port>
+                                </ports>
+                                <volumes>
+                                    <bind>
+                                        <volume>${sock-dir-docker-host}:/var/run/docker.sock</volume>
+                                    </bind>
+                                </volumes>
+                                <autoRemove>true</autoRemove>
+                            </run>
+                        </image>
                         <image>
                             <alias>postgres</alias>
                             <name>postgres:11</name>
@@ -161,6 +210,10 @@
                                 <wait>
                                     <time>5000</time>
                                 </wait>
+                                <autoRemove>true</autoRemove>
+                                <labels>
+                                    <killme>true</killme>
+                                </labels>
                             </run>
                         </image>
                     </images>
@@ -171,13 +224,6 @@
                         <phase>generate-sources</phase>
                         <goals>
                             <goal>start</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>stop-postgres</id>
-                        <phase>process-sources</phase>
-                        <goals>
-                            <goal>stop</goal>
                         </goals>
                     </execution>
                 </executions>
