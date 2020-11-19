@@ -17,6 +17,7 @@
     <modules>
         <module>appstore-metadata-service</module>
         <module>appstore-metadata-service-tests</module>
+        <module>tcp-msg-maven-plugin</module>
     </modules>
 
     <properties>
@@ -63,6 +64,8 @@
             The MIT License|${line.separator}
             The MIT License (MIT)
         </license.includedLicenses>
+        <license.excludedGroups>(^org\.eclipse\.sisu)|(^com\.sun\.xml\.bind)
+        </license.excludedGroups> <!-- dependencies of maven-plugin-api -->
     </properties>
 
     <distributionManagement>
