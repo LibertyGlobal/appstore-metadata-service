@@ -20,6 +20,7 @@
         <groovy-version>2.5.13</groovy-version>
         <allure-version>2.13.6</allure-version>
         <skipFTs>true</skipFTs>
+        <dev-depl-url/>
     </properties>
 
     <profiles>
@@ -35,6 +36,7 @@
                 <maven-surefire-version>${maven-test-plugins-version}</maven-surefire-version>
                 <skipUTs>true</skipUTs>
                 <skipFTs>false</skipFTs>
+                <dev-depl-url>appstore-metadata-service.dac.appdev.io</dev-depl-url>
             </properties>
         </profile>
     </profiles>
@@ -191,8 +193,15 @@
                 <artifactId>maven-failsafe-plugin</artifactId>
                 <version>${maven-test-plugins-version}</version>
                 <configuration>
+                    <systemProperties>
+                        <property>
+                            <name>BASE_URL</name>
+                            <value>${dev-depl-url}</value>
+                        </property>
+                    </systemProperties>
                     <includes>
                         <include>**/*FTSpec</include>
+                        <include>**/*FTSpecSmoke</include>
                     </includes>
                     <argLine>
                         -javaagent:"${settings.localRepository}/org/aspectj/aspectjweaver/${aspectj.version}/aspectjweaver-${aspectj.version}.jar"

@@ -64,3 +64,11 @@ e.g.:
 c:\allure-cli-2.13.5\bin\allure generate target\allure-results -o target\allure-report
 c:\allure-cli-2.13.5\bin\allure open target\allure-report
 ```
+
+Running smoke test against deployment on DEV
+---
+
+One needs to provide env. var. with information about the deployment location. Otherwise smoke tests will be ignored.
+```
+BASE_URL=appstore-metadata-service.dac.appdev.io
+```
