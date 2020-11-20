@@ -26,7 +26,6 @@ import com.lgi.appstore.metadata.model.ApplicationForUpdate
 import io.restassured.path.json.JsonPath
 import io.restassured.response.ExtractableResponse
 import io.restassured.response.Response
-import spock.lang.Requires
 
 import static com.lgi.appstore.metadata.api.testing.framework.model.request.ApplicationMetadataBuilder.builder
 import static com.lgi.appstore.metadata.api.testing.framework.model.response.ApplicationDetailsPath.field
@@ -43,7 +42,6 @@ import static org.apache.http.HttpStatus.SC_NO_CONTENT
 import static org.apache.http.HttpStatus.SC_OK
 import static org.assertj.core.api.Assertions.assertThat
 
-@Requires({ env.BASE_URL })
 class DevApiFTSpecSmoke extends AsmsIntegrationSpecBase {
 
     def "smoke check of example apps"() {
@@ -66,7 +64,6 @@ class DevApiFTSpecSmoke extends AsmsIntegrationSpecBase {
         ApplicationsPath.field().meta().resultSet().count().from(jsonBody) >= 3
         assertThat(ApplicationsPath.field().applications().id().from(jsonBody)).as("hardcoded example application IDs should be present on test env").asList().containsAll(exampleApps)
     }
-
 
     def "CRUD operations check (POST, GET, PUT, DELETE)"() {
         given:

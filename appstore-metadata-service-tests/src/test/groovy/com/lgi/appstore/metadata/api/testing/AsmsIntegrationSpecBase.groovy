@@ -18,7 +18,7 @@ import spock.lang.Specification
 @ExtendWith([SpringExtension.class])
 @SpringBootTest(classes = ITCaseContext.class)
 class AsmsIntegrationSpecBase extends Specification {
-    /** @noinspection WeakerAccess as this might be used in test scenarios     */
+    /** @noinspection WeakerAccess as this might be used in test scenarios   */
     @Shared
     protected Logger LOG = LoggerFactory.getLogger(AsmsIntegrationSpecBase.class)
 
