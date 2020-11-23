@@ -54,14 +54,19 @@
             CDDL/GPLv2+CE|${line.separator}
             Eclipse Public License 1.0|${line.separator}
             Eclipse Public License - v 1.0|${line.separator}
+            GPLv2+CE|${line.separator} <!-- temporary allow it just to run tests with validator-->
+            CDDL|${line.separator}
             Eclipse Public License v2.0|${line.separator}
             EDL 1.0|${line.separator}
             Eclipse Distribution License - v 1.0|${line.separator}
             GPL2 w/ CPE|${line.separator}
             MIT|${line.separator}
             MIT License|${line.separator}
+            MIT license|${line.separator}
             The MIT License|${line.separator}
-            The MIT License (MIT)
+            The MIT License (MIT)|${line.separator}
+            Mozilla Public License, Version 2.0|${line.separator} <!-- temporary allow it just to run tests with validator-->
+            Lesser General Public License, version 3 or greater <!-- temporary allow it just to run tests with validator-->
         </license.includedLicenses>
     </properties>
 
