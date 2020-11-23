@@ -19,6 +19,10 @@
 
 package com.lgi.appstore.metadata.api.testing.framework.infrastructure.service.base;
 
+import com.atlassian.oai.validator.OpenApiInteractionValidator;
+import com.atlassian.oai.validator.report.LevelResolver;
+import com.atlassian.oai.validator.report.ValidationReport;
+import com.atlassian.oai.validator.restassured.OpenApiValidationFilter;
 import com.lgi.appstore.metadata.api.testing.framework.TestSession;
 import com.lgi.appstore.metadata.api.testing.framework.utils.DefaultObjectMapperFactory;
 import io.qameta.allure.restassured.AllureRestAssured;
@@ -37,6 +41,7 @@ import org.springframework.core.env.Environment;
 import org.testcontainers.shaded.org.apache.commons.lang.NotImplementedException;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Map;
 import java.util.Optional;
 
 public class ServiceClientBase {
@@ -70,6 +75,15 @@ public class ServiceClientBase {
         ALLURE_REPORTING_FILTER = new AllureRestAssured();
     }
 
+    private static final OpenApiInteractionValidator validator = OpenApiInteractionValidator
+            .createFor("../appstore-metadata-service/src/main/resources/static/appstore-metadata-service.yaml")
+            .withLevelResolver(
+                    LevelResolver.create().withLevels(
+                            Map.of("validation.schema.additionalProperties", ValidationReport.Level.IGNORE,
+                                    "validation.request.parameter.schema.invalidJson", ValidationReport.Level.IGNORE))
+                            .build())
+            .build();
+
     protected String getBaseUri() {
         TestSession.TestType currentTestType = testSession.getTestType();
         if (currentTestType == TestSession.TestType.LOCAL) {
@@ -87,6 +101,7 @@ public class ServiceClientBase {
     protected RequestSpecification given() {
         return RestAssured.given()
                 .config(REST_ASSURED_CONFIG)
-                .filter(ALLURE_REPORTING_FILTER);
+                .filter(ALLURE_REPORTING_FILTER)
+                .filter(new OpenApiValidationFilter(validator)).log().ifValidationFails();
     }
 }
