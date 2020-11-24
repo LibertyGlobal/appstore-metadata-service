@@ -250,6 +250,8 @@ paths:
           description: Bad request
         401:
           description: Access denied
+        409:
+          description: Conflict
         5XX:
           description: Unexpected error
   /maintainers/{maintainerCode}/apps/{applicationId}:
