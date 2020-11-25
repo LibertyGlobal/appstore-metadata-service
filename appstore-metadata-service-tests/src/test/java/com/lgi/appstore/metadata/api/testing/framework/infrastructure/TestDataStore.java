@@ -24,6 +24,7 @@ import com.zaxxer.hikari.HikariDataSource;
 import org.apache.commons.beanutils.RowSetDynaClass;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.env.PropertyResolver;
 import org.testcontainers.containers.PostgreSQLContainer;
 
 import javax.sql.DataSource;
@@ -36,8 +37,6 @@ import java.util.Optional;
 public class TestDataStore extends PostgreSQLContainer<TestDataStore> {
     private static final Logger LOG = LoggerFactory.getLogger(TestDataStore.class);
 
-    public static final String DB_SCHEMA_NAME = "appstore_metadata_service";
-
     private static final String DB_IMAGE_NAME = "postgres:11.1";
     private static final String DB_NAME = "postgres";
     private static final String DB_USER = "postgres";
@@ -46,14 +45,17 @@ public class TestDataStore extends PostgreSQLContainer<TestDataStore> {
     private static TestDataStore singleton;
 
     private DataSource ds;
+    private String databaseSchemaName;
 
-    private TestDataStore() {
+    private TestDataStore(PropertyResolver propertyResolver) {
         super(DB_IMAGE_NAME);
+
+        databaseSchemaName = propertyResolver.getProperty("db.schema", String.class);
     }
 
-    public static TestDataStore getInstance() {
+    public static TestDataStore getInstance(PropertyResolver propertyResolver) {
         if (singleton == null) {
-            singleton = new TestDataStore()
+            singleton = new TestDataStore(propertyResolver)
                     .withDatabaseName(DB_NAME)
                     .withUsername(DB_USER)
                     .withPassword(DB_PASSWORD);
@@ -94,6 +96,10 @@ public class TestDataStore extends PostgreSQLContainer<TestDataStore> {
                 }
             }
         }
+    }
+
+    public String getDatabaseSchemaName() {
+        return databaseSchemaName;
     }
 
     private static DataSource initDataSource() {
