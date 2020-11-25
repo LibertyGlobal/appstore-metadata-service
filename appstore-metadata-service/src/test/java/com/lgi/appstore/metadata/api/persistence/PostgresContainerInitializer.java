@@ -19,14 +19,17 @@
 
 package com.lgi.appstore.metadata.api.persistence;
 
-import com.lgi.appstore.metadata.jooq.model.AppstoreMetadataService;
+import com.lgi.appstore.metadata.jooq.model.DefaultCatalog;
 import org.flywaydb.core.Flyway;
 import org.flywaydb.core.api.configuration.Configuration;
 import org.flywaydb.core.api.configuration.FluentConfiguration;
+import org.jooq.Schema;
 import org.springframework.context.ApplicationContextInitializer;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.test.context.support.TestPropertySourceUtils;
 import org.testcontainers.containers.PostgreSQLContainer;
+
+import java.util.List;
 
 public class PostgresContainerInitializer implements ApplicationContextInitializer<ConfigurableApplicationContext> {
 
@@ -36,11 +39,16 @@ public class PostgresContainerInitializer implements ApplicationContextInitializ
         POSTGRE_SQL_CONTAINER = new PostgreSQLContainer();
         POSTGRE_SQL_CONTAINER.start();
 
+        final List<Schema> schemas = DefaultCatalog.DEFAULT_CATALOG.getSchemas();
+        if (schemas.size() != 1) {
+            throw new IllegalStateException("There should be exactly one schema");
+        }
+
         Configuration flywayConfiguration = new FluentConfiguration()
                 .dataSource(POSTGRE_SQL_CONTAINER.getJdbcUrl(),
                         POSTGRE_SQL_CONTAINER.getUsername(),
                         POSTGRE_SQL_CONTAINER.getPassword())
-                .schemas(AppstoreMetadataService.APPSTORE_METADATA_SERVICE.getName())
+                .schemas(schemas.get(0).getName())
                 .locations("classpath:db.migration");
 
         Flyway flyway = new Flyway(flywayConfiguration);

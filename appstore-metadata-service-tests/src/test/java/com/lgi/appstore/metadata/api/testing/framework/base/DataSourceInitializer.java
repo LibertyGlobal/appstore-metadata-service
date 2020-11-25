@@ -25,15 +25,13 @@ import org.springframework.context.ApplicationContextInitializer;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.env.ConfigurableEnvironment;
 
-import static com.lgi.appstore.metadata.api.testing.framework.infrastructure.TestDataStore.DB_SCHEMA_NAME;
-
 public class DataSourceInitializer implements ApplicationContextInitializer<ConfigurableApplicationContext> {
     public void initialize(ConfigurableApplicationContext context) {
-        TestDataStore dbTestContainer = TestDataStore.getInstance();
-        ConfigurableEnvironment environment = context.getEnvironment();
+        final ConfigurableEnvironment environment = context.getEnvironment();
+        TestDataStore dbTestContainer = TestDataStore.getInstance(environment);
         System.out.println(environment.getActiveProfiles());
         TestPropertyValues.of(
-                "spring.datasource.url=" + dbTestContainer.withUrlParam("currentSchema", DB_SCHEMA_NAME).getJdbcUrl(),
+                "spring.datasource.url=" + dbTestContainer.withUrlParam("currentSchema", dbTestContainer.getDatabaseSchemaName()).getJdbcUrl(),
                 "spring.datasource.username=" + dbTestContainer.getUsername(),
                 "spring.datasource.password=" + dbTestContainer.getPassword(),
                 "spring.datasource.driver-class-name" + dbTestContainer.getDriverClassName(),

@@ -25,6 +25,9 @@ import org.apache.commons.beanutils.DynaBean;
 import org.apache.commons.beanutils.RowSetDynaClass;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
@@ -35,19 +38,23 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Stream;
 
-import static com.lgi.appstore.metadata.api.testing.framework.infrastructure.TestDataStore.DB_SCHEMA_NAME;
 import static com.lgi.appstore.metadata.api.testing.framework.steps.MaintainerSteps.DEFAULT_DEV_CODE;
 
 @Profile("local-test")
 @Lazy
 @Component
-public class DbSteps {
+public class DbSteps implements ApplicationContextAware {
     private static final Logger LOG = LoggerFactory.getLogger(DbSteps.class);
 
     private static final String ASMS_TABLE_NAME_APPLICATION = "application";
     private static final String ASMS_TABLE_NAME_MAINTAINER = "maintainer";
 
-    private final TestDataStore DB = TestDataStore.getInstance();
+    private TestDataStore db;
+
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        db = TestDataStore.getInstance(applicationContext.getEnvironment());
+    }
 
     @Step
     public void dbCleanup() throws SQLException {
@@ -77,8 +84,8 @@ public class DbSteps {
     @Step
     private void createNewMaintainer(String code, String name, String address, String homepage, String email) throws SQLException {
         LOG.info("Adding a new maintainer");
-        Optional<RowSetDynaClass> rowSet = DB.performQuery(String.format("INSERT INTO %s.%s (code, name, address, homepage, email) " +
-                "VALUES ('%s', '%s', '%s', '%s', '%s')", DB_SCHEMA_NAME, ASMS_TABLE_NAME_MAINTAINER, code, name, address, homepage, email));
+        Optional<RowSetDynaClass> rowSet = db.performQuery(String.format("INSERT INTO %s.%s (code, name, address, homepage, email) " +
+                "VALUES ('%s', '%s', '%s', '%s', '%s')", db.getDatabaseSchemaName(), ASMS_TABLE_NAME_MAINTAINER, code, name, address, homepage, email));
         rowSet.ifPresent(this::logRows);
     }
 
@@ -89,7 +96,7 @@ public class DbSteps {
 
     public void checkConfigurationForMaxConnections() throws SQLException { // this is utility method for debug/info
         LOG.info("Get max_connection from Postgres config");
-        Optional<RowSetDynaClass> rowSet = DB.performQuery("SHOW max_connections");
+        Optional<RowSetDynaClass> rowSet = db.performQuery("SHOW max_connections");
         rowSet.ifPresent(this::logRows);
     }
 
@@ -108,7 +115,7 @@ public class DbSteps {
 
     private void purgeTableMaintainer() throws SQLException {
         LOG.info("Purging DB table: {}, leaving only hardcoded default entry for code = {}", ASMS_TABLE_NAME_MAINTAINER, DEFAULT_DEV_CODE);
-        DB.performQuery(String.format("DELETE FROM %s.%s WHERE code <> '%s'", DB_SCHEMA_NAME, ASMS_TABLE_NAME_MAINTAINER, DEFAULT_DEV_CODE));
+        db.performQuery(String.format("DELETE FROM %s.%s WHERE code <> '%s'", db.getDatabaseSchemaName(), ASMS_TABLE_NAME_MAINTAINER, DEFAULT_DEV_CODE));
     }
 
     /**
@@ -117,7 +124,7 @@ public class DbSteps {
     private void listAllFromTable(String tableName) throws SQLException {
         LOG.info("SELECT * FROM {}", tableName);
 
-        Optional<RowSetDynaClass> rowSet = DB.performQuery(String.format("SELECT * FROM %s.%s", DB_SCHEMA_NAME, tableName));
+        Optional<RowSetDynaClass> rowSet = db.performQuery(String.format("SELECT * FROM %s.%s", db.getDatabaseSchemaName(), tableName));
         rowSet.ifPresent(this::logRows);
     }
 
@@ -126,6 +133,6 @@ public class DbSteps {
      */
     private void purgeTable(String tableName) throws SQLException {
         LOG.info("Purging DB table: {}", tableName);
-        DB.performQuery(String.format("DELETE FROM %s.%s", DB_SCHEMA_NAME, tableName));
+        db.performQuery(String.format("DELETE FROM %s.%s", db.getDatabaseSchemaName(), tableName));
     }
 }
