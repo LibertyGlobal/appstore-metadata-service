@@ -21,6 +21,7 @@
         <allure-version>2.13.6</allure-version>
         <skipFTs>true</skipFTs>
         <dev-depl-url/>
+        <db.schema>appstore_metadata_service</db.schema>
     </properties>
 
     <profiles>
@@ -197,6 +198,10 @@
                         <property>
                             <name>BASE_URL</name>
                             <value>${dev-depl-url}</value>
+                        </property>
+                        <property>
+                            <name>db.schema</name>
+                            <value>${db.schema}</value>
                         </property>
                     </systemProperties>
                     <includes>
