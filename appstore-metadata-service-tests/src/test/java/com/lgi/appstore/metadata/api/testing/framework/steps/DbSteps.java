@@ -84,7 +84,7 @@ public class DbSteps implements ApplicationContextAware {
     @Step
     private void createNewMaintainer(String code, String name, String address, String homepage, String email) throws SQLException {
         LOG.info("Adding a new maintainer");
-        Optional<RowSetDynaClass> rowSet = db.performQuery(String.format("INSERT INTO %s.%s (code, name, address, homepage, email) " +
+        Optional<RowSetDynaClass> rowSet = db.performQuery(String.format("INSERT INTO \"%s\".%s (code, name, address, homepage, email) " +
                 "VALUES ('%s', '%s', '%s', '%s', '%s')", db.getDatabaseSchemaName(), ASMS_TABLE_NAME_MAINTAINER, code, name, address, homepage, email));
         rowSet.ifPresent(this::logRows);
     }
@@ -115,7 +115,7 @@ public class DbSteps implements ApplicationContextAware {
 
     private void purgeTableMaintainer() throws SQLException {
         LOG.info("Purging DB table: {}, leaving only hardcoded default entry for code = {}", ASMS_TABLE_NAME_MAINTAINER, DEFAULT_DEV_CODE);
-        db.performQuery(String.format("DELETE FROM %s.%s WHERE code <> '%s'", db.getDatabaseSchemaName(), ASMS_TABLE_NAME_MAINTAINER, DEFAULT_DEV_CODE));
+        db.performQuery(String.format("DELETE FROM \"%s\".%s WHERE code <> '%s'", db.getDatabaseSchemaName(), ASMS_TABLE_NAME_MAINTAINER, DEFAULT_DEV_CODE));
     }
 
     /**
@@ -124,7 +124,7 @@ public class DbSteps implements ApplicationContextAware {
     private void listAllFromTable(String tableName) throws SQLException {
         LOG.info("SELECT * FROM {}", tableName);
 
-        Optional<RowSetDynaClass> rowSet = db.performQuery(String.format("SELECT * FROM %s.%s", db.getDatabaseSchemaName(), tableName));
+        Optional<RowSetDynaClass> rowSet = db.performQuery(String.format("SELECT * FROM \"%s\".%s", db.getDatabaseSchemaName(), tableName));
         rowSet.ifPresent(this::logRows);
     }
 
@@ -133,6 +133,6 @@ public class DbSteps implements ApplicationContextAware {
      */
     private void purgeTable(String tableName) throws SQLException {
         LOG.info("Purging DB table: {}", tableName);
-        db.performQuery(String.format("DELETE FROM %s.%s", db.getDatabaseSchemaName(), tableName));
+        db.performQuery(String.format("DELETE FROM \"%s\".%s", db.getDatabaseSchemaName(), tableName));
     }
 }
