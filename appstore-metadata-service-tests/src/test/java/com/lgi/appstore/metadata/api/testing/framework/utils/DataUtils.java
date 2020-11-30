@@ -101,7 +101,7 @@ public class DataUtils {
             case "platform":
                 return platformQueryString(app);
             case "category":
-                return app.getHeader().getCategory().name();
+                return app.getHeader().getCategory().getValue();
             case "maintainerName":
                 return maintainerNamesForApps.get(app);
             default:

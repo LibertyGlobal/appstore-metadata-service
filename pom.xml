@@ -17,6 +17,7 @@
     <modules>
         <module>appstore-metadata-service</module>
         <module>appstore-metadata-service-tests</module>
+        <module>tcp-msg-maven-plugin</module>
     </modules>
 
     <properties>
@@ -25,6 +26,7 @@
         <springdoc-openapi-ui-version>1.4.3</springdoc-openapi-ui-version>
         <junit-version>5.6.2</junit-version>
         <maven-surefire-version>2.22.2</maven-surefire-version>
+        <logstash.logback.encoder.version>6.4</logstash.logback.encoder.version>
         <skipUTs>false</skipUTs>
         <registry.url>set_for_pushing_docker_image</registry.url>
         <registry.namespace>set_for_pushing_docker_image</registry.namespace>
@@ -63,6 +65,8 @@
             The MIT License|${line.separator}
             The MIT License (MIT)
         </license.includedLicenses>
+        <license.excludedGroups>(^org\.eclipse\.sisu)|(^com\.sun\.xml\.bind)
+        </license.excludedGroups> <!-- dependencies of maven-plugin-api -->
     </properties>
 
     <distributionManagement>
@@ -92,6 +96,15 @@
                 <skipUTs>true</skipUTs>
                 <skipFTs>true</skipFTs>
             </properties>
+        </profile>
+        <profile>
+            <id>dev</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+        </profile>
+        <profile>
+            <id>prod</id>
         </profile>
     </profiles>
 
