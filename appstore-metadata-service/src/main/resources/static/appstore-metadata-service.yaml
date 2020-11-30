@@ -126,6 +126,148 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+  /maintainers:
+    post:
+      operationId: createMaintainer
+      tags:
+        - Maintainer
+      parameters:
+        - name: x-maintainer-id
+          in: header
+          schema:
+            type: string
+          description: Identifier of the requesting maintainer. Value should be set by intermediate proxies/api gateways
+          required: false
+          example: 1234abcd
+      requestBody:
+        description: Full information on the created maintainer
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Maintainer'
+      responses:
+        204:
+          description: Maintainer successfully created
+        5XX:
+          description: Unexpected error
+        409:
+          description: Conflict
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /maintainers/{maintainerCode}:
+    get:
+      operationId: getMaintainer
+      tags:
+        - Maintainer
+      parameters:
+        - name: x-maintainer-id
+          in: header
+          schema:
+            type: string
+          description: Identifier of the requesting maintainer. Value should be set by intermediate proxies/api gateways
+          required: false
+          example: 1234abcd
+        - name: maintainerCode
+          in: path
+          schema:
+            type: string
+          description: Code of the requested maintainer
+          required: true
+          example: lgi
+      responses:
+        200:
+          description: Requested maintainer details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Maintainer'
+        403:
+          description: Access denied
+        404:
+          description: Not Found
+        5XX:
+          description: Unexpected error
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    put:
+      operationId: replaceMaintainer
+      tags:
+        - Maintainer
+      parameters:
+        - name: x-maintainer-id
+          in: header
+          schema:
+            type: string
+          description: Identifier of the requesting maintainer. Value should be set by intermediate proxies/api gateways
+          required: false
+          example: 1234abcd
+        - name: maintainerCode
+          in: path
+          schema:
+            type: string
+          description: code of the maintainer
+          required: true
+          example: lgi
+      requestBody:
+        description: Full information on the updated maintainer
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Maintainer'
+      responses:
+        204:
+          description: OK
+        403:
+          description: Access denied
+        404:
+          description: Not Found
+        5XX:
+          description: Unexpected error
+    delete:
+      operationId: deleteMaintainer
+      tags:
+        - Maintainer
+      parameters:
+        - name: x-maintainer-id
+          in: header
+          schema:
+            type: string
+          description: Identifier of the requesting maintainer. Value should be set by intermediate proxies/api gateways
+          required: false
+          example: 1234abcd
+        - name: maintainerCode
+          in: path
+          schema:
+            type: string
+          description: code of the delete maintainer
+          required: true
+          example: lgi
+      responses:
+        204:
+          description: Maintainer successfully deleted
+        403:
+          description: Access denied. The requestor is not allowed to delete the maintainer
+        404:
+          description: Not Found
+        5XX:
+          description: Unexpected error
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
   /maintainers/{maintainerCode}/apps:
     get:
       summary: Returns paginated list of applications from the maintainer
@@ -411,7 +553,6 @@ components:
       required:
         - icon
         - name
-        - url
         - type
         - category
       properties:
@@ -427,10 +568,7 @@ components:
           type: string
           description: Application description
           example: This is Awesome App
-        url:
-          type: string
-          description: Application url (eg. OCI Container Manifest, external web app url)
-          example: https://$SERVER/appcontainerstagingrdk/Libertyglobal/awesome_oci_image:1.2.3
+
         type:
           type: string
           description: Application type (example&#58; application/vnd.rdk-app.dac.lightning)
@@ -441,6 +579,15 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Localisation'
+    AppicationHeaderGeneratedAttributes:
+      type: object
+      required:
+        - url
+      properties:
+        url:
+          type: string
+          description: Application url (eg. OCI Container Manifest, external web app url)
+          example: https://$SERVER/com.libertyglobal.app.awesome/1.2.3/cascadelake/502.54.1/com.libertyglobal.app.awesome_1.2.3_cascadelake_502.54.1.tar.gz
     StbApplicationHeader:
       allOf:
         - $ref: '#/components/schemas/ApplicationHeader'
@@ -457,6 +604,14 @@ components:
               type: string
               description: Application version
               example: 1.2.3
+    StbSingleApplicationHeader:
+      allOf:
+        - $ref: '#/components/schemas/StbApplicationHeader'
+        - $ref: '#/components/schemas/AppicationHeaderGeneratedAttributes'
+    MaintainerSingleApplicationHeader:
+      allOf:
+        - $ref: '#/components/schemas/MaintainerApplicationHeader'
+        - $ref: '#/components/schemas/AppicationHeaderGeneratedAttributes'
     MaintainerApplicationHeader:
       allOf:
         - $ref: '#/components/schemas/StbApplicationHeader'
@@ -486,7 +641,7 @@ components:
         - requirements
       properties:
         header:
-          $ref: '#/components/schemas/StbApplicationHeader'
+          $ref: '#/components/schemas/StbSingleApplicationHeader'
         requirements:
           $ref: '#/components/schemas/Requirements'
         maintainer:
@@ -500,7 +655,7 @@ components:
         - requirements
       properties:
         header:
-          $ref: '#/components/schemas/MaintainerApplicationHeader'
+          $ref: '#/components/schemas/MaintainerSingleApplicationHeader'
         requirements:
           $ref: '#/components/schemas/Requirements'
         maintainer:
@@ -571,6 +726,9 @@ components:
           example: 9
     Requirements:
       type: object
+      required:
+        - platform
+        - hardware
       properties:
         dependencies:
           type: array
@@ -659,6 +817,7 @@ components:
           example: 1.2.3
     StbVersions:
       type: array
+      description: semantically sorted versions of the application
       items:
         $ref: '#/components/schemas/StbVersion'
     MaintainerVersion:
@@ -674,13 +833,18 @@ components:
               example: true
     MaintainerVersions:
       type: array
+      description: semantically sorted versions of the application
       items:
         $ref: '#/components/schemas/MaintainerVersion'
     Maintainer:
       type: object
       required:
+        - code
         - name
       properties:
+        code:
+          type: string
+          description: Maintainer code (eg. lgi)
         name:
           type: string
           description: Maintainer name
