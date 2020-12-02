@@ -38,7 +38,9 @@ import org.jooq.JSONB;
 import org.jooq.Record1;
 import org.jooq.Record9;
 import org.jooq.SelectConditionStep;
+import org.jooq.SortField;
 import org.jooq.impl.DSL;
+import org.jooq.util.postgres.PostgresDSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
@@ -56,6 +58,11 @@ public class PersistentAppsService implements AppsService {
 
     private final DSLContext dslContext;
     private final JsonProcessorHelper jsonProcessorHelper;
+
+    private static final String VERSION_PART_DELIMITER = ".";
+    private static final SortField<int[]> VERSION_SORT_FIELD = PostgresDSL.stringToArray(APPLICATION.VERSION, VERSION_PART_DELIMITER)
+            .cast(int[].class)
+            .desc();
 
     @Autowired
     public PersistentAppsService(DSLContext dslContext,
@@ -177,6 +184,7 @@ public class PersistentAppsService implements AppsService {
                 .from(APPLICATION)
                 .where(APPLICATION.ID_RDOMAIN.eq(appId))
                 .and(APPLICATION.VISIBLE.isTrue())
+                .orderBy(VERSION_SORT_FIELD)
                 .fetchStream()
                 .map(applicationVersionRecord -> new StbVersion()
                         .version(applicationVersionRecord.get(APPLICATION.VERSION))).collect(Collectors.toList());
@@ -248,6 +256,7 @@ public class PersistentAppsService implements AppsService {
                 .from(APPLICATION)
                 .where(APPLICATION.ID_RDOMAIN.eq(appId))
                 .and(APPLICATION.VISIBLE.isTrue())
+                .orderBy(VERSION_SORT_FIELD)
                 .fetchStream()
                 .map(applicationVersionRecord -> new StbVersion()
                         .version(applicationVersionRecord.get(APPLICATION.VERSION))).collect(Collectors.toList());

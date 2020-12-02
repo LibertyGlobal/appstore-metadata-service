@@ -41,8 +41,13 @@ import org.jooq.DSLContext;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -122,6 +127,54 @@ class PersistentAppsServiceTest extends BaseServiceTest {
         final List<StbApplicationHeader> applications = stbApplicationsList.getApplications();
         assertThat(applications).isNotNull().hasSize(1);
         verifyStbApplicationHeader(applications.get(0), applicationRecord, localization);
+    }
+
+    @Test
+    void applicationDetailsVersionsAreSorted() throws Exception {
+        final String[] unorderedVersions = new String[]{"1.0.1", "10.2.2", "2.1", "10.1.3", "10.1.2", "1.5", "5", "1", "2"};
+        final MaintainerRecord randomMaintainerRecord = createRandomMaintainerRecord();
+        final String applicationId = UUID.randomUUID().toString();
+        final String latestVersion = "500";
+        for (String version : unorderedVersions) {
+            createRandomApplicationRecord(randomMaintainerRecord, applicationId, version, false);
+        }
+        createRandomApplicationRecord(randomMaintainerRecord, applicationId, latestVersion, true);
+
+        final Optional<StbApplicationDetails> maybeStbApplicationDetails = appsService.getApplicationDetails(applicationId);
+
+        assertThat(maybeStbApplicationDetails).isPresent();
+        final StbApplicationDetails stbApplicationDetails = maybeStbApplicationDetails.get();
+        final List<StbVersion> versions = stbApplicationDetails.getVersions();
+        assertThat(versions).isNotNull();
+        final List<String> orderedVersions = Stream.concat(Arrays.stream(unorderedVersions), Stream.of(latestVersion))
+                .sorted(VERSION_COMPARATOR.reversed())
+                .collect(Collectors.toList());
+        assertThat(versions.stream().map(StbVersion::getVersion).filter(Objects::nonNull).collect(Collectors.toList()))
+                .containsExactlyElementsOf(orderedVersions);
+    }
+
+    @Test
+    void applicationDetailsByVersionVersionsAreSorted() throws Exception {
+        final String[] unorderedVersions = new String[]{"1.0.1", "10.2.2", "2.1", "10.1.3", "10.1.2", "1.5", "5", "1", "2"};
+        final MaintainerRecord randomMaintainerRecord = createRandomMaintainerRecord();
+        final String applicationId = UUID.randomUUID().toString();
+        final String latestVersion = "500";
+        for (String version : unorderedVersions) {
+            createRandomApplicationRecord(randomMaintainerRecord, applicationId, version, false);
+        }
+        createRandomApplicationRecord(randomMaintainerRecord, applicationId, latestVersion, true);
+
+        final Optional<StbApplicationDetails> maybeStbApplicationDetails = appsService.getApplicationDetails(applicationId, latestVersion);
+
+        assertThat(maybeStbApplicationDetails).isPresent();
+        final StbApplicationDetails stbApplicationDetails = maybeStbApplicationDetails.get();
+        final List<StbVersion> versions = stbApplicationDetails.getVersions();
+        assertThat(versions).isNotNull();
+        final List<String> orderedVersions = Stream.concat(Arrays.stream(unorderedVersions), Stream.of(latestVersion))
+                .sorted(VERSION_COMPARATOR.reversed())
+                .collect(Collectors.toList());
+        assertThat(versions.stream().map(StbVersion::getVersion).filter(Objects::nonNull).collect(Collectors.toList()))
+                .containsExactlyElementsOf(orderedVersions);
     }
 
     private void verifyStbApplicationDetails(Optional<StbApplicationDetails> maybeStbApplicationDetails,

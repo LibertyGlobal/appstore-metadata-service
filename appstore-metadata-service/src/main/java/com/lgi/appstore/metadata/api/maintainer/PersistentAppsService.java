@@ -42,6 +42,7 @@ import org.jooq.Record1;
 import org.jooq.Record10;
 import org.jooq.Record2;
 import org.jooq.SelectJoinStep;
+import org.jooq.SortField;
 import org.jooq.Table;
 import org.jooq.impl.DSL;
 import org.jooq.util.postgres.PostgresDSL;
@@ -65,6 +66,11 @@ import static com.lgi.appstore.metadata.jooq.model.tables.Application.APPLICATIO
 public class PersistentAppsService implements AppsService {
 
     private static final Logger LOG = LoggerFactory.getLogger(PersistentAppsService.class);
+
+    private static final String VERSION_PART_DELIMITER = ".";
+    private static final SortField<int[]> VERSION_SORT_FIELD = PostgresDSL.stringToArray(APPLICATION.VERSION, VERSION_PART_DELIMITER)
+            .cast(int[].class)
+            .desc();
 
     private final DSLContext dslContext;
     private final JsonProcessorHelper jsonProcessorHelper;
@@ -180,6 +186,7 @@ public class PersistentAppsService implements AppsService {
                 .from(APPLICATION)
                 .where(APPLICATION.ID_RDOMAIN.eq(appId))
                 .and(APPLICATION.MAINTAINER_ID.eq(maintainerId))
+                .orderBy(VERSION_SORT_FIELD)
                 .fetchStream()
                 .map(applicationVersionRecord -> new MaintainerVersion()
                         .version(applicationVersionRecord.get(APPLICATION.VERSION))
@@ -235,6 +242,7 @@ public class PersistentAppsService implements AppsService {
                 .from(APPLICATION)
                 .where(APPLICATION.ID_RDOMAIN.eq(appId))
                 .and(APPLICATION.MAINTAINER_ID.eq(maintainerId))
+                .orderBy(VERSION_SORT_FIELD)
                 .fetchStream()
                 .map(applicationVersionRecord -> new MaintainerVersion()
                         .version(applicationVersionRecord.get(APPLICATION.VERSION))
@@ -477,7 +485,7 @@ public class PersistentAppsService implements AppsService {
                 .from(APPLICATION)
                 .where(APPLICATION.MAINTAINER_ID.eq(maintainerId))
                 .and(APPLICATION.ID_RDOMAIN.eq(appId))
-                .orderBy(PostgresDSL.stringToArray(APPLICATION.VERSION, ".").cast(int[].class).desc())
+                .orderBy(VERSION_SORT_FIELD)
                 .limit(1)
                 .union(
                         localDslContext.select(APPLICATION.ID, DSL.inline("stb").as("latest"))

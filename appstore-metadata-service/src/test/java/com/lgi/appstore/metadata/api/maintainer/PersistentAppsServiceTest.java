@@ -45,10 +45,13 @@ import org.jooq.DSLContext;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -241,8 +244,8 @@ class PersistentAppsServiceTest extends BaseServiceTest {
         final Optional<MaintainerApplicationDetails> maybeMaintainerApplicationDetails = appsService.getApplicationDetails(maintainerCode, applicationId);
         assertThat(maybeMaintainerApplicationDetails).isPresent();
         assertThat(maybeMaintainerApplicationDetails.get().getVersions()).isNotNull()
-                .containsExactly(new MaintainerVersion().visible(true).version(applicationVersion),
-                        new MaintainerVersion().visible(true).version(latestApplicationVersion));
+                .containsExactly(new MaintainerVersion().visible(true).version(latestApplicationVersion),
+                        new MaintainerVersion().visible(true).version(applicationVersion));
 
         final boolean deleteLatestApplicationResult = appsService.deleteLatestApplication(maintainerCode, applicationId);
 
@@ -270,7 +273,48 @@ class PersistentAppsServiceTest extends BaseServiceTest {
         assertThat(deleteAllApplicationVersionsResult).isTrue();
         final Optional<MaintainerApplicationDetails> maybeMaintainerApplicationDetailsAfterDeletion = appsService.getApplicationDetails(maintainerCode, applicationId);
         assertThat(maybeMaintainerApplicationDetailsAfterDeletion).isEmpty();
+    }
 
+    @Test
+    void applicationDetailsVersionsAreSorted() {
+        final String[] unorderedVersions = new String[]{"1.0.1", "10.2.2", "2.1", "10.1.3", "10.1.2", "1.5", "5", "1", "2"};
+        final MaintainerRecord maintainerRecord = createRandomMaintainerRecord();
+        final String maintainerCode = maintainerRecord.getCode();
+        final String applicationId = UUID.randomUUID().toString();
+        Arrays.stream(unorderedVersions).forEach(version -> createRandomApplication(maintainerCode, version, applicationId));
+
+        final Optional<MaintainerApplicationDetails> maybeMaintainerApplicationDetails = appsService.getApplicationDetails(maintainerCode, applicationId);
+
+        assertThat(maybeMaintainerApplicationDetails).isPresent();
+        final MaintainerApplicationDetails maintainerApplicationDetails = maybeMaintainerApplicationDetails.get();
+        final List<MaintainerVersion> versions = maintainerApplicationDetails.getVersions();
+        assertThat(versions).isNotNull();
+        final List<String> orderedVersions = Arrays.stream(unorderedVersions)
+                .sorted(VERSION_COMPARATOR.reversed())
+                .collect(Collectors.toList());
+        assertThat(versions.stream().map(MaintainerVersion::getVersion).filter(Objects::nonNull).collect(Collectors.toList()))
+                .containsExactlyElementsOf(orderedVersions);
+    }
+
+    @Test
+    void applicationDetailsByVersionVersionsAreSorted() {
+        final String[] unorderedVersions = new String[]{"1.0.1", "10.2.2", "2.1", "10.1.3", "10.1.2", "1.5", "5", "1", "2"};
+        final MaintainerRecord maintainerRecord = createRandomMaintainerRecord();
+        final String maintainerCode = maintainerRecord.getCode();
+        final String applicationId = UUID.randomUUID().toString();
+        Arrays.stream(unorderedVersions).forEach(version -> createRandomApplication(maintainerCode, version, applicationId));
+
+        final Optional<MaintainerApplicationDetails> maybeMaintainerApplicationDetails = appsService.getApplicationDetails(maintainerCode, applicationId, unorderedVersions[0]);
+
+        assertThat(maybeMaintainerApplicationDetails).isPresent();
+        final MaintainerApplicationDetails maintainerApplicationDetails = maybeMaintainerApplicationDetails.get();
+        final List<MaintainerVersion> versions = maintainerApplicationDetails.getVersions();
+        assertThat(versions).isNotNull();
+        final List<String> orderedVersions = Arrays.stream(unorderedVersions)
+                .sorted(VERSION_COMPARATOR.reversed())
+                .collect(Collectors.toList());
+        assertThat(versions.stream().map(MaintainerVersion::getVersion).filter(Objects::nonNull).collect(Collectors.toList()))
+                .containsExactlyElementsOf(orderedVersions);
     }
 
     private Application createRandomApplication(String maintainerCode) {

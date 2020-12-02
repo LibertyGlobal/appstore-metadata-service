@@ -37,11 +37,33 @@ import org.springframework.boot.test.autoconfigure.jooq.JooqTest;
 import org.springframework.test.context.ContextConfiguration;
 
 import java.util.Collections;
+import java.util.Comparator;
+import java.util.Random;
 import java.util.UUID;
 
 @JooqTest
 @ContextConfiguration(initializers = PostgresContainerInitializer.class)
 public abstract class BaseServiceTest {
+
+    protected static final Comparator<String> VERSION_COMPARATOR = (v1, v2) -> {
+        final String[] v1SeparatedVersionParts = v1.split("\\.");
+        final String[] v2SeparatedVersionParts = v2.split("\\.");
+
+        for (int i = 0; i < v1SeparatedVersionParts.length && i < v2SeparatedVersionParts.length; i++) {
+            final int v1SeparatedVersionPart = Integer.parseInt(v1SeparatedVersionParts[i]);
+            final int v2SeparatedVersionPart = Integer.parseInt(v2SeparatedVersionParts[i]);
+
+            if (v1SeparatedVersionPart > v2SeparatedVersionPart) {
+                return 1;
+            }
+
+            if (v1SeparatedVersionPart < v2SeparatedVersionPart) {
+                return -1;
+            }
+        }
+
+        return Integer.compare(v1SeparatedVersionParts.length, v2SeparatedVersionParts.length);
+    };
 
     protected ObjectMapper objectMapper = new ObjectMapper();
 
@@ -54,20 +76,39 @@ public abstract class BaseServiceTest {
                                                               Platform platform,
                                                               Dependency dependency,
                                                               Feature feature) throws JsonProcessingException {
+        return createRandomApplicationRecord(maintainerRecord, localisation, hardware, platform, dependency, feature, UUID.randomUUID().toString(),
+                String.valueOf(new Random().nextInt(200)), true);
+    }
+
+    protected ApplicationRecord createRandomApplicationRecord(MaintainerRecord maintainerRecord, String applicationId, String version, boolean latest)
+            throws JsonProcessingException {
+        return createRandomApplicationRecord(maintainerRecord, createRandomLocalisation(), createRandomHardware(), createRandomPlatform(),
+                createRandomDependency(), createRandomFeature(), applicationId, version, latest);
+    }
+
+    protected ApplicationRecord createRandomApplicationRecord(MaintainerRecord maintainerRecord,
+                                                              Localisation localisation,
+                                                              Hardware hardware,
+                                                              Platform platform,
+                                                              Dependency dependency,
+                                                              Feature feature,
+                                                              String applicationId,
+                                                              String version,
+                                                              boolean latest) throws JsonProcessingException {
         final ApplicationRecord applicationRecord = new ApplicationRecord()
                 .setMaintainerId(maintainerRecord.getId())
                 .setCategory(Category.APPLICATION.getValue())
-                .setIdRdomain(UUID.randomUUID().toString())
+                .setIdRdomain(applicationId)
                 .setDescription(UUID.randomUUID().toString())
                 .setIcon(UUID.randomUUID().toString())
                 .setVisible(true)
-                .setLatest(JSONB.valueOf("{\"stb\":true}"))
+                .setLatest(JSONB.valueOf("{\"stb\":" + latest + "}"))
                 .setLocalizations(JSONB.valueOf(objectMapper.writeValueAsString(Collections.singleton(localisation))))
                 .setDependencies(JSONB.valueOf(objectMapper.writeValueAsString(Collections.singleton(dependency))))
                 .setFeatures(JSONB.valueOf(objectMapper.writeValueAsString(Collections.singleton(feature))))
                 .setHardware(JSONB.valueOf(objectMapper.writeValueAsString(hardware)))
                 .setPlatform(JSONB.valueOf(objectMapper.writeValueAsString(platform)))
-                .setVersion(UUID.randomUUID().toString())
+                .setVersion(version)
                 .setName(UUID.randomUUID().toString())
                 .setType(UUID.randomUUID().toString());
 
