@@ -728,7 +728,6 @@ components:
       type: object
       required:
         - platform
-        - hardware
       properties:
         dependencies:
           type: array
@@ -757,6 +756,9 @@ components:
           example: 0.3.4
     Platform:
       type: object
+      required:
+        - architecture
+        - os
       properties:
         architecture:
           type: string
