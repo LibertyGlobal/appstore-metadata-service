@@ -45,7 +45,6 @@ public class ApplicationMetadataBuilder {
     private String headerVersion;
     private String headerName;
     private String headerDescription;
-    private String headerUrl;
     private String headerType;
     private String headerIcon;
     private Boolean headerVisible;
@@ -83,11 +82,6 @@ public class ApplicationMetadataBuilder {
 
     public ApplicationMetadataBuilder withName(String headerName) {
         this.headerName = headerName;
-        return this;
-    }
-
-    public ApplicationMetadataBuilder withUrl(String headerUrl) {
-        this.headerUrl = headerUrl;
         return this;
     }
 
@@ -160,9 +154,6 @@ public class ApplicationMetadataBuilder {
             case ApplicationDetailsPath.FIELD_TYPE:
                 headerType = String.valueOf(value);
                 break;
-            case ApplicationDetailsPath.FIELD_URL:
-                headerUrl = String.valueOf(value);
-                break;
             case ApplicationDetailsPath.FIELD_ICON:
                 headerIcon = String.valueOf(value);
                 break;
@@ -177,7 +168,6 @@ public class ApplicationMetadataBuilder {
         this.headerName = DataUtils.randomAppName();
         this.headerVersion = DataUtils.randomAppVersion();
         this.headerDescription = DataUtils.randomAppDescription();
-        this.headerUrl = DataUtils.randomAppUrl();
         this.headerType = DataUtils.randomAppHeaderType();
         this.headerIcon = DataUtils.randomAppHeaderIcon();
         this.headerVisible = Boolean.TRUE;
@@ -197,7 +187,6 @@ public class ApplicationMetadataBuilder {
         headerCategory = existingHeader.getCategory();
         headerName = existingHeader.getName();
         headerIcon = existingHeader.getIcon();
-        headerUrl = existingHeader.getUrl();
         headerDescription = existingHeader.getDescription();
         headerLocalisations = copyCollection(existingHeader.getLocalisations(), this::newLocalisation).orElse(null);
         requirements = newRequirements(existingApplication.getRequirements());
@@ -218,7 +207,6 @@ public class ApplicationMetadataBuilder {
                 .description(headerDescription)
                 .type(headerType)
                 .icon(headerIcon)
-                .url(headerUrl)
                 .visible(headerVisible)
                 .localisations(headerLocalisations);
 
@@ -234,7 +222,6 @@ public class ApplicationMetadataBuilder {
                 .description(headerDescription)
                 .type(headerType)
                 .icon(headerIcon)
-                .url(headerUrl)
                 .visible(headerVisible)
                 .localisations(headerLocalisations);
 

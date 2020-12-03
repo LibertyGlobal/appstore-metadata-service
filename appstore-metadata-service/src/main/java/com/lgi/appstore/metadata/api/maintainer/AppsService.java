@@ -31,9 +31,9 @@ import java.util.Optional;
 public interface AppsService {
     MaintainerApplicationsList listApplications(String maintainerCode, String name, String description, String version, String type, Platform platform, Category category, Integer offset, Integer limit);
 
-    Optional<MaintainerApplicationDetails> getApplicationDetails(String maintainerCode, String appId, String version);
+    Optional<MaintainerApplicationDetails> getApplicationDetails(String maintainerCode, String appId, String version, String platformName, String firmwareVer);
 
-    Optional<MaintainerApplicationDetails> getApplicationDetails(String maintainerCode, String appId);
+    Optional<MaintainerApplicationDetails> getApplicationDetails(String maintainerCode, String appId, String platformName, String firmwareVer);
 
     void addApplication(String maintainerCode, Application application);
 

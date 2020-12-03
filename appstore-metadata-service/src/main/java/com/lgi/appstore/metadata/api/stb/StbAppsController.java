@@ -24,7 +24,6 @@ import com.lgi.appstore.metadata.model.Category;
 import com.lgi.appstore.metadata.model.Platform;
 import com.lgi.appstore.metadata.model.StbApplicationDetails;
 import com.lgi.appstore.metadata.model.StbApplicationsList;
-import io.micrometer.core.annotation.Timed;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,15 +48,17 @@ public class StbAppsController {
 
     @GetMapping(value = "/{appId:.+}",
             produces = {"application/json"})
-    public ResponseEntity<StbApplicationDetails> getApplicationDetails(@PathVariable("appId") String appId) {
+    public ResponseEntity<StbApplicationDetails> getApplicationDetails(@PathVariable("appId") String appId,
+                                                                       @RequestParam String platformName,
+                                                                       @RequestParam String firmwareVer) {
 
         final AppIdWithVersion appIdWithVersion = AppIdWithVersion.fromString(appId);
 
         LOG.info("GET /apps/{appId} called with the following parameters: appId = '{}', version = '{}'", appIdWithVersion.getAppId(), appIdWithVersion.getVersion());
 
         final Optional<StbApplicationDetails> applicationDetails = appIdWithVersion.isLatest()
-                ? appsService.getApplicationDetails(appIdWithVersion.getAppId())
-                : appsService.getApplicationDetails(appIdWithVersion.getAppId(), appIdWithVersion.getVersion());
+                ? appsService.getApplicationDetails(appIdWithVersion.getAppId(), platformName, firmwareVer)
+                : appsService.getApplicationDetails(appIdWithVersion.getAppId(), appIdWithVersion.getVersion(), platformName, firmwareVer);
 
         LOG.info("Returning: {}", applicationDetails);
 

@@ -56,15 +56,17 @@ class MaintainerAppsController {
     @GetMapping(value = "/apps/{appId:.+}",
             produces = {"application/json"})
     public ResponseEntity<MaintainerApplicationDetails> getApplicationDetails(@PathVariable("maintainerCode") String maintainerCode,
-                                                                              @PathVariable("appId") String appId) {
+                                                                              @PathVariable("appId") String appId,
+                                                                              @RequestParam String platformName,
+                                                                              @RequestParam String firmwareVer) {
 
         final AppIdWithVersion appIdWithVersion = AppIdWithVersion.fromString(appId);
 
         LOG.info("GET /maintainers/{maintainerCode}/apps/{appId} called with the following parameters: maintainerCode = '{}', appId = '{}', version = '{}'", maintainerCode, appIdWithVersion.getAppId(), appIdWithVersion.getVersion());
 
         final Optional<MaintainerApplicationDetails> applicationDetails = appIdWithVersion.isLatest()
-                ? appsService.getApplicationDetails(maintainerCode, appIdWithVersion.getAppId())
-                : appsService.getApplicationDetails(maintainerCode, appIdWithVersion.getAppId(), appIdWithVersion.getVersion());
+                ? appsService.getApplicationDetails(maintainerCode, appIdWithVersion.getAppId(), platformName, firmwareVer)
+                : appsService.getApplicationDetails(maintainerCode, appIdWithVersion.getAppId(), appIdWithVersion.getVersion(), platformName, firmwareVer);
 
         LOG.info("Returning: {}", applicationDetails);
 

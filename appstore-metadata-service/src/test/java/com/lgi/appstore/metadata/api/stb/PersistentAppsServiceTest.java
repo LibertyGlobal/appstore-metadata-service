@@ -37,9 +37,8 @@ import com.lgi.appstore.metadata.model.StbApplicationHeader;
 import com.lgi.appstore.metadata.model.StbApplicationsList;
 import com.lgi.appstore.metadata.model.StbSingleApplicationHeader;
 import com.lgi.appstore.metadata.model.StbVersion;
+import com.lgi.appstore.metadata.util.ApplicationUrlCreator;
 import com.lgi.appstore.metadata.util.JsonProcessorHelper;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 import org.jooq.DSLContext;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,7 +59,7 @@ class PersistentAppsServiceTest extends BaseServiceTest {
 
     @Autowired
     public PersistentAppsServiceTest(DSLContext dslContext) {
-        appsService = new PersistentAppsService(dslContext, new JsonProcessorHelper(objectMapper));
+        appsService = new PersistentAppsService(dslContext, new JsonProcessorHelper(objectMapper), new ApplicationUrlCreator("", ""));
     }
 
     @Test
@@ -73,7 +72,7 @@ class PersistentAppsServiceTest extends BaseServiceTest {
         final Feature feature = createRandomFeature();
         final ApplicationRecord applicationRecord = createRandomApplicationRecord(maintainerRecord, localisation, hardware, platform, dependency, feature);
 
-        final Optional<StbApplicationDetails> maybeStbApplicationDetails = appsService.getApplicationDetails(applicationRecord.getIdRdomain());
+        final Optional<StbApplicationDetails> maybeStbApplicationDetails = appsService.getApplicationDetails(applicationRecord.getIdRdomain(), "", "");
 
         verifyStbApplicationDetails(maybeStbApplicationDetails, maintainerRecord, applicationRecord, localisation, hardware, platform, dependency, feature);
     }
@@ -89,7 +88,7 @@ class PersistentAppsServiceTest extends BaseServiceTest {
         final ApplicationRecord applicationRecord = createRandomApplicationRecord(maintainerRecord, localisation, hardware, platform, dependency, feature);
 
         final Optional<StbApplicationDetails> maybeStbApplicationDetails = appsService.getApplicationDetails(applicationRecord.getIdRdomain(),
-                applicationRecord.getVersion());
+                applicationRecord.getVersion(), "", "");
 
         verifyStbApplicationDetails(maybeStbApplicationDetails, maintainerRecord, applicationRecord, localisation, hardware, platform, dependency, feature);
     }
@@ -143,7 +142,7 @@ class PersistentAppsServiceTest extends BaseServiceTest {
         }
         createRandomApplicationRecord(randomMaintainerRecord, applicationId, latestVersion, true);
 
-        final Optional<StbApplicationDetails> maybeStbApplicationDetails = appsService.getApplicationDetails(applicationId);
+        final Optional<StbApplicationDetails> maybeStbApplicationDetails = appsService.getApplicationDetails(applicationId, "", "");
 
         assertThat(maybeStbApplicationDetails).isPresent();
         final StbApplicationDetails stbApplicationDetails = maybeStbApplicationDetails.get();
@@ -167,7 +166,7 @@ class PersistentAppsServiceTest extends BaseServiceTest {
         }
         createRandomApplicationRecord(randomMaintainerRecord, applicationId, latestVersion, true);
 
-        final Optional<StbApplicationDetails> maybeStbApplicationDetails = appsService.getApplicationDetails(applicationId, latestVersion);
+        final Optional<StbApplicationDetails> maybeStbApplicationDetails = appsService.getApplicationDetails(applicationId, latestVersion, "", "");
 
         assertThat(maybeStbApplicationDetails).isPresent();
         final StbApplicationDetails stbApplicationDetails = maybeStbApplicationDetails.get();
@@ -215,7 +214,6 @@ class PersistentAppsServiceTest extends BaseServiceTest {
         assertThat(header.getIcon()).isEqualTo(applicationRecord.getIcon());
         assertThat(header.getName()).isEqualTo(applicationRecord.getName());
         assertThat(header.getType()).isEqualTo(applicationRecord.getType());
-        assertThat(header.getUrl()).isEqualTo(applicationRecord.getUrl());
         assertThat(header.getVersion()).isEqualTo(applicationRecord.getVersion());
         assertThat(header.getLocalisations()).containsExactly(localisation);
     }
@@ -227,7 +225,7 @@ class PersistentAppsServiceTest extends BaseServiceTest {
         assertThat(header.getIcon()).isEqualTo(applicationRecord.getIcon());
         assertThat(header.getName()).isEqualTo(applicationRecord.getName());
         assertThat(header.getType()).isEqualTo(applicationRecord.getType());
-        assertThat(header.getUrl()).isEqualTo(applicationRecord.getUrl());
+        assertThat(header.getUrl()).isNotNull();
         assertThat(header.getVersion()).isEqualTo(applicationRecord.getVersion());
         assertThat(header.getLocalisations()).containsExactly(localisation);
     }

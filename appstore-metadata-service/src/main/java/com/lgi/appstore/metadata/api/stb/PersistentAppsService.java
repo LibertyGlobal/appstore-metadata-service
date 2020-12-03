@@ -32,12 +32,13 @@ import com.lgi.appstore.metadata.model.StbApplicationHeader;
 import com.lgi.appstore.metadata.model.StbApplicationsList;
 import com.lgi.appstore.metadata.model.StbSingleApplicationHeader;
 import com.lgi.appstore.metadata.model.StbVersion;
+import com.lgi.appstore.metadata.util.ApplicationUrlCreator;
 import com.lgi.appstore.metadata.util.JsonProcessorHelper;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.JSONB;
 import org.jooq.Record1;
-import org.jooq.Record9;
+import org.jooq.Record8;
 import org.jooq.SelectConditionStep;
 import org.jooq.SortField;
 import org.jooq.impl.DSL;
@@ -59,6 +60,7 @@ public class PersistentAppsService implements AppsService {
 
     private final DSLContext dslContext;
     private final JsonProcessorHelper jsonProcessorHelper;
+    private final ApplicationUrlCreator applicationUrlCreator;
 
     private static final String VERSION_PART_DELIMITER = ".";
     private static final SortField<int[]> VERSION_SORT_FIELD = PostgresDSL.stringToArray(APPLICATION.VERSION, VERSION_PART_DELIMITER)
@@ -67,9 +69,10 @@ public class PersistentAppsService implements AppsService {
 
     @Autowired
     public PersistentAppsService(DSLContext dslContext,
-            JsonProcessorHelper jsonProcessorHelper) {
+            JsonProcessorHelper jsonProcessorHelper, ApplicationUrlCreator applicationUrlCreator) {
         this.dslContext = dslContext;
         this.jsonProcessorHelper = jsonProcessorHelper;
+        this.applicationUrlCreator = applicationUrlCreator;
     }
 
     @Override
@@ -82,13 +85,12 @@ public class PersistentAppsService implements AppsService {
             String maintainerName,
             Integer offset,
             Integer limit) {
-        final SelectConditionStep<Record9<String, String, String, String, String, String, String, String, JSONB>> where = dslContext.select(
+        final SelectConditionStep<Record8<String, String, String, String, String, String, String, JSONB>> where = dslContext.select(
                 APPLICATION.ID_RDOMAIN,
                 APPLICATION.VERSION,
                 APPLICATION.ICON,
                 APPLICATION.NAME,
                 APPLICATION.DESCRIPTION,
-                APPLICATION.URL,
                 APPLICATION.TYPE,
                 APPLICATION.CATEGORY,
                 APPLICATION.LOCALIZATIONS)
@@ -154,7 +156,6 @@ public class PersistentAppsService implements AppsService {
                         .icon(applicationMetadataRecord.get(APPLICATION.ICON))
                         .name(applicationMetadataRecord.get(APPLICATION.NAME))
                         .description(applicationMetadataRecord.get(APPLICATION.DESCRIPTION))
-                        .url(applicationMetadataRecord.get(APPLICATION.URL))
                         .type(applicationMetadataRecord.get(APPLICATION.TYPE))
                         .category(Category.fromValue(applicationMetadataRecord.get(APPLICATION.CATEGORY)))
                         .localisations(jsonProcessorHelper
@@ -178,7 +179,7 @@ public class PersistentAppsService implements AppsService {
     }
 
     @Override
-    public Optional<StbApplicationDetails> getApplicationDetails(String appId, String version) {
+    public Optional<StbApplicationDetails> getApplicationDetails(String appId, String version, String platformName, String firmwareVer) {
 
         final List<StbVersion> versions = dslContext.select(
                 APPLICATION.VERSION
@@ -202,7 +203,6 @@ public class PersistentAppsService implements AppsService {
                 APPLICATION.ICON,
                 APPLICATION.NAME,
                 APPLICATION.DESCRIPTION,
-                APPLICATION.URL,
                 APPLICATION.TYPE,
                 APPLICATION.CATEGORY,
                 APPLICATION.LOCALIZATIONS,
@@ -226,7 +226,10 @@ public class PersistentAppsService implements AppsService {
                             .icon(applicationMetadataRecord.get(APPLICATION.ICON))
                             .name(applicationMetadataRecord.get(APPLICATION.NAME))
                             .description(applicationMetadataRecord.get(APPLICATION.DESCRIPTION))
-                            .url(applicationMetadataRecord.get(APPLICATION.URL))
+                            .url(applicationUrlCreator.createApplicationUrl(applicationMetadataRecord.get(APPLICATION.ID_RDOMAIN),
+                                    applicationMetadataRecord.get(APPLICATION.VERSION),
+                                    platformName,
+                                    firmwareVer))
                             .type(applicationMetadataRecord.get(APPLICATION.TYPE))
                             .category(Category.fromValue(applicationMetadataRecord.get(APPLICATION.CATEGORY)))
                             .localisations(jsonProcessorHelper
@@ -259,7 +262,7 @@ public class PersistentAppsService implements AppsService {
     }
 
     @Override
-    public Optional<StbApplicationDetails> getApplicationDetails(String appId) {
+    public Optional<StbApplicationDetails> getApplicationDetails(String appId, String platformName, String firmwareVer) {
         final List<StbVersion> versions = dslContext.select(
                 APPLICATION.VERSION
         )
@@ -282,7 +285,6 @@ public class PersistentAppsService implements AppsService {
                 APPLICATION.ICON,
                 APPLICATION.NAME,
                 APPLICATION.DESCRIPTION,
-                APPLICATION.URL,
                 APPLICATION.TYPE,
                 APPLICATION.CATEGORY,
                 APPLICATION.LOCALIZATIONS,
@@ -306,7 +308,10 @@ public class PersistentAppsService implements AppsService {
                             .icon(applicationMetadataRecord.get(APPLICATION.ICON))
                             .name(applicationMetadataRecord.get(APPLICATION.NAME))
                             .description(applicationMetadataRecord.get(APPLICATION.DESCRIPTION))
-                            .url(applicationMetadataRecord.get(APPLICATION.URL))
+                            .url(applicationUrlCreator.createApplicationUrl(applicationMetadataRecord.get(APPLICATION.ID_RDOMAIN),
+                                    applicationMetadataRecord.get(APPLICATION.VERSION),
+                                    platformName,
+                                    firmwareVer))
                             .type(applicationMetadataRecord.get(APPLICATION.TYPE))
                             .category(Category.fromValue(applicationMetadataRecord.get(APPLICATION.CATEGORY)))
                             .localisations(jsonProcessorHelper

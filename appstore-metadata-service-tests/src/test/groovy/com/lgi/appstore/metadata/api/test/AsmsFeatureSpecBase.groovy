@@ -21,6 +21,7 @@ package com.lgi.appstore.metadata.api.test
 
 import com.lgi.appstore.metadata.api.test.framework.TestSession
 import com.lgi.appstore.metadata.api.test.framework.base.DataSourceInitializer
+import com.lgi.appstore.metadata.api.testing.framework.base.EnvPropertiesInitializer
 import com.lgi.appstore.metadata.api.test.framework.steps.DbSteps
 import com.lgi.appstore.metadata.api.test.framework.steps.MaintainerViewSteps
 import com.lgi.appstore.metadata.api.test.framework.steps.StbViewSteps
@@ -35,7 +36,7 @@ import spock.lang.Specification
 
 @ActiveProfiles(["tests", "local-test"])
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ContextConfiguration(initializers = [DataSourceInitializer.class])
+@ContextConfiguration(initializers = [DataSourceInitializer.class, EnvPropertiesInitializer.class])
 class AsmsFeatureSpecBase extends Specification {
     /** @noinspection WeakerAccess as this might be used in test scenarios   */
     @Shared

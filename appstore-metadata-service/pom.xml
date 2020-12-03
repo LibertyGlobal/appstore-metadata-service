@@ -410,7 +410,7 @@
             <plugin>
                 <groupId>org.openapitools</groupId>
                 <artifactId>openapi-generator-maven-plugin</artifactId>
-                <version>4.3.1</version>
+                <version>5.0.0-beta3</version>
                 <executions>
                     <execution>
                         <id>openapi-generate-spring</id>
@@ -437,34 +437,6 @@
                         </configuration>
                     </execution>
                 </executions>
-            </plugin>
-            <plugin>
-                <groupId>com.google.code.maven-replacer-plugin</groupId>
-                <artifactId>replacer</artifactId>
-                <version>1.5.3</version>
-                <executions>
-                    <execution>
-                        <id>remove-invalid-dependency</id>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>replace</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <basedir>${project.basedir}</basedir>
-                    <includes>
-                        <include>target/generated-sources/openapi/src/main/java/com/lgi/appstore/metadata/model/*.java
-                        </include>
-                    </includes>
-                    <regex>false</regex>
-                    <replacements>
-                        <replacement>
-                            <token>import org.openapitools.jackson.nullable.JsonNullable;</token>
-                            <value/>
-                        </replacement>
-                    </replacements>
-                </configuration>
             </plugin>
         </plugins>
     </build>

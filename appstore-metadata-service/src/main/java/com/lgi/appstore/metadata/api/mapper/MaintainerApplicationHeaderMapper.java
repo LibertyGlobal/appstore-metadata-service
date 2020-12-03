@@ -27,11 +27,9 @@ import com.lgi.appstore.metadata.model.MaintainerApplicationHeader;
 import com.lgi.appstore.metadata.util.JsonProcessorHelper;
 import org.jooq.JSONB;
 import org.jooq.Record;
-import org.jooq.RecordMapper;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Function;
 
 import static com.lgi.appstore.metadata.jooq.model.tables.Application.APPLICATION;
 
@@ -43,7 +41,7 @@ public class MaintainerApplicationHeaderMapper {
     private MaintainerApplicationHeaderMapper() {
     }
 
-    public static final Function<JsonProcessorHelper, RecordMapper<Record, MaintainerApplicationHeader>> OBJ_MAPPER_PROVIDER = jsonProcessorHelper -> applicationMetadataRecord -> {
+    public static MaintainerApplicationHeader map(Record applicationMetadataRecord, JsonProcessorHelper jsonProcessorHelper) {
         final List<Localisation> localisations = Optional.ofNullable(applicationMetadataRecord.get(APPLICATION.LOCALIZATIONS))
                 .map(JSONB::data)
                 .map(json -> jsonProcessorHelper.readValue(JsonObjectNames.LOCALIZATIONS, json, LOCALIZATIONS_TYPE))
@@ -56,10 +54,9 @@ public class MaintainerApplicationHeaderMapper {
                 .name(applicationMetadataRecord.get(APPLICATION.NAME))
                 .description(applicationMetadataRecord.get(APPLICATION.DESCRIPTION))
                 .visible(applicationMetadataRecord.get(APPLICATION.VISIBLE))
-                .url(applicationMetadataRecord.get(APPLICATION.URL))
                 .type(applicationMetadataRecord.get(APPLICATION.TYPE))
                 .category(Category.fromValue(applicationMetadataRecord.get(APPLICATION.CATEGORY)))
                 .localisations(localisations);
-    };
+    }
 }
 

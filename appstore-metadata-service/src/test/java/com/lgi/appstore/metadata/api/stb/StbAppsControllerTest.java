@@ -51,6 +51,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -96,7 +97,6 @@ public class StbAppsControllerTest {
             .version("0.0.1")
             .icon("default_app_collection.png")
             .description("Container contains both Flutter application and Flutter engine running on wayland-egl, developed by Liberty Global while evaluating Google Flutter UI toolkit.")
-            .url("https://us.icr.io/v2/appcontainerstagingrdk/flutter/manifests/latest")
             .category(Category.APPLICATION);
 
     private static final StbApplicationHeader WAYLAND_EGL_TEST_APPLICATION_HEADER = new StbApplicationHeader()
@@ -106,7 +106,6 @@ public class StbAppsControllerTest {
             .version("3.2.1")
             .icon("wayland.png")
             .description("Source code example of simple Wayland EGL application intended as tutorial for developers. Contains the few but necessary setup code for any direct to wayland-egl client application such as how to connect to wayland server, create/use EGL surface and draw on screen via opengles api. Application shows simple rectangle on screen. Applications based on this example should run on the various wayland compositors supporting the wayland-egl protocol out there.")
-            .url("https://us.icr.io/v2/appcontainerstagingrdk/wayland-egl-test/manifests/latest")
             .category(Category.APPLICATION);
 
     private static final StbApplicationHeader YOU_I_APPLICATION_HEADER = new StbApplicationHeader()
@@ -116,7 +115,6 @@ public class StbAppsControllerTest {
             .version("1.2.3")
             .icon("default_app_collection.png")
             .description("Showcase application from the company youi.tv. The container package contains both the react native application and the You.i TV react native Gfx engine beneath.")
-            .url("https://us.icr.io/v2/appcontainerstagingrdk/you.i/manifests/latest")
             .category(Category.APPLICATION)
             .localisations(
                     List.of(
@@ -139,7 +137,6 @@ public class StbAppsControllerTest {
             .version("1.2.3")
             .icon("default_app_collection.png")
             .description("Showcase application from the company youi.tv. The container package contains both the react native application and the You.i TV react native Gfx engine beneath.")
-            .url("https://us.icr.io/v2/appcontainerstagingrdk/you.i/manifests/latest")
             .category(Category.APPLICATION)
             .localisations(
                     List.of(
@@ -451,14 +448,16 @@ public class StbAppsControllerTest {
     @Test
     public void canGetDetailsByJustApplicationIdOfAnExistingApplication() throws Exception {
         // given
-        given(appsService.getApplicationDetails(anyString()))
+        final String platformName = UUID.randomUUID().toString();
+        final String firmwareVer = UUID.randomUUID().toString();
+        given(appsService.getApplicationDetails(anyString(), anyString(), anyString()))
                 .willReturn(Optional.empty());
-        given(appsService.getApplicationDetails("com.libertyglobal.app.youi"))
+        given(appsService.getApplicationDetails("com.libertyglobal.app.youi", platformName, firmwareVer))
                 .willReturn(Optional.of(YOU_I_APPLICATION_DETAILS));
 
         // when
         MockHttpServletResponse response = mvc
-                .perform(get("/apps/com.libertyglobal.app.youi"))
+                .perform(get("/apps/com.libertyglobal.app.youi?platformName={platformName}&firmwareVer={firmwareVer}", platformName, firmwareVer))
                 .andReturn()
                 .getResponse();
 
@@ -470,14 +469,17 @@ public class StbAppsControllerTest {
     @Test
     public void canGetDetailsByApplicationIdAndVersionOfAnExistingApplication() throws Exception {
         // given
-        given(appsService.getApplicationDetails(anyString(), anyString()))
+        final String platformName = UUID.randomUUID().toString();
+        final String firmwareVer = UUID.randomUUID().toString();
+        given(appsService.getApplicationDetails(anyString(), anyString(), anyString(), anyString()))
                 .willReturn(Optional.empty());
-        given(appsService.getApplicationDetails("com.libertyglobal.app.youi", "1.2.3"))
+        given(appsService.getApplicationDetails("com.libertyglobal.app.youi", "1.2.3", platformName, firmwareVer))
                 .willReturn(Optional.of(YOU_I_APPLICATION_DETAILS));
 
         // when
         MockHttpServletResponse response = mvc
-                .perform(get("/apps/com.libertyglobal.app.youi:1.2.3"))
+                .perform(get("/apps/com.libertyglobal.app.youi:1.2.3?platformName={platformName}&firmwareVer={firmwareVer}",
+                        platformName, firmwareVer))
                 .andReturn()
                 .getResponse();
 
@@ -489,14 +491,17 @@ public class StbAppsControllerTest {
     @Test
     public void canGetDetailsByApplicationIdAndLatestVersionOfAnExistingApplication() throws Exception {
         // given
-        given(appsService.getApplicationDetails(anyString()))
+        final String platformName = UUID.randomUUID().toString();
+        final String firmwareVer = UUID.randomUUID().toString();
+        given(appsService.getApplicationDetails(anyString(), anyString(), anyString()))
                 .willReturn(Optional.empty());
-        given(appsService.getApplicationDetails("com.libertyglobal.app.youi"))
+        given(appsService.getApplicationDetails("com.libertyglobal.app.youi", platformName, firmwareVer))
                 .willReturn(Optional.of(YOU_I_APPLICATION_DETAILS));
 
         // when
         MockHttpServletResponse response = mvc
-                .perform(get("/apps/com.libertyglobal.app.youi:latest"))
+                .perform(get("/apps/com.libertyglobal.app.youi:latest?platformName={platformName}&firmwareVer={firmwareVer}",
+                        platformName, firmwareVer))
                 .andReturn()
                 .getResponse();
 
@@ -511,11 +516,41 @@ public class StbAppsControllerTest {
 
         // when
         MockHttpServletResponse response = mvc
-                .perform(get("/apps/nonExistingApp"))
+                .perform(get("/apps/nonExistingApp?platformName=doesntmatter&firmwareVer=doesntmatter"))
                 .andReturn()
                 .getResponse();
 
         // then
         assertThat(response.getStatus()).isEqualTo(HttpStatus.NOT_FOUND.value());
+    }
+
+    @Test
+    public void cannotGetApplicationDetailsWithoutPlatformName() throws Exception {
+        // given
+
+        // when
+        MockHttpServletResponse response = mvc
+                .perform(get("/apps/nonExistingApp?firmwareVer=doesntmatter"))
+                .andReturn()
+                .getResponse();
+
+        // then
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.getContentAsString()).isEqualTo("{\"message\":\"platformName parameter is missing\"}");
+    }
+
+    @Test
+    public void cannotGetApplicationDetailsWithoutFirmwareVer() throws Exception {
+        // given
+
+        // when
+        MockHttpServletResponse response = mvc
+                .perform(get("/apps/nonExistingApp?platformName=doesntmatter"))
+                .andReturn()
+                .getResponse();
+
+        // then
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.getContentAsString()).isEqualTo("{\"message\":\"firmwareVer parameter is missing\"}");
     }
 }

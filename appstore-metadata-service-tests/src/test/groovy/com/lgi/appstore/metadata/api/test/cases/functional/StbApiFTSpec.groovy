@@ -55,6 +55,8 @@ import static com.lgi.appstore.metadata.api.test.framework.steps.MaintainerViewS
 import static com.lgi.appstore.metadata.api.test.framework.steps.MaintainerViewSteps.DEFAULT_DEV_EMAIL
 import static com.lgi.appstore.metadata.api.test.framework.steps.MaintainerViewSteps.DEFAULT_DEV_HOMEPAGE
 import static com.lgi.appstore.metadata.api.test.framework.steps.MaintainerViewSteps.DEFAULT_DEV_NAME
+import static com.lgi.appstore.metadata.api.test.framework.steps.MaintainerViewSteps.DEFAULT_FIRMWARE_VER
+import static com.lgi.appstore.metadata.api.test.framework.steps.MaintainerViewSteps.DEFAULT_PLATFORM_NAME
 import static com.lgi.appstore.metadata.api.test.framework.utils.DataUtils.appKeyFor
 import static com.lgi.appstore.metadata.api.test.framework.utils.DataUtils.getFieldValueFromApplication
 import static com.lgi.appstore.metadata.api.test.framework.utils.DataUtils.mapAppsToKeys
@@ -249,7 +251,6 @@ class StbApiFTSpec extends AsmsFeatureSpecBase {
         def v1Description = "Some Description €\\€\\€\\€\\"
         def v1Category = pickRandomCategory()
         def v1Type = "someCustomType"
-        def v1Url = "url://app.great"
         def v1Icon = "//home/alwi/Icon.png"
         def v1PlatformArch = "v1PlatformArch"
         def v1PlatformOs = "v1PlatformOs"
@@ -274,7 +275,6 @@ class StbApiFTSpec extends AsmsFeatureSpecBase {
                 .withDescription(v1Description)
                 .withCategory(v1Category)
                 .withType(v1Type)
-                .withUrl(v1Url)
                 .withIcon(v1Icon)
                 .withPlatform(v1PlatformArch, v1PlatformOs, v1PlatformVariant)
                 .withHardware(v1HardwareCache, v1HardwareDmips, v1HardwarePersistent, v1HardwareRam, v1HardwareImage)
@@ -342,7 +342,12 @@ class StbApiFTSpec extends AsmsFeatureSpecBase {
         extract(FIELD_DESCRIPTION).from(theBody1) == v1Description
         extract(FIELD_CATEGORY).from(theBody1) == String.valueOf(v1Category)
         extract(FIELD_TYPE).from(theBody1) == v1Type
-        extract(FIELD_URL).from(theBody1) == v1Url
+        def url = extract(FIELD_URL).from(theBody1)
+        assertThat(url).isNotNull()
+                .isOfAnyClassIn(String.class)
+                .asString()
+                .contains(DEFAULT_PLATFORM_NAME)
+                .contains(DEFAULT_FIRMWARE_VER)
         extract(FIELD_ICON).from(theBody1) == v1Icon
 
         and: "the body exposes maintainer section with his details"

@@ -31,6 +31,8 @@ import org.springframework.stereotype.Component;
 
 import java.util.Map;
 
+import static com.lgi.appstore.metadata.api.test.framework.steps.MaintainerViewSteps.DEFAULT_FIRMWARE_VER;
+import static com.lgi.appstore.metadata.api.test.framework.steps.MaintainerViewSteps.DEFAULT_PLATFORM_NAME;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @Component
@@ -50,7 +52,7 @@ public class StbViewSteps {
 
     @Step
     public ValidatableResponse getApplicationDetails(String applicationKey) {
-        return stbPerspectiveAsmsClient.getApp(applicationKey);
+        return stbPerspectiveAsmsClient.getApp(applicationKey, DEFAULT_PLATFORM_NAME, DEFAULT_FIRMWARE_VER);
     }
 
     @Step

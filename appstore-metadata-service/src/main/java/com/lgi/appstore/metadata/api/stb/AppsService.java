@@ -29,7 +29,7 @@ import java.util.Optional;
 public interface AppsService {
     StbApplicationsList listApplications(String name, String description, String version, String type, Platform platform, Category category, String maintainerName, Integer offset, Integer limit);
 
-    Optional<StbApplicationDetails> getApplicationDetails(String appId, String version);
+    Optional<StbApplicationDetails> getApplicationDetails(String appId, String version, String platformName, String firmwareVer);
 
-    Optional<StbApplicationDetails> getApplicationDetails(String appId);
+    Optional<StbApplicationDetails> getApplicationDetails(String appId, String platformName, String firmwareVer);
 }

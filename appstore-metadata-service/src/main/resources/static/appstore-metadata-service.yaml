@@ -107,6 +107,18 @@ paths:
           description: Reverse Domain Notation ID + optional version separated by a colon. If the version is not specified then default latest version is considered
           required: true
           example: com.libertyglobal.app.awesome:1.2.3
+        - name: platformName
+          in: query
+          schema:
+            type: string
+          description: Platform name
+          required: true
+        - name: firmwareVer
+          in: query
+          schema:
+            type: string
+          description: Firmware version
+          required: true
       responses:
         200:
           description: Requested application details
@@ -467,6 +479,18 @@ paths:
           description: Identifier of the requesting maintainer, in case the Client is a MAINTAINER. Value should be set by intermediate proxies/api gateways. Used for authentication/authorization purposes.
           required: false
           example: 1234abcd
+        - name: platformName
+          in: query
+          schema:
+            type: string
+          description: Platform name
+          required: true
+        - name: firmwareVer
+          in: query
+          schema:
+            type: string
+          description: Firmware version
+          required: true
       responses:
         200:
           description: Requested Application details
@@ -553,7 +577,6 @@ components:
       required:
         - icon
         - name
-        - url
         - type
         - category
       properties:
@@ -569,10 +592,6 @@ components:
           type: string
           description: Application description
           example: This is Awesome App
-        url:
-          type: string
-          description: Application url (eg. OCI Container Manifest, external web app url)
-          example: https://$SERVER/appcontainerstagingrdk/Libertyglobal/awesome_oci_image:1.2.3
         type:
           type: string
           description: Application type (example&#58; application/vnd.rdk-app.dac.lightning)
