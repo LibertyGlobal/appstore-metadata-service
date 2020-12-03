@@ -30,6 +30,7 @@ import com.lgi.appstore.metadata.model.Category;
 import com.lgi.appstore.metadata.model.Hardware;
 import com.lgi.appstore.metadata.model.Localisation;
 import com.lgi.appstore.metadata.model.Maintainer;
+import com.lgi.appstore.metadata.model.MaintainerSingleApplicationHeader;
 import com.lgi.appstore.metadata.model.Meta;
 import com.lgi.appstore.metadata.model.Platform;
 import com.lgi.appstore.metadata.model.Requirements;
@@ -103,7 +104,8 @@ public class MaintainerAppsControllerTest {
             .type("application/vnd.rdk-app.dac.native")
             .version("0.0.1")
             .icon("default_app_collection.png")
-            .description("Container contains both Flutter application and Flutter engine running on wayland-egl, developed by Liberty Global while evaluating Google Flutter UI toolkit.")
+            .description(
+                    "Container contains both Flutter application and Flutter engine running on wayland-egl, developed by Liberty Global while evaluating Google Flutter UI toolkit.")
             .url("https://us.icr.io/v2/appcontainerstagingrdk/flutter/manifests/latest")
             .category(Category.APPLICATION)
             .visible(true);
@@ -114,7 +116,8 @@ public class MaintainerAppsControllerTest {
             .type("application/vnd.rdk-app.dac.native")
             .version("3.2.1")
             .icon("wayland.png")
-            .description("Source code example of simple Wayland EGL application intended as tutorial for developers. Contains the few but necessary setup code for any direct to wayland-egl client application such as how to connect to wayland server, create/use EGL surface and draw on screen via opengles api. Application shows simple rectangle on screen. Applications based on this example should run on the various wayland compositors supporting the wayland-egl protocol out there.")
+            .description(
+                    "Source code example of simple Wayland EGL application intended as tutorial for developers. Contains the few but necessary setup code for any direct to wayland-egl client application such as how to connect to wayland server, create/use EGL surface and draw on screen via opengles api. Application shows simple rectangle on screen. Applications based on this example should run on the various wayland compositors supporting the wayland-egl protocol out there.")
             .url("https://us.icr.io/v2/appcontainerstagingrdk/wayland-egl-test/manifests/latest")
             .category(Category.APPLICATION)
             .visible(true);
@@ -125,7 +128,8 @@ public class MaintainerAppsControllerTest {
             .type("application/vnd.rdk-app.dac.native")
             .version("1.2.3")
             .icon("default_app_collection.png")
-            .description("Showcase application from the company youi.tv. The container package contains both the react native application and the You.i TV react native Gfx engine beneath.")
+            .description(
+                    "Showcase application from the company youi.tv. The container package contains both the react native application and the You.i TV react native Gfx engine beneath.")
             .url("https://us.icr.io/v2/appcontainerstagingrdk/you.i/manifests/latest")
             .category(Category.APPLICATION)
             .visible(true)
@@ -133,18 +137,47 @@ public class MaintainerAppsControllerTest {
                     List.of(
                             new Localisation()
                                     .name("Jij.ik")
-                                    .description("Showcase-applicatie van het bedrijf youi.tv. Het containerpakket bevat zowel de native-toepassing reageren als de You.i TV reageren native Gfx-engine eronder.")
+                                    .description(
+                                            "Showcase-applicatie van het bedrijf youi.tv. Het containerpakket bevat zowel de native-toepassing reageren als de You.i TV reageren native Gfx-engine eronder.")
                                     .languageCode("nld"),
 
                             new Localisation()
                                     .name("Ty.ja")
-                                    .description("Prezentacja aplikacji firmy youi.tv. Kontener zawiera zarówno natywną aplikację react, jak i znajdujący się poniżej natywny silnik Gfx.")
+                                    .description(
+                                            "Prezentacja aplikacji firmy youi.tv. Kontener zawiera zarówno natywną aplikację react, jak i znajdujący się poniżej natywny silnik Gfx.")
+                                    .languageCode("pol")
+                    )
+            );
+
+    private static final MaintainerSingleApplicationHeader YOU_I_SINGLE_APPLICATION_HEADER = new MaintainerSingleApplicationHeader()
+            .id("com.libertyglobal.app.youi")
+            .name("you.i")
+            .type("application/vnd.rdk-app.dac.native")
+            .version("1.2.3")
+            .icon("default_app_collection.png")
+            .description(
+                    "Showcase application from the company youi.tv. The container package contains both the react native application and the You.i TV react native Gfx engine beneath.")
+            .url("https://us.icr.io/v2/appcontainerstagingrdk/you.i/manifests/latest")
+            .category(Category.APPLICATION)
+            .visible(true)
+            .localisations(
+                    List.of(
+                            new Localisation()
+                                    .name("Jij.ik")
+                                    .description(
+                                            "Showcase-applicatie van het bedrijf youi.tv. Het containerpakket bevat zowel de native-toepassing reageren als de You.i TV reageren native Gfx-engine eronder.")
+                                    .languageCode("nld"),
+
+                            new Localisation()
+                                    .name("Ty.ja")
+                                    .description(
+                                            "Prezentacja aplikacji firmy youi.tv. Kontener zawiera zarówno natywną aplikację react, jak i znajdujący się poniżej natywny silnik Gfx.")
                                     .languageCode("pol")
                     )
             );
 
     private static final MaintainerApplicationDetails YOU_I_APPLICATION_DETAILS = new MaintainerApplicationDetails()
-            .header(YOU_I_APPLICATION_HEADER)
+            .header(YOU_I_SINGLE_APPLICATION_HEADER)
             .requirements(new Requirements()
                     .platform(new Platform()
                             .architecture("arm")
@@ -343,7 +376,6 @@ public class MaintainerAppsControllerTest {
         given(appsService.listApplications(MAINTAINER_CODE, "flutter", null, null, null, null, null, null, null))
                 .willReturn(FLUTTER_ONLY_APPLICATIONS_LIST);
 
-
         // when
         MockHttpServletResponse response = mvc
                 .perform(get("/maintainers/{maintainerCode}/apps?name=flutter", MAINTAINER_CODE).accept(MediaType.APPLICATION_JSON))
@@ -365,7 +397,8 @@ public class MaintainerAppsControllerTest {
 
         // when
         MockHttpServletResponse response = mvc
-                .perform(get("/maintainers/{maintainerCode}/apps?description=Container contains both Flutter", MAINTAINER_CODE).accept(MediaType.APPLICATION_JSON))
+                .perform(get("/maintainers/{maintainerCode}/apps?description=Container contains both Flutter", MAINTAINER_CODE)
+                        .accept(MediaType.APPLICATION_JSON))
                 .andReturn()
                 .getResponse();
 

@@ -19,25 +19,24 @@
 
 package com.lgi.appstore.metadata.api.mapper;
 
+import static com.lgi.appstore.metadata.jooq.model.Tables.MAINTAINER;
+import static com.lgi.appstore.metadata.jooq.model.tables.Application.APPLICATION;
+
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.lgi.appstore.metadata.model.Dependency;
 import com.lgi.appstore.metadata.model.Feature;
 import com.lgi.appstore.metadata.model.Hardware;
 import com.lgi.appstore.metadata.model.JsonObjectNames;
 import com.lgi.appstore.metadata.model.MaintainerApplicationDetails;
-import com.lgi.appstore.metadata.model.MaintainerApplicationHeader;
+import com.lgi.appstore.metadata.model.MaintainerSingleApplicationHeader;
 import com.lgi.appstore.metadata.model.MaintainerVersion;
 import com.lgi.appstore.metadata.model.Platform;
 import com.lgi.appstore.metadata.model.Requirements;
 import com.lgi.appstore.metadata.util.JsonProcessorHelper;
-import org.jooq.Record;
-import org.jooq.RecordMapper;
-
 import java.util.List;
 import java.util.function.BiFunction;
-
-import static com.lgi.appstore.metadata.jooq.model.Tables.MAINTAINER;
-import static com.lgi.appstore.metadata.jooq.model.tables.Application.APPLICATION;
+import org.jooq.Record;
+import org.jooq.RecordMapper;
 
 public class MaintainerApplicationDetailsMapper {
 
@@ -51,7 +50,8 @@ public class MaintainerApplicationDetailsMapper {
 
     public static final BiFunction<JsonProcessorHelper, List<MaintainerVersion>, RecordMapper<Record, MaintainerApplicationDetails>> OBJ_MAPPER_PROVIDER = (jsonProcessorHelper, versions) -> applicationMetadataRecord -> {
 
-        final MaintainerApplicationHeader applicationHeader = applicationMetadataRecord.map(MaintainerApplicationHeaderMapper.OBJ_MAPPER_PROVIDER.apply(jsonProcessorHelper));
+        final MaintainerSingleApplicationHeader applicationHeader = applicationMetadataRecord
+                .map(MaintainerSingleApplicationHeaderMapper.OBJ_MAPPER_PROVIDER.apply(jsonProcessorHelper));
 
         return new MaintainerApplicationDetails()
                 .header(applicationHeader)
@@ -62,10 +62,14 @@ public class MaintainerApplicationDetailsMapper {
                         .email(applicationMetadataRecord.get(MAINTAINER.EMAIL)))
                 .versions(versions)
                 .requirements(new Requirements()
-                        .dependencies(jsonProcessorHelper.readValue(JsonObjectNames.DEPENDENCIES, applicationMetadataRecord.get(APPLICATION.DEPENDENCIES).data(), DEPENDENCIES_TYPE))
-                        .features(jsonProcessorHelper.readValue(JsonObjectNames.FEATURES, applicationMetadataRecord.get(APPLICATION.FEATURES).data(), FEATURES_TYPE))
-                        .hardware(jsonProcessorHelper.readValue(JsonObjectNames.HARDWARE, applicationMetadataRecord.get(APPLICATION.HARDWARE).data(), Hardware.class))
-                        .platform(jsonProcessorHelper.readValue(JsonObjectNames.PLATFORM, applicationMetadataRecord.get(APPLICATION.PLATFORM).data(), Platform.class)));
+                        .dependencies(jsonProcessorHelper
+                                .readValue(JsonObjectNames.DEPENDENCIES, applicationMetadataRecord.get(APPLICATION.DEPENDENCIES).data(), DEPENDENCIES_TYPE))
+                        .features(jsonProcessorHelper
+                                .readValue(JsonObjectNames.FEATURES, applicationMetadataRecord.get(APPLICATION.FEATURES).data(), FEATURES_TYPE))
+                        .hardware(jsonProcessorHelper
+                                .readValue(JsonObjectNames.HARDWARE, applicationMetadataRecord.get(APPLICATION.HARDWARE).data(), Hardware.class))
+                        .platform(jsonProcessorHelper
+                                .readValue(JsonObjectNames.PLATFORM, applicationMetadataRecord.get(APPLICATION.PLATFORM).data(), Platform.class)));
     };
 }
 

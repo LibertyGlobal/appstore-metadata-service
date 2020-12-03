@@ -58,7 +58,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return handleGenericResponse(ex, HttpStatus.NOT_FOUND, request);
     }
 
-    @ExceptionHandler(ApplicationAlreadyExistsException.class)
+    @ExceptionHandler({ApplicationAlreadyExistsException.class, MaintainerAlreadyExistsException.class})
     public ResponseEntity<Object> handleConflict(Exception ex, WebRequest request) {
         return handleGenericResponse(ex, HttpStatus.CONFLICT, request);
     }
@@ -92,19 +92,22 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @Override
-    protected ResponseEntity<Object> handleMissingServletRequestParameter(MissingServletRequestParameterException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
+    protected ResponseEntity<Object> handleMissingServletRequestParameter(MissingServletRequestParameterException ex, HttpHeaders headers, HttpStatus status,
+            WebRequest request) {
         final ErrorResponse errorResponse = new ErrorResponse().message(ex.getParameterName() + " parameter is missing");
 
         return handleGenericResponse(ex, errorResponse, headers, HttpStatus.BAD_REQUEST, request);
     }
 
     @Override
-    protected ResponseEntity<Object> handleMissingServletRequestPart(MissingServletRequestPartException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
+    protected ResponseEntity<Object> handleMissingServletRequestPart(MissingServletRequestPartException ex, HttpHeaders headers, HttpStatus status,
+            WebRequest request) {
         return handleGenericResponse(ex, headers, HttpStatus.BAD_REQUEST, request);
     }
 
     @Override
-    protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
+    protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatus status,
+            WebRequest request) {
         final List<String> errors = new ArrayList<>();
 
         for (FieldError error : ex.getBindingResult().getFieldErrors()) {
@@ -132,7 +135,8 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return handleGenericResponse(ex, createResponse(ex), httpHeaders, httpStatus, webRequest);
     }
 
-    private ResponseEntity<Object> handleGenericResponse(Exception ex, ErrorResponse errorResponse, @Nullable HttpHeaders httpHeaders, HttpStatus httpStatus, WebRequest webRequest) {
+    private ResponseEntity<Object> handleGenericResponse(Exception ex, ErrorResponse errorResponse, @Nullable HttpHeaders httpHeaders, HttpStatus httpStatus,
+            WebRequest webRequest) {
         LOG.warn("Exception: ", ex);
         return handleExceptionInternal(ex, errorResponse, httpHeaders != null ? httpHeaders : new HttpHeaders(), httpStatus, webRequest);
     }

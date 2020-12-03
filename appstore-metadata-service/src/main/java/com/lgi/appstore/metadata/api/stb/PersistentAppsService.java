@@ -30,6 +30,7 @@ import com.lgi.appstore.metadata.model.ResultSetMeta;
 import com.lgi.appstore.metadata.model.StbApplicationDetails;
 import com.lgi.appstore.metadata.model.StbApplicationHeader;
 import com.lgi.appstore.metadata.model.StbApplicationsList;
+import com.lgi.appstore.metadata.model.StbSingleApplicationHeader;
 import com.lgi.appstore.metadata.model.StbVersion;
 import com.lgi.appstore.metadata.util.JsonProcessorHelper;
 import org.jooq.Condition;
@@ -66,21 +67,21 @@ public class PersistentAppsService implements AppsService {
 
     @Autowired
     public PersistentAppsService(DSLContext dslContext,
-                                 JsonProcessorHelper jsonProcessorHelper) {
+            JsonProcessorHelper jsonProcessorHelper) {
         this.dslContext = dslContext;
         this.jsonProcessorHelper = jsonProcessorHelper;
     }
 
     @Override
     public StbApplicationsList listApplications(String name,
-                                                String description,
-                                                String version,
-                                                String type,
-                                                Platform platform,
-                                                Category category,
-                                                String maintainerName,
-                                                Integer offset,
-                                                Integer limit) {
+            String description,
+            String version,
+            String type,
+            Platform platform,
+            Category category,
+            String maintainerName,
+            Integer offset,
+            Integer limit) {
         final SelectConditionStep<Record9<String, String, String, String, String, String, String, String, JSONB>> where = dslContext.select(
                 APPLICATION.ID_RDOMAIN,
                 APPLICATION.VERSION,
@@ -119,7 +120,8 @@ public class PersistentAppsService implements AppsService {
         }
         if (platform != null) {
             if (platform.getArchitecture() != null) {
-                condition = condition.and(DSL.condition(APPLICATION.PLATFORM.getQualifiedName() + " ->> 'architecture' = '" + platform.getArchitecture() + "'"));
+                condition = condition
+                        .and(DSL.condition(APPLICATION.PLATFORM.getQualifiedName() + " ->> 'architecture' = '" + platform.getArchitecture() + "'"));
             }
             if (platform.getVariant() != null) {
                 condition = condition.and(DSL.condition(APPLICATION.PLATFORM.getQualifiedName() + " ->> 'variant' = '" + platform.getVariant() + "'"));
@@ -155,8 +157,10 @@ public class PersistentAppsService implements AppsService {
                         .url(applicationMetadataRecord.get(APPLICATION.URL))
                         .type(applicationMetadataRecord.get(APPLICATION.TYPE))
                         .category(Category.fromValue(applicationMetadataRecord.get(APPLICATION.CATEGORY)))
-                        .localisations(jsonProcessorHelper.readValue(JsonObjectNames.LOCALIZATIONS, applicationMetadataRecord.get(APPLICATION.LOCALIZATIONS).data(), new TypeReference<>() {
-                        })))
+                        .localisations(jsonProcessorHelper
+                                .readValue(JsonObjectNames.LOCALIZATIONS, applicationMetadataRecord.get(APPLICATION.LOCALIZATIONS).data(),
+                                        new TypeReference<>() {
+                                        })))
                 .collect(Collectors.toList());
 
         final Meta meta = new Meta()
@@ -167,7 +171,6 @@ public class PersistentAppsService implements AppsService {
                                 .count(applicationHeaderList.size())
                                 .total(total)
                 );
-
 
         return new StbApplicationsList()
                 .applications(applicationHeaderList)
@@ -217,7 +220,7 @@ public class PersistentAppsService implements AppsService {
                 .and(APPLICATION.VISIBLE.eq(true))
                 .fetchOptional()
                 .map(applicationMetadataRecord -> {
-                    final StbApplicationHeader applicationHeader = new StbApplicationHeader()
+                    final StbSingleApplicationHeader applicationHeader = new StbSingleApplicationHeader()
                             .id(applicationMetadataRecord.get(APPLICATION.ID_RDOMAIN))
                             .version(applicationMetadataRecord.get(APPLICATION.VERSION))
                             .icon(applicationMetadataRecord.get(APPLICATION.ICON))
@@ -226,8 +229,10 @@ public class PersistentAppsService implements AppsService {
                             .url(applicationMetadataRecord.get(APPLICATION.URL))
                             .type(applicationMetadataRecord.get(APPLICATION.TYPE))
                             .category(Category.fromValue(applicationMetadataRecord.get(APPLICATION.CATEGORY)))
-                            .localisations(jsonProcessorHelper.readValue(JsonObjectNames.LOCALIZATIONS, applicationMetadataRecord.get(APPLICATION.LOCALIZATIONS).data(), new TypeReference<>() {
-                            }));
+                            .localisations(jsonProcessorHelper
+                                    .readValue(JsonObjectNames.LOCALIZATIONS, applicationMetadataRecord.get(APPLICATION.LOCALIZATIONS).data(),
+                                            new TypeReference<>() {
+                                            }));
 
                     return new StbApplicationDetails()
                             .header(applicationHeader)
@@ -238,12 +243,18 @@ public class PersistentAppsService implements AppsService {
                                     .email(applicationMetadataRecord.get(MAINTAINER.EMAIL)))
                             .versions(versions)
                             .requirements(new Requirements()
-                                    .dependencies(jsonProcessorHelper.readValue(JsonObjectNames.DEPENDENCIES, applicationMetadataRecord.get(APPLICATION.DEPENDENCIES).data(), new TypeReference<>() {
-                                    }))
-                                    .features(jsonProcessorHelper.readValue(JsonObjectNames.FEATURES, applicationMetadataRecord.get(APPLICATION.FEATURES).data(), new TypeReference<>() {
-                                    }))
-                                    .hardware(jsonProcessorHelper.readValue(JsonObjectNames.HARDWARE, applicationMetadataRecord.get(APPLICATION.HARDWARE).data(), Hardware.class))
-                                    .platform(jsonProcessorHelper.readValue(JsonObjectNames.PLATFORM, applicationMetadataRecord.get(APPLICATION.PLATFORM).data(), Platform.class)));
+                                    .dependencies(jsonProcessorHelper
+                                            .readValue(JsonObjectNames.DEPENDENCIES, applicationMetadataRecord.get(APPLICATION.DEPENDENCIES).data(),
+                                                    new TypeReference<>() {
+                                                    }))
+                                    .features(jsonProcessorHelper
+                                            .readValue(JsonObjectNames.FEATURES, applicationMetadataRecord.get(APPLICATION.FEATURES).data(),
+                                                    new TypeReference<>() {
+                                                    }))
+                                    .hardware(jsonProcessorHelper
+                                            .readValue(JsonObjectNames.HARDWARE, applicationMetadataRecord.get(APPLICATION.HARDWARE).data(), Hardware.class))
+                                    .platform(jsonProcessorHelper
+                                            .readValue(JsonObjectNames.PLATFORM, applicationMetadataRecord.get(APPLICATION.PLATFORM).data(), Platform.class)));
                 });
     }
 
@@ -289,7 +300,7 @@ public class PersistentAppsService implements AppsService {
                 .and(APPLICATION.VISIBLE.eq(true))
                 .fetchOptional()
                 .map(applicationMetadataRecord -> {
-                    final StbApplicationHeader applicationHeader = new StbApplicationHeader()
+                    final StbSingleApplicationHeader applicationHeader = new StbSingleApplicationHeader()
                             .id(applicationMetadataRecord.get(APPLICATION.ID_RDOMAIN))
                             .version(applicationMetadataRecord.get(APPLICATION.VERSION))
                             .icon(applicationMetadataRecord.get(APPLICATION.ICON))
@@ -298,8 +309,9 @@ public class PersistentAppsService implements AppsService {
                             .url(applicationMetadataRecord.get(APPLICATION.URL))
                             .type(applicationMetadataRecord.get(APPLICATION.TYPE))
                             .category(Category.fromValue(applicationMetadataRecord.get(APPLICATION.CATEGORY)))
-                            .localisations(jsonProcessorHelper.readValue("localizations", applicationMetadataRecord.get(APPLICATION.LOCALIZATIONS).data(), new TypeReference<>() {
-                            }));
+                            .localisations(jsonProcessorHelper
+                                    .readValue("localizations", applicationMetadataRecord.get(APPLICATION.LOCALIZATIONS).data(), new TypeReference<>() {
+                                    }));
 
                     return new StbApplicationDetails()
                             .header(applicationHeader)
@@ -310,12 +322,18 @@ public class PersistentAppsService implements AppsService {
                                     .email(applicationMetadataRecord.get(MAINTAINER.EMAIL)))
                             .versions(versions)
                             .requirements(new Requirements()
-                                    .dependencies(jsonProcessorHelper.readValue(JsonObjectNames.DEPENDENCIES, applicationMetadataRecord.get(APPLICATION.DEPENDENCIES).data(), new TypeReference<>() {
-                                    }))
-                                    .features(jsonProcessorHelper.readValue(JsonObjectNames.FEATURES, applicationMetadataRecord.get(APPLICATION.FEATURES).data(), new TypeReference<>() {
-                                    }))
-                                    .hardware(jsonProcessorHelper.readValue(JsonObjectNames.HARDWARE, applicationMetadataRecord.get(APPLICATION.HARDWARE).data(), Hardware.class))
-                                    .platform(jsonProcessorHelper.readValue(JsonObjectNames.PLATFORM, applicationMetadataRecord.get(APPLICATION.PLATFORM).data(), Platform.class)));
+                                    .dependencies(jsonProcessorHelper
+                                            .readValue(JsonObjectNames.DEPENDENCIES, applicationMetadataRecord.get(APPLICATION.DEPENDENCIES).data(),
+                                                    new TypeReference<>() {
+                                                    }))
+                                    .features(jsonProcessorHelper
+                                            .readValue(JsonObjectNames.FEATURES, applicationMetadataRecord.get(APPLICATION.FEATURES).data(),
+                                                    new TypeReference<>() {
+                                                    }))
+                                    .hardware(jsonProcessorHelper
+                                            .readValue(JsonObjectNames.HARDWARE, applicationMetadataRecord.get(APPLICATION.HARDWARE).data(), Hardware.class))
+                                    .platform(jsonProcessorHelper
+                                            .readValue(JsonObjectNames.PLATFORM, applicationMetadataRecord.get(APPLICATION.PLATFORM).data(), Platform.class)));
                 });
     }
 }

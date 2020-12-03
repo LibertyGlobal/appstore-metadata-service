@@ -35,8 +35,11 @@ import com.lgi.appstore.metadata.model.ResultSetMeta;
 import com.lgi.appstore.metadata.model.StbApplicationDetails;
 import com.lgi.appstore.metadata.model.StbApplicationHeader;
 import com.lgi.appstore.metadata.model.StbApplicationsList;
+import com.lgi.appstore.metadata.model.StbSingleApplicationHeader;
 import com.lgi.appstore.metadata.model.StbVersion;
 import com.lgi.appstore.metadata.util.JsonProcessorHelper;
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import org.jooq.DSLContext;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -178,17 +181,17 @@ class PersistentAppsServiceTest extends BaseServiceTest {
     }
 
     private void verifyStbApplicationDetails(Optional<StbApplicationDetails> maybeStbApplicationDetails,
-                                             MaintainerRecord maintainerRecord,
-                                             ApplicationRecord applicationRecord,
-                                             Localisation localisation,
-                                             Hardware hardware,
-                                             Platform platform,
-                                             Dependency dependency,
-                                             Feature feature) {
+            MaintainerRecord maintainerRecord,
+            ApplicationRecord applicationRecord,
+            Localisation localisation,
+            Hardware hardware,
+            Platform platform,
+            Dependency dependency,
+            Feature feature) {
         assertThat(maybeStbApplicationDetails).isPresent();
         final StbApplicationDetails stbApplicationDetails = maybeStbApplicationDetails.get();
-        final StbApplicationHeader header = stbApplicationDetails.getHeader();
-        verifyStbApplicationHeader(header, applicationRecord, localisation);
+        final StbSingleApplicationHeader header = stbApplicationDetails.getHeader();
+        verifyStbSingleApplicationHeader(header, applicationRecord, localisation);
         final Maintainer maintainer = stbApplicationDetails.getMaintainer();
         assertThat(maintainer).isNotNull();
         assertThat(maintainer.getAddress()).isEqualTo(maintainerRecord.getAddress());
@@ -206,6 +209,18 @@ class PersistentAppsServiceTest extends BaseServiceTest {
     }
 
     private void verifyStbApplicationHeader(StbApplicationHeader header, ApplicationRecord applicationRecord, Localisation localisation) {
+        assertThat(header).isNotNull();
+        assertThat(header.getCategory()).isEqualTo(Category.fromValue(applicationRecord.getCategory()));
+        assertThat(header.getDescription()).isEqualTo(applicationRecord.getDescription());
+        assertThat(header.getIcon()).isEqualTo(applicationRecord.getIcon());
+        assertThat(header.getName()).isEqualTo(applicationRecord.getName());
+        assertThat(header.getType()).isEqualTo(applicationRecord.getType());
+        assertThat(header.getUrl()).isEqualTo(applicationRecord.getUrl());
+        assertThat(header.getVersion()).isEqualTo(applicationRecord.getVersion());
+        assertThat(header.getLocalisations()).containsExactly(localisation);
+    }
+
+    private void verifyStbSingleApplicationHeader(StbSingleApplicationHeader header, ApplicationRecord applicationRecord, Localisation localisation) {
         assertThat(header).isNotNull();
         assertThat(header.getCategory()).isEqualTo(Category.fromValue(applicationRecord.getCategory()));
         assertThat(header.getDescription()).isEqualTo(applicationRecord.getDescription());
