@@ -29,32 +29,19 @@ import io.restassured.config.ObjectMapperConfig;
 import io.restassured.config.RestAssuredConfig;
 import io.restassured.specification.RequestSpecification;
 import org.apache.http.params.CoreConnectionPNames;
-import org.junit.AssumptionViolatedException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
-import org.testcontainers.shaded.org.apache.commons.lang.NotImplementedException;
 
 import java.nio.charset.StandardCharsets;
-import java.util.Optional;
 
 public class ServiceClientBase {
-    private static final Logger LOG = LoggerFactory.getLogger(ServiceClientBase.class);
-    private static final String ENV_VAR_BASE_URL = "BASE_URL";
 
     @Autowired
     private TestSession testSession;
-
-    @Autowired
-    private Environment environment;
 
     private static final Integer REST_QUERY_TIMEOUT_FOR_TESTING_MS = 10000;
 
     private static final AllureRestAssured ALLURE_REPORTING_FILTER;
     private static final RestAssuredConfig REST_ASSURED_CONFIG;
-
-    private static final String SERVICE_HOST = "localhost";
 
     static {
         //noinspection deprecation - due to generic rest assured open issue: https://github.com/rest-assured/rest-assured/issues/497
@@ -71,17 +58,7 @@ public class ServiceClientBase {
     }
 
     protected String getBaseUri() {
-        TestSession.TestType currentTestType = testSession.getTestType();
-        if (currentTestType == TestSession.TestType.LOCAL) {
-            Integer servicePort = Integer.valueOf(Optional.ofNullable(environment.getProperty("local.server.port")).orElse("8080"));
-            return String.format("http://%s:%d", SERVICE_HOST, servicePort);
-        } else if (currentTestType == TestSession.TestType.ITCASE_DEV) {
-            String serviceHost = environment.getProperty(ENV_VAR_BASE_URL);
-            LOG.info("Reading env. var. {}={}", ENV_VAR_BASE_URL, serviceHost);
-            return String.format("http://%s", Optional.ofNullable(serviceHost).orElseThrow(() -> new AssumptionViolatedException(String.format("Skipping test. %s needs to be set and pointing to deployment.", ENV_VAR_BASE_URL))));
-        } else {
-            throw new NotImplementedException(String.format("Base URL not specified for test type=%s", currentTestType));
-        }
+        return String.format("http://%s", testSession.getTestedServiceLocation());
     }
 
     protected RequestSpecification given() {

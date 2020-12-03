@@ -169,7 +169,7 @@
                         <configuration>
                             <port>${ryuk.port}</port>
                             <msg>label=killme</msg>
-                            <repeatAmount>6</repeatAmount>
+                            <repeatAmount>2</repeatAmount>
                         </configuration>
                     </execution>
                 </executions>
