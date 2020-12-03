@@ -50,6 +50,8 @@ public class MaintainerViewSteps {
     public static final String DEFAULT_DEV_ADDRESS = "Liberty Global B.V., Boeing Avenue 53, 1119 PE Schiphol Rijk, The Netherlands";
     public static final String DEFAULT_DEV_HOMEPAGE = "https://www.libertyglobal.com";
     public static final String DEFAULT_DEV_EMAIL = "developer@libertyglobal.com";
+    public static final String DEFAULT_PLATFORM_NAME = "win";
+    public static final String DEFAULT_FIRMWARE_VER = "5.0.1";
 
     @Autowired
     private MaintainerPerspectiveAsmsClient maintainerPerspectiveAsmsClient;
@@ -119,7 +121,7 @@ public class MaintainerViewSteps {
 
     @Step
     public ValidatableResponse getApplicationDetails(String maintainerCode, String applicationKey) {
-        return maintainerPerspectiveAsmsClient.getApp(maintainerCode, applicationKey);
+        return maintainerPerspectiveAsmsClient.getApp(maintainerCode, applicationKey, DEFAULT_PLATFORM_NAME, DEFAULT_FIRMWARE_VER);
     }
 
     @Step

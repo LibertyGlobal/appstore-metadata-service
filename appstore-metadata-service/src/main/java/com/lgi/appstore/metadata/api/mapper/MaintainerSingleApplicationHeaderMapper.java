@@ -19,20 +19,19 @@
 
 package com.lgi.appstore.metadata.api.mapper;
 
-import static com.lgi.appstore.metadata.jooq.model.tables.Application.APPLICATION;
-
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.lgi.appstore.metadata.model.Category;
 import com.lgi.appstore.metadata.model.JsonObjectNames;
 import com.lgi.appstore.metadata.model.Localisation;
 import com.lgi.appstore.metadata.model.MaintainerSingleApplicationHeader;
 import com.lgi.appstore.metadata.util.JsonProcessorHelper;
-import java.util.List;
-import java.util.Optional;
-import java.util.function.Function;
 import org.jooq.JSONB;
 import org.jooq.Record;
-import org.jooq.RecordMapper;
+
+import java.util.List;
+import java.util.Optional;
+
+import static com.lgi.appstore.metadata.jooq.model.tables.Application.APPLICATION;
 
 public class MaintainerSingleApplicationHeaderMapper {
 
@@ -42,7 +41,7 @@ public class MaintainerSingleApplicationHeaderMapper {
     private MaintainerSingleApplicationHeaderMapper() {
     }
 
-    public static final Function<JsonProcessorHelper, RecordMapper<Record, MaintainerSingleApplicationHeader>> OBJ_MAPPER_PROVIDER = jsonProcessorHelper -> applicationMetadataRecord -> {
+    public static MaintainerSingleApplicationHeader map(Record applicationMetadataRecord, JsonProcessorHelper jsonProcessorHelper, String url) {
         final List<Localisation> localisations = Optional.ofNullable(applicationMetadataRecord.get(APPLICATION.LOCALIZATIONS))
                 .map(JSONB::data)
                 .map(json -> jsonProcessorHelper.readValue(JsonObjectNames.LOCALIZATIONS, json, LOCALIZATIONS_TYPE))
@@ -55,10 +54,10 @@ public class MaintainerSingleApplicationHeaderMapper {
                 .name(applicationMetadataRecord.get(APPLICATION.NAME))
                 .description(applicationMetadataRecord.get(APPLICATION.DESCRIPTION))
                 .visible(applicationMetadataRecord.get(APPLICATION.VISIBLE))
-                .url(applicationMetadataRecord.get(APPLICATION.URL))
+                .url(url)
                 .type(applicationMetadataRecord.get(APPLICATION.TYPE))
                 .category(Category.fromValue(applicationMetadataRecord.get(APPLICATION.CATEGORY)))
                 .localisations(localisations);
-    };
+    }
 }
 

@@ -59,6 +59,8 @@ import static com.lgi.appstore.metadata.api.test.framework.steps.MaintainerViewS
 import static com.lgi.appstore.metadata.api.test.framework.steps.MaintainerViewSteps.DEFAULT_DEV_EMAIL
 import static com.lgi.appstore.metadata.api.test.framework.steps.MaintainerViewSteps.DEFAULT_DEV_HOMEPAGE
 import static com.lgi.appstore.metadata.api.test.framework.steps.MaintainerViewSteps.DEFAULT_DEV_NAME
+import static com.lgi.appstore.metadata.api.test.framework.steps.MaintainerViewSteps.DEFAULT_FIRMWARE_VER
+import static com.lgi.appstore.metadata.api.test.framework.steps.MaintainerViewSteps.DEFAULT_PLATFORM_NAME
 import static com.lgi.appstore.metadata.api.test.framework.utils.DataUtils.appKeyFor
 import static com.lgi.appstore.metadata.api.test.framework.utils.DataUtils.assembleSearchCriteria
 import static com.lgi.appstore.metadata.api.test.framework.utils.DataUtils.mapAppsToKeys
@@ -94,7 +96,7 @@ class MaintainerApiFTSpec extends AsmsFeatureSpecBase {
         behavior              | appId    | v1      | visible || httpStatus
         "missing id"          | null     | "1.0.0" | false   || SC_BAD_REQUEST
         "missing version"     | randId() | null    | false   || SC_BAD_REQUEST
-        "only mandatory data" | randId() | "1.0.0" | null    || SC_CREATED // mandatory is header having: id, version, type, category, name, icon, url, requirements (even if only empty)
+        "only mandatory data" | randId() | "1.0.0" | null    || SC_CREATED // mandatory is header having: id, version, type, category, name, icon, requirements (even if only empty)
     }
 
     def "second attempt to create same application should be rejected"() {
@@ -210,7 +212,6 @@ class MaintainerApiFTSpec extends AsmsFeatureSpecBase {
         def v1Icon = "v1Icon"
         def v1Type = "v1Type"
         def v1Category = pickRandomCategory()
-        def v1Url = "url://app.great"
         def v1PlatformArch = "v1PlatformArch"
         def v1PlatformOs = "v1PlatformOs"
         def v1PlatformVariant = "v1PlatformVariant"
@@ -238,7 +239,6 @@ class MaintainerApiFTSpec extends AsmsFeatureSpecBase {
                 .withIcon(v1Icon)
                 .withType(v1Type)
                 .withCategory(v1Category)
-                .withUrl(v1Url)
                 .withPlatform(v1PlatformArch, v1PlatformOs, v1PlatformVariant)
                 .withHardware(v1HardwareCache, v1HardwareDmips, v1HardwarePersistent, v1HardwareRam, v1HardwareImage)
                 .withDependency(v1Dependency1Id, v1Dependency1Version)
@@ -254,7 +254,6 @@ class MaintainerApiFTSpec extends AsmsFeatureSpecBase {
         def v2Icon = "v2NewIcon"
         def v2Type = "v2NewType"
         def v2Category = pickRandomCategoryExcluding(v1Category)
-        def v2Url = "url://app.greater"
         def v2PlatformArch = "v2PlatformArch"
         def v2PlatformOs = "v2PlatformOs"
         def v2PlatformVariant = "v2PlatformVariant"
@@ -281,7 +280,6 @@ class MaintainerApiFTSpec extends AsmsFeatureSpecBase {
                 .withIcon(v2Icon)
                 .withType(v2Type)
                 .withCategory(v2Category)
-                .withUrl(v2Url)
                 .withPlatform(v2PlatformArch, v2PlatformOs, v2PlatformVariant)
                 .withHardware(v2HardwareCache, v2HardwareDmips, v2HardwarePersistent, v2HardwareRam, v2HardwareImage)
                 .withDependency(v2Dependency1Id, v2Dependency1Version)
@@ -308,7 +306,12 @@ class MaintainerApiFTSpec extends AsmsFeatureSpecBase {
         field().header().visible().from(theBody1) == v1Visible
         field().header().name().from(theBody1) == v1Name
         field().header().category().from(theBody1) == String.valueOf(v1Category)
-        field().header().url().from(theBody1) == v1Url
+        def url = extract(FIELD_URL).from(theBody1)
+        assertThat(url).isNotNull()
+                .isOfAnyClassIn(String.class)
+                .asString()
+                .contains(DEFAULT_PLATFORM_NAME)
+                .contains(DEFAULT_FIRMWARE_VER)
         field().header().description().from(theBody1) == v1Description
         field().header().type().from(theBody1) == v1Type
         field().header().icon().from(theBody1) == v1Icon
@@ -360,7 +363,6 @@ class MaintainerApiFTSpec extends AsmsFeatureSpecBase {
         field().header().category().from(theBody2) == String.valueOf(v2Category)
         field().header().name().from(theBody2) == v2Name
         field().header().description().from(theBody2) == v2Description
-        field().header().url().from(theBody2) == v2Url
         field().header().type().from(theBody2) == v2Type
         field().header().icon().from(theBody2) == v2Icon
 
@@ -430,7 +432,6 @@ class MaintainerApiFTSpec extends AsmsFeatureSpecBase {
         FIELD_DESCRIPTION | "Description Before ąćęłóśżź" || "Description After €\\€\\€\\€\\"
         FIELD_CATEGORY    | String.valueOf(Category.DEV)  || String.valueOf(pickRandomCategory())
         FIELD_TYPE        | "typeBefore"                  || "typeAfter"
-        FIELD_URL         | "url://before"                || "url://after"
         FIELD_ICON        | "c:\\Icon.before.png"         || "//home/alwi/Icon.after"
     }
 
@@ -489,7 +490,6 @@ class MaintainerApiFTSpec extends AsmsFeatureSpecBase {
         FIELD_DESCRIPTION | "Description Before ąćęłóśżź" || "Description After €\\€\\€\\€\\"
         FIELD_CATEGORY    | String.valueOf(Category.DEV)  || String.valueOf(Category.RESOURCE)
         FIELD_TYPE        | "typeBefore"                  || "typeAfter"
-        FIELD_URL         | "url://before"                || "url://after"
         FIELD_ICON        | "c:\\Icon.before.png"         || "//home/alwi/Icon.after"
     }
 

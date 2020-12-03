@@ -40,7 +40,7 @@ public class MaintainerPerspectiveAsmsClient extends ServiceClientBase {
     private static final String PATH_MAINTAINER_DELETE = "/maintainers/{maintainerCode}";
 
     private static final String PATH_MAINTAINER_POST_APP = "/maintainers/{maintainerCode}/apps/";
-    private static final String PATH_MAINTAINER_GET_APP = "/maintainers/{maintainerCode}/apps/{applicationId}";
+    private static final String PATH_MAINTAINER_GET_APP = "/maintainers/{maintainerCode}/apps/{applicationId}?platformName={platformName}&firmwareVer={firmwareVer}";
     private static final String PATH_MAINTAINER_GET_APPS = "/maintainers/{maintainerCode}/apps";
     private static final String PATH_MAINTAINER_PUT_APP = "/maintainers/{maintainerCode}/apps/{applicationId}";
     private static final String PATH_MAINTAINER_DELETE_APP = "/maintainers/{maintainerCode}/apps/{applicationId}";
@@ -112,12 +112,12 @@ public class MaintainerPerspectiveAsmsClient extends ServiceClientBase {
                 .then().log().status().log().body();
     }
 
-    public ValidatableResponse getApp(String maintainerCode, String applicationKey) {
+    public ValidatableResponse getApp(String maintainerCode, String applicationKey, String platformName, String firmwareVer) {
         return given()
                 .baseUri(getBaseUri())
                 .contentType(ContentType.JSON)
                 .when().log().uri().log().method().log().body()
-                .get(PATH_MAINTAINER_GET_APP, maintainerCode, applicationKey)
+                .get(PATH_MAINTAINER_GET_APP, maintainerCode, applicationKey, platformName, firmwareVer)
                 .then().log().status().log().body();
     }
 

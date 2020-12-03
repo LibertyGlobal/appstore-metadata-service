@@ -41,6 +41,7 @@ import com.lgi.appstore.metadata.model.Meta;
 import com.lgi.appstore.metadata.model.Platform;
 import com.lgi.appstore.metadata.model.Requirements;
 import com.lgi.appstore.metadata.model.ResultSetMeta;
+import com.lgi.appstore.metadata.util.ApplicationUrlCreator;
 import com.lgi.appstore.metadata.util.JsonProcessorHelper;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -67,7 +68,7 @@ class PersistentAppsServiceTest extends BaseServiceTest {
 
     @Autowired
     public PersistentAppsServiceTest(DSLContext dslContext) {
-        appsService = new PersistentAppsService(dslContext, new JsonProcessorHelper(objectMapper));
+        appsService = new PersistentAppsService(dslContext, new JsonProcessorHelper(objectMapper), new ApplicationUrlCreator("", ""));
     }
 
     @Test
@@ -77,7 +78,7 @@ class PersistentAppsServiceTest extends BaseServiceTest {
         final Application application = createRandomApplication(maintainerCode);
 
         final Optional<MaintainerApplicationDetails> maybeMaintainerApplicationDetails = appsService.getApplicationDetails(maintainerCode,
-                application.getHeader().getId());
+                application.getHeader().getId(), "", "");
 
         verifyMaintainerApplicationDetails(maybeMaintainerApplicationDetails, maintainerRecord, application);
     }
@@ -90,7 +91,9 @@ class PersistentAppsServiceTest extends BaseServiceTest {
 
         final Optional<MaintainerApplicationDetails> maybeMaintainerApplicationDetails = appsService.getApplicationDetails(maintainerCode,
                 application.getHeader().getId(),
-                application.getHeader().getVersion());
+                application.getHeader().getVersion(),
+                "",
+                "");
 
         verifyMaintainerApplicationDetails(maybeMaintainerApplicationDetails, maintainerRecord, application);
     }
@@ -143,7 +146,7 @@ class PersistentAppsServiceTest extends BaseServiceTest {
                 .header(maintainerApplicationHeader);
         appsService.addApplication(maintainerCode, application);
         final Optional<MaintainerApplicationDetails> maybeMaintainerApplicationDetails = appsService
-                .getApplicationDetails(maintainerCode, application.getHeader().getId());
+                .getApplicationDetails(maintainerCode, application.getHeader().getId(), "", "");
         assertThat(maybeMaintainerApplicationDetails).isPresent();
 
         assertThrows(ApplicationAlreadyExistsException.class, () -> appsService.addApplication(maintainerCode, application));
@@ -180,7 +183,7 @@ class PersistentAppsServiceTest extends BaseServiceTest {
                 .header(maintainerApplicationHeader);
         appsService.addApplication(maintainerCode, application);
         final Optional<MaintainerApplicationDetails> maybeMaintainerApplicationDetails = appsService
-                .getApplicationDetails(maintainerCode, application.getHeader().getId());
+                .getApplicationDetails(maintainerCode, application.getHeader().getId(), "", "");
         assertThat(maybeMaintainerApplicationDetails).isPresent();
         final ApplicationForUpdate applicationForUpdate = new ApplicationForUpdate();
         final Requirements updatedRequirements = new Requirements()
@@ -194,7 +197,7 @@ class PersistentAppsServiceTest extends BaseServiceTest {
 
         appsService.updateLatestApplication(maintainerCode, maintainerApplicationHeader.getId(), applicationForUpdate);
         final Optional<MaintainerApplicationDetails> maintainerApplicationAfterUpdate = appsService
-                .getApplicationDetails(maintainerCode, maintainerApplicationHeader.getId());
+                .getApplicationDetails(maintainerCode, maintainerApplicationHeader.getId(), "", "");
 
         verifyMaintainerApplicationDetails(maintainerApplicationAfterUpdate, maintainerRecord, applicationForUpdate);
     }
@@ -206,7 +209,7 @@ class PersistentAppsServiceTest extends BaseServiceTest {
         final Application application = createRandomApplication(maintainerCode);
         final MaintainerApplicationHeader maintainerApplicationHeader = application.getHeader();
         final Optional<MaintainerApplicationDetails> maybeMaintainerApplicationDetails = appsService
-                .getApplicationDetails(maintainerCode, maintainerApplicationHeader.getId());
+                .getApplicationDetails(maintainerCode, maintainerApplicationHeader.getId(), "", "");
         assertThat(maybeMaintainerApplicationDetails).isPresent();
         final ApplicationForUpdate applicationForUpdate = new ApplicationForUpdate();
         final Requirements updatedRequirements = new Requirements()
@@ -220,7 +223,7 @@ class PersistentAppsServiceTest extends BaseServiceTest {
 
         appsService.updateApplication(maintainerCode, maintainerApplicationHeader.getId(), maintainerApplicationHeader.getVersion(), applicationForUpdate);
         final Optional<MaintainerApplicationDetails> maintainerApplicationAfterUpdate = appsService
-                .getApplicationDetails(maintainerCode, maintainerApplicationHeader.getId());
+                .getApplicationDetails(maintainerCode, maintainerApplicationHeader.getId(), "", "");
 
         verifyMaintainerApplicationDetails(maintainerApplicationAfterUpdate, maintainerRecord, applicationForUpdate);
     }
@@ -231,13 +234,13 @@ class PersistentAppsServiceTest extends BaseServiceTest {
         final String maintainerCode = maintainerRecord.getCode();
         final Application application = createRandomApplication(maintainerCode);
         final String applicationId = application.getHeader().getId();
-        final Optional<MaintainerApplicationDetails> maybeMaintainerApplicationDetails = appsService.getApplicationDetails(maintainerCode, applicationId);
+        final Optional<MaintainerApplicationDetails> maybeMaintainerApplicationDetails = appsService.getApplicationDetails(maintainerCode, applicationId, "", "");
         assertThat(maybeMaintainerApplicationDetails).isPresent();
 
         appsService.deleteApplication(maintainerCode, applicationId, application.getHeader().getVersion());
 
         final Optional<MaintainerApplicationDetails> maybeMaintainerApplicationDetailsAfterDeletion = appsService
-                .getApplicationDetails(maintainerCode, applicationId);
+                .getApplicationDetails(maintainerCode, applicationId, "", "");
         assertThat(maybeMaintainerApplicationDetailsAfterDeletion).isEmpty();
     }
 
@@ -250,7 +253,7 @@ class PersistentAppsServiceTest extends BaseServiceTest {
         final String applicationId = application.getHeader().getId();
         final String latestApplicationVersion = "1.0.1";
         createRandomApplication(maintainerCode, latestApplicationVersion, applicationId);
-        final Optional<MaintainerApplicationDetails> maybeMaintainerApplicationDetails = appsService.getApplicationDetails(maintainerCode, applicationId);
+        final Optional<MaintainerApplicationDetails> maybeMaintainerApplicationDetails = appsService.getApplicationDetails(maintainerCode, applicationId, "", "");
         assertThat(maybeMaintainerApplicationDetails).isPresent();
         assertThat(maybeMaintainerApplicationDetails.get().getVersions()).isNotNull()
                 .containsExactly(new MaintainerVersion().visible(true).version(latestApplicationVersion),
@@ -260,7 +263,7 @@ class PersistentAppsServiceTest extends BaseServiceTest {
 
         assertThat(deleteLatestApplicationResult).isTrue();
         final Optional<MaintainerApplicationDetails> maybeMaintainerApplicationDetailsAfterDeletion = appsService
-                .getApplicationDetails(maintainerCode, applicationId);
+                .getApplicationDetails(maintainerCode, applicationId, "", "");
         assertThat(maybeMaintainerApplicationDetailsAfterDeletion).isPresent();
         assertThat(maybeMaintainerApplicationDetailsAfterDeletion.get().getVersions()).isNotNull()
                 .containsExactly(new MaintainerVersion().visible(true).version(applicationVersion));
@@ -274,7 +277,7 @@ class PersistentAppsServiceTest extends BaseServiceTest {
         final Application application = createRandomApplication(maintainerCode, "1.0.0");
         final String applicationId = application.getHeader().getId();
         createRandomApplication(maintainerCode, "1.0.1", applicationId);
-        final Optional<MaintainerApplicationDetails> maybeMaintainerApplicationDetails = appsService.getApplicationDetails(maintainerCode, applicationId);
+        final Optional<MaintainerApplicationDetails> maybeMaintainerApplicationDetails = appsService.getApplicationDetails(maintainerCode, applicationId, "", "");
         assertThat(maybeMaintainerApplicationDetails).isPresent();
         assertThat(maybeMaintainerApplicationDetails.get().getVersions()).isNotNull().hasSize(2);
 
@@ -282,7 +285,7 @@ class PersistentAppsServiceTest extends BaseServiceTest {
 
         assertThat(deleteAllApplicationVersionsResult).isTrue();
         final Optional<MaintainerApplicationDetails> maybeMaintainerApplicationDetailsAfterDeletion = appsService
-                .getApplicationDetails(maintainerCode, applicationId);
+                .getApplicationDetails(maintainerCode, applicationId, "", "");
         assertThat(maybeMaintainerApplicationDetailsAfterDeletion).isEmpty();
     }
 
@@ -294,7 +297,7 @@ class PersistentAppsServiceTest extends BaseServiceTest {
         final String applicationId = UUID.randomUUID().toString();
         Arrays.stream(unorderedVersions).forEach(version -> createRandomApplication(maintainerCode, version, applicationId));
 
-        final Optional<MaintainerApplicationDetails> maybeMaintainerApplicationDetails = appsService.getApplicationDetails(maintainerCode, applicationId);
+        final Optional<MaintainerApplicationDetails> maybeMaintainerApplicationDetails = appsService.getApplicationDetails(maintainerCode, applicationId, "", "");
 
         assertThat(maybeMaintainerApplicationDetails).isPresent();
         final MaintainerApplicationDetails maintainerApplicationDetails = maybeMaintainerApplicationDetails.get();
@@ -315,7 +318,7 @@ class PersistentAppsServiceTest extends BaseServiceTest {
         final String applicationId = UUID.randomUUID().toString();
         Arrays.stream(unorderedVersions).forEach(version -> createRandomApplication(maintainerCode, version, applicationId));
 
-        final Optional<MaintainerApplicationDetails> maybeMaintainerApplicationDetails = appsService.getApplicationDetails(maintainerCode, applicationId, unorderedVersions[0]);
+        final Optional<MaintainerApplicationDetails> maybeMaintainerApplicationDetails = appsService.getApplicationDetails(maintainerCode, applicationId, unorderedVersions[0], "", "");
 
         assertThat(maybeMaintainerApplicationDetails).isPresent();
         final MaintainerApplicationDetails maintainerApplicationDetails = maybeMaintainerApplicationDetails.get();
@@ -368,7 +371,6 @@ class PersistentAppsServiceTest extends BaseServiceTest {
                 .id(applicationId)
                 .name(UUID.randomUUID().toString())
                 .type(UUID.randomUUID().toString())
-                .url(UUID.randomUUID().toString())
                 .version(version)
                 .localisations(Collections.singletonList(localisation))
                 .visible(true);
@@ -381,7 +383,6 @@ class PersistentAppsServiceTest extends BaseServiceTest {
                 .icon(UUID.randomUUID().toString())
                 .name(UUID.randomUUID().toString())
                 .type(UUID.randomUUID().toString())
-                .url(UUID.randomUUID().toString())
                 .localisations(Collections.singletonList(localisation))
                 .visible(true);
     }
@@ -396,7 +397,6 @@ class PersistentAppsServiceTest extends BaseServiceTest {
                 "icon",
                 "name",
                 "description",
-                "url",
                 "type",
                 "category",
                 "localisations",
@@ -444,7 +444,7 @@ class PersistentAppsServiceTest extends BaseServiceTest {
         assertThat(header.getIcon()).isEqualTo(applicationHeader.getIcon());
         assertThat(header.getName()).isEqualTo(applicationHeader.getName());
         assertThat(header.getDescription()).isEqualTo(applicationHeader.getDescription());
-        assertThat(header.getUrl()).isEqualTo(applicationHeader.getUrl());
+        assertThat(header.getUrl()).isNotNull();
         assertThat(header.getCategory()).isEqualTo(applicationHeader.getCategory());
         assertThat(header.getLocalisations()).isEqualTo(applicationHeader.getLocalisations());
         assertThat(header.getId()).isEqualTo(applicationHeader.getId());

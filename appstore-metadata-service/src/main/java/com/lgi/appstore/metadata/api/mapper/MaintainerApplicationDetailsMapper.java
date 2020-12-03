@@ -33,10 +33,9 @@ import com.lgi.appstore.metadata.model.MaintainerVersion;
 import com.lgi.appstore.metadata.model.Platform;
 import com.lgi.appstore.metadata.model.Requirements;
 import com.lgi.appstore.metadata.util.JsonProcessorHelper;
-import java.util.List;
-import java.util.function.BiFunction;
 import org.jooq.Record;
-import org.jooq.RecordMapper;
+
+import java.util.List;
 
 public class MaintainerApplicationDetailsMapper {
 
@@ -48,10 +47,11 @@ public class MaintainerApplicationDetailsMapper {
     private MaintainerApplicationDetailsMapper() {
     }
 
-    public static final BiFunction<JsonProcessorHelper, List<MaintainerVersion>, RecordMapper<Record, MaintainerApplicationDetails>> OBJ_MAPPER_PROVIDER = (jsonProcessorHelper, versions) -> applicationMetadataRecord -> {
-
-        final MaintainerSingleApplicationHeader applicationHeader = applicationMetadataRecord
-                .map(MaintainerSingleApplicationHeaderMapper.OBJ_MAPPER_PROVIDER.apply(jsonProcessorHelper));
+    public static MaintainerApplicationDetails map(Record applicationMetadataRecord,
+                                                   List<MaintainerVersion> versions,
+                                                   JsonProcessorHelper jsonProcessorHelper,
+                                                   String url) {
+        final MaintainerSingleApplicationHeader applicationHeader = MaintainerSingleApplicationHeaderMapper.map(applicationMetadataRecord, jsonProcessorHelper, url);
 
         return new MaintainerApplicationDetails()
                 .header(applicationHeader)
@@ -62,14 +62,10 @@ public class MaintainerApplicationDetailsMapper {
                         .email(applicationMetadataRecord.get(MAINTAINER.EMAIL)))
                 .versions(versions)
                 .requirements(new Requirements()
-                        .dependencies(jsonProcessorHelper
-                                .readValue(JsonObjectNames.DEPENDENCIES, applicationMetadataRecord.get(APPLICATION.DEPENDENCIES).data(), DEPENDENCIES_TYPE))
-                        .features(jsonProcessorHelper
-                                .readValue(JsonObjectNames.FEATURES, applicationMetadataRecord.get(APPLICATION.FEATURES).data(), FEATURES_TYPE))
-                        .hardware(jsonProcessorHelper
-                                .readValue(JsonObjectNames.HARDWARE, applicationMetadataRecord.get(APPLICATION.HARDWARE).data(), Hardware.class))
-                        .platform(jsonProcessorHelper
-                                .readValue(JsonObjectNames.PLATFORM, applicationMetadataRecord.get(APPLICATION.PLATFORM).data(), Platform.class)));
-    };
+                        .dependencies(jsonProcessorHelper.readValue(JsonObjectNames.DEPENDENCIES, applicationMetadataRecord.get(APPLICATION.DEPENDENCIES).data(), DEPENDENCIES_TYPE))
+                        .features(jsonProcessorHelper.readValue(JsonObjectNames.FEATURES, applicationMetadataRecord.get(APPLICATION.FEATURES).data(), FEATURES_TYPE))
+                        .hardware(jsonProcessorHelper.readValue(JsonObjectNames.HARDWARE, applicationMetadataRecord.get(APPLICATION.HARDWARE).data(), Hardware.class))
+                        .platform(jsonProcessorHelper.readValue(JsonObjectNames.PLATFORM, applicationMetadataRecord.get(APPLICATION.PLATFORM).data(), Platform.class)));
+    }
 }
 

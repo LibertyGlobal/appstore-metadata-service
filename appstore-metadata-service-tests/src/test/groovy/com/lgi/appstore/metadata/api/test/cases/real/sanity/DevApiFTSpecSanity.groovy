@@ -28,12 +28,16 @@ import io.restassured.response.ExtractableResponse
 import io.restassured.response.Response
 
 import static com.lgi.appstore.metadata.api.test.framework.model.request.ApplicationMetadataBuilder.builder
+import static com.lgi.appstore.metadata.api.test.framework.model.response.ApplicationDetailsPath.FIELD_URL
+import static com.lgi.appstore.metadata.api.test.framework.model.response.ApplicationDetailsPath.extract
 import static com.lgi.appstore.metadata.api.test.framework.model.response.ApplicationDetailsPath.field
 import static com.lgi.appstore.metadata.api.test.framework.steps.MaintainerViewSteps.DEFAULT_DEV_ADDRESS
 import static com.lgi.appstore.metadata.api.test.framework.steps.MaintainerViewSteps.DEFAULT_DEV_CODE
 import static com.lgi.appstore.metadata.api.test.framework.steps.MaintainerViewSteps.DEFAULT_DEV_EMAIL
 import static com.lgi.appstore.metadata.api.test.framework.steps.MaintainerViewSteps.DEFAULT_DEV_HOMEPAGE
 import static com.lgi.appstore.metadata.api.test.framework.steps.MaintainerViewSteps.DEFAULT_DEV_NAME
+import static com.lgi.appstore.metadata.api.test.framework.steps.MaintainerViewSteps.DEFAULT_FIRMWARE_VER
+import static com.lgi.appstore.metadata.api.test.framework.steps.MaintainerViewSteps.DEFAULT_PLATFORM_NAME
 import static com.lgi.appstore.metadata.api.test.framework.utils.DataUtils.pickRandomCategory
 import static com.lgi.appstore.metadata.api.test.framework.utils.DataUtils.pickRandomCategoryExcluding
 import static com.lgi.appstore.metadata.api.test.framework.utils.DataUtils.randId
@@ -53,7 +57,6 @@ class DevApiFTSpecSanity extends AsmsSanitySpecBase {
         def v1Icon = "v1Icon"
         def v1Type = "v1Type"
         def v1Category = pickRandomCategory()
-        def v1Url = "url://app.great"
         def v1PlatformArch = "v1PlatformArch"
         def v1PlatformOs = "v1PlatformOs"
         def v1PlatformVariant = "v1PlatformVariant"
@@ -87,7 +90,6 @@ class DevApiFTSpecSanity extends AsmsSanitySpecBase {
                 .withIcon(v1Icon)
                 .withType(v1Type)
                 .withCategory(v1Category)
-                .withUrl(v1Url)
                 .withLocalisation(v1Localisation1Name, v1Localisation1Lang, v1Localisation1Description)
                 .withLocalisation(v1Localisation2Name, v1Localisation2Lang, v1Localisation2Description)
                 .withPlatform(v1PlatformArch, v1PlatformOs, v1PlatformVariant)
@@ -105,7 +107,6 @@ class DevApiFTSpecSanity extends AsmsSanitySpecBase {
         def v2Icon = "v2NewIcon"
         def v2Type = "v2NewType"
         def v2Category = pickRandomCategoryExcluding(v1Category)
-        def v2Url = "url://app.greater"
         def v2PlatformArch = "v2PlatformArch"
         def v2PlatformOs = "v2PlatformOs"
         def v2PlatformVariant = "v2PlatformVariant"
@@ -138,7 +139,6 @@ class DevApiFTSpecSanity extends AsmsSanitySpecBase {
                 .withIcon(v2Icon)
                 .withType(v2Type)
                 .withCategory(v2Category)
-                .withUrl(v2Url)
                 .withLocalisation(v2Localisation1Name, v2Localisation1Lang, v2Localisation1Description)
                 .withLocalisation(v2Localisation2Name, v2Localisation2Lang, v2Localisation2Description)
                 .withPlatform(v2PlatformArch, v2PlatformOs, v2PlatformVariant)
@@ -166,7 +166,12 @@ class DevApiFTSpecSanity extends AsmsSanitySpecBase {
         field().header().visible().from(theBody1) == v1Visible
         field().header().name().from(theBody1) == v1Name
         field().header().category().from(theBody1) == String.valueOf(v1Category)
-        field().header().url().from(theBody1) == v1Url
+        def url = extract(FIELD_URL).from(theBody1)
+        assertThat(url).isNotNull()
+                .isOfAnyClassIn(String.class)
+                .asString()
+                .contains(DEFAULT_PLATFORM_NAME)
+                .contains(DEFAULT_FIRMWARE_VER)
         field().header().description().from(theBody1) == v1Description
         field().header().type().from(theBody1) == v1Type
         field().header().icon().from(theBody1) == v1Icon
@@ -227,7 +232,6 @@ class DevApiFTSpecSanity extends AsmsSanitySpecBase {
         field().header().category().from(theBody2) == String.valueOf(v2Category)
         field().header().name().from(theBody2) == v2Name
         field().header().description().from(theBody2) == v2Description
-        field().header().url().from(theBody2) == v2Url
         field().header().type().from(theBody2) == v2Type
         field().header().icon().from(theBody2) == v2Icon
 

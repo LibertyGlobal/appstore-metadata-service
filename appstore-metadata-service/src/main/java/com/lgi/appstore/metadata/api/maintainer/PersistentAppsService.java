@@ -34,13 +34,14 @@ import com.lgi.appstore.metadata.model.MaintainerVersion;
 import com.lgi.appstore.metadata.model.Meta;
 import com.lgi.appstore.metadata.model.Platform;
 import com.lgi.appstore.metadata.model.ResultSetMeta;
+import com.lgi.appstore.metadata.util.ApplicationUrlCreator;
 import com.lgi.appstore.metadata.util.JsonProcessorHelper;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.JSONB;
 import org.jooq.Record1;
-import org.jooq.Record10;
 import org.jooq.Record2;
+import org.jooq.Record9;
 import org.jooq.SelectJoinStep;
 import org.jooq.SortField;
 import org.jooq.Table;
@@ -74,11 +75,13 @@ public class PersistentAppsService implements AppsService {
 
     private final DSLContext dslContext;
     private final JsonProcessorHelper jsonProcessorHelper;
+    private final ApplicationUrlCreator applicationUrlCreator;
 
     @Autowired
-    public PersistentAppsService(DSLContext dslContext, JsonProcessorHelper jsonProcessorHelper) {
+    public PersistentAppsService(DSLContext dslContext, JsonProcessorHelper jsonProcessorHelper, ApplicationUrlCreator applicationUrlCreator) {
         this.dslContext = dslContext;
         this.jsonProcessorHelper = jsonProcessorHelper;
+        this.applicationUrlCreator = applicationUrlCreator;
     }
 
     @Override
@@ -91,7 +94,7 @@ public class PersistentAppsService implements AppsService {
                 .map(integerRecord1 -> integerRecord1.get(MAINTAINER.ID))
                 .orElseThrow(() -> new MaintainerNotFoundException(maintainerCode));
 
-        final SelectJoinStep<Record10<String, String, String, String, String, Boolean, String, String, String, JSONB>> from = dslContext
+        final SelectJoinStep<Record9<String, String, String, String, String, Boolean, String, String, JSONB>> from = dslContext
                 .select(
                         APPLICATION.ID_RDOMAIN,
                         APPLICATION.VERSION,
@@ -99,7 +102,6 @@ public class PersistentAppsService implements AppsService {
                         APPLICATION.NAME,
                         APPLICATION.DESCRIPTION,
                         APPLICATION.VISIBLE,
-                        APPLICATION.URL,
                         APPLICATION.TYPE,
                         APPLICATION.CATEGORY,
                         APPLICATION.LOCALIZATIONS)
@@ -150,7 +152,7 @@ public class PersistentAppsService implements AppsService {
                 .offset(effectiveOffset)
                 .limit(effectiveLimit)
                 .fetchStream()
-                .map(applicationMetadataRecord -> applicationMetadataRecord.map(MaintainerApplicationHeaderMapper.OBJ_MAPPER_PROVIDER.apply(jsonProcessorHelper)))
+                .map(applicationMetadataRecord -> MaintainerApplicationHeaderMapper.map(applicationMetadataRecord, jsonProcessorHelper))
                 .collect(Collectors.toList());
 
         final Meta meta = new Meta()
@@ -169,7 +171,7 @@ public class PersistentAppsService implements AppsService {
     }
 
     @Override
-    public Optional<MaintainerApplicationDetails> getApplicationDetails(String maintainerCode, String appId, String version) {
+    public Optional<MaintainerApplicationDetails> getApplicationDetails(String maintainerCode, String appId, String version, String platformName, String firmwareVer) {
         final Integer maintainerId = dslContext
                 .select(MAINTAINER.ID)
                 .from(MAINTAINER)
@@ -205,7 +207,6 @@ public class PersistentAppsService implements AppsService {
                 APPLICATION.DESCRIPTION,
                 APPLICATION.VISIBLE,
                 APPLICATION.VERSION,
-                APPLICATION.URL,
                 APPLICATION.TYPE,
                 APPLICATION.CATEGORY,
                 APPLICATION.LOCALIZATIONS,
@@ -222,11 +223,17 @@ public class PersistentAppsService implements AppsService {
                 .and(APPLICATION.MAINTAINER_ID.eq(maintainerId))
                 .and(APPLICATION.VERSION.eq(version))
                 .fetchOptional()
-                .map(applicationMetadataRecord -> applicationMetadataRecord.map(MaintainerApplicationDetailsMapper.OBJ_MAPPER_PROVIDER.apply(jsonProcessorHelper, versions)));
+                .map(applicationMetadataRecord -> {
+                    final String url = applicationUrlCreator.createApplicationUrl(applicationMetadataRecord.get(APPLICATION.ID_RDOMAIN),
+                            applicationMetadataRecord.get(APPLICATION.VERSION),
+                            platformName,
+                            firmwareVer);
+                    return MaintainerApplicationDetailsMapper.map(applicationMetadataRecord, versions, jsonProcessorHelper, url);
+                });
     }
 
     @Override
-    public Optional<MaintainerApplicationDetails> getApplicationDetails(String maintainerCode, String appId) {
+    public Optional<MaintainerApplicationDetails> getApplicationDetails(String maintainerCode, String appId, String platformName, String firmwareVer) {
         final Integer maintainerId = dslContext.select(MAINTAINER.ID)
                 .from(MAINTAINER)
                 .where(MAINTAINER.CODE.eq(maintainerCode))
@@ -260,7 +267,6 @@ public class PersistentAppsService implements AppsService {
                 APPLICATION.ICON,
                 APPLICATION.NAME,
                 APPLICATION.DESCRIPTION,
-                APPLICATION.URL,
                 APPLICATION.TYPE,
                 APPLICATION.CATEGORY,
                 APPLICATION.LOCALIZATIONS,
@@ -277,7 +283,13 @@ public class PersistentAppsService implements AppsService {
                 .and(APPLICATION.MAINTAINER_ID.eq(maintainerId))
                 .and(DSL.condition(APPLICATION.LATEST.getQualifiedName() + " ->> 'maintainer' = 'true'"))
                 .fetchOptional()
-                .map(applicationMetadataRecord -> applicationMetadataRecord.map(MaintainerApplicationDetailsMapper.OBJ_MAPPER_PROVIDER.apply(jsonProcessorHelper, versions)));
+                .map(applicationMetadataRecord -> {
+                    final String url = applicationUrlCreator.createApplicationUrl(applicationMetadataRecord.get(APPLICATION.ID_RDOMAIN),
+                            applicationMetadataRecord.get(APPLICATION.VERSION),
+                            platformName,
+                            firmwareVer);
+                    return MaintainerApplicationDetailsMapper.map(applicationMetadataRecord, versions, jsonProcessorHelper, url);
+                });
     }
 
     @Override
@@ -302,7 +314,6 @@ public class PersistentAppsService implements AppsService {
                         APPLICATION.VISIBLE,
                         APPLICATION.NAME,
                         APPLICATION.DESCRIPTION,
-                        APPLICATION.URL,
                         APPLICATION.ICON,
                         APPLICATION.TYPE,
                         APPLICATION.CATEGORY,
@@ -318,7 +329,6 @@ public class PersistentAppsService implements AppsService {
                                 application.getHeader().isVisible(),
                                 application.getHeader().getName(),
                                 application.getHeader().getDescription(),
-                                application.getHeader().getUrl(),
                                 application.getHeader().getIcon(),
                                 application.getHeader().getType(),
                                 application.getHeader().getCategory().toString(),
@@ -354,7 +364,6 @@ public class PersistentAppsService implements AppsService {
                             .set(APPLICATION.VISIBLE, applicationForUpdate.getHeader().isVisible())
                             .set(APPLICATION.NAME, applicationForUpdate.getHeader().getName())
                             .set(APPLICATION.DESCRIPTION, applicationForUpdate.getHeader().getDescription())
-                            .set(APPLICATION.URL, applicationForUpdate.getHeader().getUrl())
                             .set(APPLICATION.ICON, applicationForUpdate.getHeader().getIcon())
                             .set(APPLICATION.TYPE, applicationForUpdate.getHeader().getType())
                             .set(APPLICATION.CATEGORY, applicationForUpdate.getHeader().getCategory().toString())
@@ -392,7 +401,6 @@ public class PersistentAppsService implements AppsService {
                             .set(APPLICATION.VISIBLE, applicationForUpdate.getHeader().isVisible())
                             .set(APPLICATION.NAME, applicationForUpdate.getHeader().getName())
                             .set(APPLICATION.DESCRIPTION, applicationForUpdate.getHeader().getDescription())
-                            .set(APPLICATION.URL, applicationForUpdate.getHeader().getUrl())
                             .set(APPLICATION.ICON, applicationForUpdate.getHeader().getIcon())
                             .set(APPLICATION.TYPE, applicationForUpdate.getHeader().getType())
                             .set(APPLICATION.CATEGORY, applicationForUpdate.getHeader().getCategory().toString())

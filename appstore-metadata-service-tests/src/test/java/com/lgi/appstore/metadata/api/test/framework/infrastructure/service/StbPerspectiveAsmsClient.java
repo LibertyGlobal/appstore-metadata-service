@@ -28,15 +28,15 @@ import java.util.Map;
 
 @Component
 public class StbPerspectiveAsmsClient extends ServiceClientBase {
-    private static final String PATH_MAINTAINER_GET_APP = "/apps/{applicationId}";
+    private static final String PATH_MAINTAINER_GET_APP = "/apps/{applicationId}?platformName={platformName}&firmwareVer={firmwareVer}";
     private static final String PATH_MAINTAINER_READ_APPS = "/apps";
 
-    public ValidatableResponse getApp(String appKey) {
+    public ValidatableResponse getApp(String appKey, String platformName, String firmwareVer) {
         return given()
                 .baseUri(getBaseUri())
                 .contentType(ContentType.JSON)
                 .when().log().uri().log().method().log().body()
-                .get(PATH_MAINTAINER_GET_APP, appKey)
+                .get(PATH_MAINTAINER_GET_APP, appKey, platformName, firmwareVer)
                 .then().log().status().log().body();
     }
 
