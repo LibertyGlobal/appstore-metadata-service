@@ -202,6 +202,7 @@
                     <includes>
                         <include>**/*FTSpec</include>
                         <include>**/*FTSpecSmoke</include>
+                        <include>**/*FTSpecSanity</include>
                     </includes>
                     <argLine>
                         -javaagent:"${settings.localRepository}/org/aspectj/aspectjweaver/${aspectj.version}/aspectjweaver-${aspectj.version}.jar"

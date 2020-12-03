@@ -31,11 +31,6 @@ class AsmsIntegrationSpecBase extends Specification {
     @Autowired
     protected TestSession testSession
 
-    void setup() {
-        LOG.info("Starting tests -> setup spec.")
-        testSession.setTestType(TestSession.TestType.ITCASE_DEV)
-    }
-
     void cleanup() {
         maintainerSteps.deleteAllAppsThatWereAdded()
     }
