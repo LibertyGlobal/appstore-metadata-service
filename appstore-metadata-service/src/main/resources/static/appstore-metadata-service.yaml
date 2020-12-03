@@ -571,6 +571,8 @@ components:
           example: 9
     Requirements:
       type: object
+      required:
+        - platform
       properties:
         dependencies:
           type: array
@@ -599,6 +601,9 @@ components:
           example: 0.3.4
     Platform:
       type: object
+      required:
+        - architecture
+        - os
       properties:
         architecture:
           type: string
