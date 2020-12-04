@@ -156,25 +156,6 @@
                 </executions>
             </plugin>
             <plugin>
-                <groupId>com.lgi.common.maven</groupId>
-                <artifactId>tcp-msg-maven-plugin</artifactId>
-                <version>0.0.1-SNAPSHOT</version>
-                <executions>
-                    <execution>
-                        <id>write-death-note-for-postgres</id>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>tcpmsg</goal>
-                        </goals>
-                        <configuration>
-                            <port>${ryuk.port}</port>
-                            <msg>label=killme</msg>
-                            <repeatAmount>2</repeatAmount>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
                 <groupId>io.fabric8</groupId>
                 <artifactId>docker-maven-plugin</artifactId>
                 <version>0.34.0</version>
@@ -225,6 +206,25 @@
                         <goals>
                             <goal>start</goal>
                         </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>com.lgi.common.maven</groupId>
+                <artifactId>tcp-msg-maven-plugin</artifactId>
+                <version>0.0.1-SNAPSHOT</version>
+                <executions>
+                    <execution>
+                        <id>write-death-note-for-postgres</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>tcpmsg</goal>
+                        </goals>
+                        <configuration>
+                            <port>${ryuk.port}</port>
+                            <msg>label=killme</msg>
+                            <repeatAmount>2</repeatAmount>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
