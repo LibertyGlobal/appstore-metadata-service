@@ -20,20 +20,34 @@
 package com.lgi.appstore.metadata.api.testing.framework.base;
 
 import com.lgi.appstore.metadata.api.testing.framework.infrastructure.TestDataStore;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.test.util.TestPropertyValues;
 import org.springframework.context.ApplicationContextInitializer;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.env.ConfigurableEnvironment;
 
+import java.util.Arrays;
+
 public class DataSourceInitializer implements ApplicationContextInitializer<ConfigurableApplicationContext> {
+    private Logger LOG = LoggerFactory.getLogger(DataSourceInitializer.class);
+
     public void initialize(ConfigurableApplicationContext context) {
         final ConfigurableEnvironment environment = context.getEnvironment();
+        LOG.info("Active profiles: {}", Arrays.toString(environment.getActiveProfiles()));
+
         TestDataStore dbTestContainer = TestDataStore.getInstance(environment);
-        System.out.println(environment.getActiveProfiles());
+        String dbUrl = dbTestContainer.withUrlParam("currentSchema", dbTestContainer.getDatabaseSchemaName()).getJdbcUrl();
+        String dbUsername = dbTestContainer.getUsername();
+        String dbPassword = dbTestContainer.getPassword();
+        LOG.info("dbUrl: {}", dbUrl);
+        LOG.info("dbUsername: {}", dbUsername);
+        LOG.info("dbPassword: {}", dbPassword);
+
         TestPropertyValues.of(
-                "spring.datasource.url=" + dbTestContainer.withUrlParam("currentSchema", dbTestContainer.getDatabaseSchemaName()).getJdbcUrl(),
-                "spring.datasource.username=" + dbTestContainer.getUsername(),
-                "spring.datasource.password=" + dbTestContainer.getPassword(),
+                "spring.datasource.url=" + dbUrl,
+                "spring.datasource.username=" + dbUsername,
+                "spring.datasource.password=" + dbPassword,
                 "spring.datasource.driver-class-name" + dbTestContainer.getDriverClassName(),
                 "spring.datasource.hikari.maximum-pool-size=40",
                 "spring.datasource.hikari.minimum-idle=5"

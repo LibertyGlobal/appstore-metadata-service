@@ -38,6 +38,9 @@ so we can execute more extensive tests there (sanity testing).
 
 Having that said, still most of new tests should be added within functional scenarios suite which are the fastest ones (most of functional testing).
 
+Functional (local) and smoke tests require `db.schema=appstore_metadata_service` env. var to be set. While sanity tests might be run against parallel deployments
+from different branches and each might set up own DB instance on same environment and namespace therefore they should provide unique schema name as well. 
+
 Build and execution from IntelliJ level - Add Groovy framework support instead of dependency library
 ---
 
@@ -125,7 +128,8 @@ curl -v -XPOST -H "Content-type: application/json" -d '{
   },
   "requirements": {
     "platform": {
-      "architecture": "arm"
+      "architecture": "arm",
+      "os": "linux"
     },
     "hardware": {
       "ram": "256",
@@ -165,7 +169,8 @@ curl -v -XPOST -H "Content-type: application/json" -d '{
   },
   "requirements": {
     "platform": {
-      "architecture": "arm"
+      "architecture": "arm", 
+      "os": "linux"
     },
     "hardware": {
       "ram": "256",
@@ -199,7 +204,8 @@ curl -v -XPOST -H "Content-type: application/json" -d '{
   },
   "requirements": {
     "platform": {
-      "architecture": "arm"
+      "architecture": "arm",
+      "os": "linux"
     },
     "hardware": {
       "ram": "256",
