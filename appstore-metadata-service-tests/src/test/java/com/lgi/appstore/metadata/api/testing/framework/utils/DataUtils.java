@@ -32,7 +32,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Random;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -43,7 +42,6 @@ import static com.lgi.appstore.metadata.api.testing.framework.model.request.Quer
  * @noinspection WeakerAccess as this is utility class
  */
 public class DataUtils {
-    private static final Random RANDOM = new Random();
     private static final Faker FAKER = new Faker();
 
     public static Category pickRandomCategory() {
@@ -69,7 +67,7 @@ public class DataUtils {
     }
 
     public static String randomAppHeaderType() {
-        return String.format("%s.%d.rdk-app.dac.native", FAKER.file().mimeType(), RANDOM.nextInt(100));
+        return String.format("%s.%d.rdk-app.dac.native", FAKER.file().mimeType(), FAKER.random().nextInt(100));
     }
 
     public static String randomAppUrl() {
@@ -81,7 +79,7 @@ public class DataUtils {
     }
 
     public static String randomAppName() {
-        return RANDOM.nextBoolean() ? FAKER.app().name() : FAKER.app().name() + "-" + FAKER.app().name();
+        return FAKER.random().nextBoolean() ? FAKER.app().name() : FAKER.app().name() + "-" + FAKER.app().name();
     }
 
     public static String randomAppDescription() {
@@ -134,9 +132,17 @@ public class DataUtils {
 
     private static String randomReversedDomainName() {
         int domainFirstWordIdx = 1;
-        int domainMaxWords = 2 + RANDOM.nextInt(3); // min 2, max 5
+        int domainMaxWords = 2 + FAKER.random().nextInt(3); // min 2, max 5
         return FAKER.internet().domainSuffix() + "." + IntStream.range(domainFirstWordIdx, domainMaxWords).boxed()
                 .map(i -> FAKER.internet().domainWord())
                 .collect(Collectors.joining("."));
+    }
+
+    public static String randomPlatformArch() {
+        return FAKER.hacker().adjective() + "_" + FAKER.hacker().abbreviation();
+    }
+
+    public static String randomPlatformOs() {
+        return FAKER.hacker().adjective() + "_" + FAKER.hacker().noun();
     }
 }

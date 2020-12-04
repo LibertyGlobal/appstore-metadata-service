@@ -182,6 +182,7 @@ public class ApplicationMetadataBuilder {
         this.headerIcon = DataUtils.randomAppHeaderIcon();
         this.headerVisible = Boolean.TRUE;
         this.headerCategory = Category.APPLICATION;
+        this.platform = new Platform().architecture(DataUtils.randomPlatformArch()).os(DataUtils.randomPlatformOs());
 
         return this;
     }
