@@ -16,6 +16,9 @@
 #  and limitations under the License.
 
 FROM adoptopenjdk/openjdk13:alpine-jre
-ARG JAR_FILE=target/*.jar
+ARG JAR_FILE=target/appstore-metadata-service.jar
+RUN mkdir jars
 COPY ${JAR_FILE} app.jar
+COPY target/jars jars/
+
 ENTRYPOINT ["java","-jar","/app.jar"]
