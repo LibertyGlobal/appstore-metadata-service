@@ -349,7 +349,7 @@ class StbApiFTSpec extends AsmsFeatureSpecBase {
 
         and: "the body exposes version section with all versions and visibility information"
         assertThat(field().versions().from(theBody1)).asList().hasSize(2) // 3rd hidden version should not be exposed
-        assertThat(field().versions().version().from(theBody1)).asList().containsExactlyInAnyOrder(v1, v2)
+        assertThat(field().versions().version().from(theBody1)).asList().containsExactly(v2, v1)
         assertThat(field().versions().visible().from(theBody1)).asList().containsExactly(null, null) // 'visible' field should not be exposed
 
         and: "the body exposes requirements section with dependencies information"
@@ -388,7 +388,7 @@ class StbApiFTSpec extends AsmsFeatureSpecBase {
 
         and: "the body exposes version section with all versions and visibility information"
         assertThat(field().versions().from(theBody2)).asList().hasSize(2) // 3rd hidden version should not be exposed
-        assertThat(field().versions().version().from(theBody2)).asList().containsExactlyInAnyOrder(v1, v2)
+        assertThat(field().versions().version().from(theBody2)).asList().containsExactly(v2, v1)
         assertThat(field().versions().visible().from(theBody2)).asList().containsExactly(null, null) // 'visible' field should not be exposed
 
         and: "the body exposes requirements section with dependencies information"
