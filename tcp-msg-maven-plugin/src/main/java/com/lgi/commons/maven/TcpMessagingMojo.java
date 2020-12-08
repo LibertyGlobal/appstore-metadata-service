@@ -45,7 +45,7 @@ public class TcpMessagingMojo extends AbstractMojo {
     @Parameter(property = "tcpmsg.port")
     private Integer port;
 
-    @Parameter(property = "tcpmsg.command")
+    @Parameter(property = "tcpmsg.msg")
     private String msg;
 
     @Override
