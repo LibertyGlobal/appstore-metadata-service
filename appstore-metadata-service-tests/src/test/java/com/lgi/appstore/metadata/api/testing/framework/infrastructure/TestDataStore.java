@@ -37,6 +37,8 @@ import java.util.Optional;
 public class TestDataStore extends PostgreSQLContainer<TestDataStore> {
     private static final Logger LOG = LoggerFactory.getLogger(TestDataStore.class);
 
+    private static final String DB_SCHEMA_NAME_DEFAULT = "appstore_metadata_service";
+
     private static final String DB_IMAGE_NAME = "postgres:11.1";
     private static final String DB_NAME = "postgres";
     private static final String DB_USER = "postgres";
@@ -50,7 +52,7 @@ public class TestDataStore extends PostgreSQLContainer<TestDataStore> {
     private TestDataStore(PropertyResolver propertyResolver) {
         super(DB_IMAGE_NAME);
 
-        databaseSchemaName = propertyResolver.getProperty("db.schema", String.class);
+        databaseSchemaName = propertyResolver.getProperty("db.schema", String.class, DB_SCHEMA_NAME_DEFAULT);
     }
 
     public static TestDataStore getInstance(PropertyResolver propertyResolver) {
