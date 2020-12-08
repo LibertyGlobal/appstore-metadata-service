@@ -319,8 +319,8 @@ class MaintainerApiFTSpec extends AsmsFeatureSpecBase {
 
         and: "the body exposes version section with all versions and visibility information"
         assertThat(field().versions().from(theBody1)).asList().hasSize(2)
-        assertThat(field().versions().version().from(theBody1)).asList().containsExactlyInAnyOrder(v1, v2)
-        assertThat(field().versions().visible().from(theBody1)).asList().containsExactlyInAnyOrder(v1Visible, v2Visible)
+        assertThat(field().versions().version().from(theBody1)).asList().containsExactly(v2, v1)
+        assertThat(field().versions().visible().from(theBody1)).asList().containsExactly(v2Visible, v1Visible)
 
         and: "the body exposes requirements section with dependencies information"
         assertThat(field().requirements().dependencies().id().from(theBody1)).asList().containsExactlyInAnyOrder(v1Dependency1Id, v1Dependency2Id)
@@ -370,8 +370,8 @@ class MaintainerApiFTSpec extends AsmsFeatureSpecBase {
 
         and: "the body exposes version section with all versions and visibility information"
         assertThat(field().versions().from(theBody2)).asList().hasSize(2)
-        assertThat(field().versions().version().from(theBody2)).asList().containsExactlyInAnyOrder(v1, v2)
-        assertThat(field().versions().visible().from(theBody2)).asList().containsExactlyInAnyOrder(v1Visible, v2Visible)
+        assertThat(field().versions().version().from(theBody2)).asList().containsExactly(v2, v1)
+        assertThat(field().versions().visible().from(theBody2)).asList().containsExactly(v2Visible, v1Visible)
 
         and: "the body exposes requirements section with dependencies information"
         assertThat(field().requirements().dependencies().id().from(theBody2)).asList().containsExactlyInAnyOrder(v2Dependency1Id, v2Dependency2Id)
