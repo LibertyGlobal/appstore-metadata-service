@@ -13,10 +13,11 @@ Then execute to package it:
 mvn package
 ```
 
-Then to run it you need to:
+Then to run it you need to be in `target` directory:
 
 ```
-java -jar target/appstore-metadata-service-0.0.1-SNAPSHOT.jar
+cd target
+java -jar appstore-metadata-service-0.0.1-SNAPSHOT.jar
 ```
 
 The service is available by default at:
