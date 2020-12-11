@@ -22,7 +22,7 @@ public class TestSession {
     private static final Logger LOG = LoggerFactory.getLogger(ServiceClientBase.class);
 
     private static final String SERVICE_HOST = "localhost";
-    private static final String ENV_VAR_URL_FOR_SMOKE_TESTS = "BASE_URL";
+    private static final String ENV_VAR_URL_FOR_SMOKE_TESTS = "BASE_URL_MASTER";
     private static final String ENV_VAR_URL_FOR_SANITY_TESTS = "BASE_URL_PR";
 
     private TestType testType;
