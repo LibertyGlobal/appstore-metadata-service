@@ -147,21 +147,21 @@ paths:
         - name: name
           in: query
           schema:
-            tyep: string
+            type: string
           description: name of the searched maintainer (search is prefix based, not FTS)
           required: false
           example: lgi
         - name: limit
           in: query
           schema:
-            tyep: int
+            type: int
           description: The numbers of items to return
           required: false
           example: 10
         - name: offset
           in: query
           schema:
-            tyep: int
+            type: int
           description: The number of items to skip before starting to collect the result set
           required: false
           example: 10
@@ -959,10 +959,18 @@ components:
           description: Maintainer's email address
           example: developer@libertyglobal.com
     MaintainerList:
-      type: array
-      description: list of found maintainers
-      items:
-        $ref: '#/components/schemas/Maintainer'
+      type: object
+      required:
+        - maintainers
+        - meta
+      properties:
+        maintainers:
+          type: array
+          description: list of found maintainers
+          items:
+            $ref: '#/components/schemas/Maintainer'
+        meta:
+          $ref: '#/components/schemas/Meta'
     ErrorResponse:
       type: object
       required:

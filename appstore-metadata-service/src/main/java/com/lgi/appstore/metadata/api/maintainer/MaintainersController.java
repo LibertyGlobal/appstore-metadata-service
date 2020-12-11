@@ -21,6 +21,7 @@ package com.lgi.appstore.metadata.api.maintainer;
 
 import com.lgi.appstore.metadata.model.Maintainer;
 import com.lgi.appstore.metadata.model.MaintainerForUpdate;
+import com.lgi.appstore.metadata.model.MaintainerList;
 import java.util.List;
 import javax.validation.Valid;
 import org.slf4j.Logger;
@@ -96,7 +97,7 @@ public class MaintainersController {
     }
 
     @GetMapping(produces = {"application/json"})
-    public ResponseEntity<List<Maintainer>> searchMaintainers(@RequestParam(value = "name", required = false) String name,
+    public ResponseEntity<MaintainerList> searchMaintainers(@RequestParam(value = "name", required = false) String name,
             @RequestParam(value = "limit", required = false) Integer limit,
             @RequestParam(value = "offset", required = false) Integer offset) {
         LOG.info("GET /maintainers called with the following parameters: name = '{}, limit = '{}', offset = '{}'", name, limit, offset);

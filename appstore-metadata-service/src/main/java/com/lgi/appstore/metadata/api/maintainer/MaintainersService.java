@@ -21,6 +21,7 @@ package com.lgi.appstore.metadata.api.maintainer;
 
 import com.lgi.appstore.metadata.model.Maintainer;
 import com.lgi.appstore.metadata.model.MaintainerForUpdate;
+import com.lgi.appstore.metadata.model.MaintainerList;
 import java.util.List;
 
 public interface MaintainersService {
@@ -33,5 +34,5 @@ public interface MaintainersService {
 
     boolean deleteMaintainer(String maintainerCode);
 
-    List<Maintainer> searchMaintainers(String name, Integer limit, Integer offset);
+    MaintainerList searchMaintainers(String name, Integer limit, Integer offset);
 }
