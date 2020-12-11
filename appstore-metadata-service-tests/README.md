@@ -105,14 +105,26 @@ This data existence is checked by smoke test suite so be sure to load it before 
 Sample data
 ---
 
+* default maintainer
+
+```
+curl -X POST -H  "accept: application/json" -H  "x-maintainer-id: 1234abcd" -H  "Content-Type: application/json" -d '{
+{
+  "code": "lgi",
+  "name": "Liberty Global",
+  "address": "Liberty Global B.V., Boeing Avenue 53, 1119 PE Schiphol Rijk, The Netherlands",
+  "homepage": "https://www.libertyglobal.com",
+  "email": "developer@libertyglobal.com"
+}' 'http://<host>:<port>/maintainers'
+```
+
 * Awesome Application / com.libertyglobal.app.awesome	
 ```
-curl -v -XPOST -H "Content-type: application/json" -d '{
+curl -v -X POST -H "Content-type: application/json" -d '{
   "header": {
     "icon": "default_app_collection.png",
     "name": "Awesome Application",
     "description": "This is Awesome App.",
-    "url": "https://us.icr.io/v2/appcontainerstagingrdk/you.i/manifests/latest",
     "type": "application/vnd.rdk-app.dac.native",
     "category": "application",
     "localisations": [
@@ -143,12 +155,11 @@ curl -v -XPOST -H "Content-type: application/json" -d '{
 
 * you.i / com.libertyglobal.app.youi	
 ```
-curl -v -XPOST -H "Content-type: application/json" -d '{
+curl -v -X POST -H "Content-type: application/json" -d '{
   "header": {
     "icon": "default_app_collection.png",
     "name": "you.i1",
     "description": "Showcase application from the company youi.tv. The container package contains both the react native application and the You.i TV react native Gfx engine beneath.",
-    "url": "https://us.icr.io/v2/appcontainerstagingrdk/you.i/manifests/latest",
     "type": "application/vnd.rdk-app.dac.native",
     "category": "application",
     "localisations": [
@@ -183,12 +194,11 @@ curl -v -XPOST -H "Content-type: application/json" -d '{
 ```
 * flutter / com.libertyglobal.app.flutter	
 ```
-curl -v -XPOST -H "Content-type: application/json" -d '{
+curl -v -X POST -H "Content-type: application/json" -d '{
   "header": {
     "icon": "default_app_collection.png",
     "name": "flutter",
     "description": "Container contains both Flutter application and Flutter engine running on wayland-egl, developed by Liberty Global while evaluating Google Flutter UI toolkit.",
-    "url": "https://us.icr.io/v2/appcontainerstagingrdk/flutter/manifests/latest",
     "type": "application/vnd.rdk-app.dac.native",
     "category": "application",
     "localisations": [
@@ -215,4 +225,34 @@ curl -v -XPOST -H "Content-type: application/json" -d '{
     }
   }
 }' 'http://<host>:<port>/maintainers/lgi/apps'
+```
+
+API usage examples 
+---
+
+### Maintainers 
+
+#### Retrieve created maintainer:  
+```
+curl -X GET "http://<host>:<port>/maintainers/lgi" -H  "accept: application/json" -H  "x-maintainer-id: 1234abcd"
+```
+
+```json
+{
+  "code": "lgi",
+  "name": "Liberty Global",
+  "address": "Liberty Global B.V., Boeing Avenue 53, 1119 PE Schiphol Rijk, The Netherlands",
+  "homepage": "https://www.libertyglobal.com",
+  "email": "developer@libertyglobal.com"
+}
+```
+
+#### Update created maintainer:
+```
+curl -X PUT "http://<host>:<port>/maintainers/lgi" -H  "accept: */*" -H  "x-maintainer-id: 1234abcd" -H  "Content-Type: application/json" -d "{\"name\":\"Liberty Global\",\"address\":\"Liberty Global B.V., Boeing Avenue 53, 1119 PE Schiphol Rijk, The Netherlands\",\"homepage\":\"https://www.libertyglobal.com\",\"email\":\"developer@libertyglobal.com\"}"
+```
+
+#### Delete a created maintainer:
+```
+curl -X DELETE "http://<host>:<port>/maintainers/lgi" -H  "accept: application/json" -H  "x-maintainer-id: 1234abcd"
 ```

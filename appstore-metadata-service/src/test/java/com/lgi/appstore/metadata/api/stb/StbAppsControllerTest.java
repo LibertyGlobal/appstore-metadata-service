@@ -34,6 +34,7 @@ import com.lgi.appstore.metadata.model.ResultSetMeta;
 import com.lgi.appstore.metadata.model.StbApplicationDetails;
 import com.lgi.appstore.metadata.model.StbApplicationHeader;
 import com.lgi.appstore.metadata.model.StbApplicationsList;
+import com.lgi.appstore.metadata.model.StbSingleApplicationHeader;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -131,8 +132,31 @@ public class StbAppsControllerTest {
                     )
             );
 
+    private static final StbSingleApplicationHeader YOU_I_SINGLE_APPLICATION_HEADER = new StbSingleApplicationHeader()
+            .id("com.libertyglobal.app.youi")
+            .name("you.i")
+            .type("application/vnd.rdk-app.dac.native")
+            .version("1.2.3")
+            .icon("default_app_collection.png")
+            .description("Showcase application from the company youi.tv. The container package contains both the react native application and the You.i TV react native Gfx engine beneath.")
+            .url("https://us.icr.io/v2/appcontainerstagingrdk/you.i/manifests/latest")
+            .category(Category.APPLICATION)
+            .localisations(
+                    List.of(
+                            new Localisation()
+                                    .name("Jij.ik")
+                                    .description("Showcase-applicatie van het bedrijf youi.tv. Het containerpakket bevat zowel de native-toepassing reageren als de You.i TV reageren native Gfx-engine eronder.")
+                                    .languageCode("nld"),
+
+                            new Localisation()
+                                    .name("Ty.ja")
+                                    .description("Prezentacja aplikacji firmy youi.tv. Kontener zawiera zarówno natywną aplikację react, jak i znajdujący się poniżej natywny silnik Gfx.")
+                                    .languageCode("pol")
+                    )
+            );
+
     private static final StbApplicationDetails YOU_I_APPLICATION_DETAILS = new StbApplicationDetails()
-            .header(YOU_I_APPLICATION_HEADER)
+            .header(YOU_I_SINGLE_APPLICATION_HEADER)
             .requirements(new Requirements()
                     .platform(new Platform()
                             .architecture("arm")
