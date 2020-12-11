@@ -21,6 +21,7 @@ package com.lgi.appstore.metadata.api.maintainer;
 
 import com.lgi.appstore.metadata.model.Maintainer;
 import com.lgi.appstore.metadata.model.MaintainerForUpdate;
+import java.util.List;
 import javax.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,6 +35,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -91,5 +93,14 @@ public class MaintainersController {
         return deleteResult
                 ? ResponseEntity.noContent().build()
                 : ResponseEntity.notFound().build();
+    }
+
+    @GetMapping(produces = {"application/json"})
+    public ResponseEntity<List<Maintainer>> searchMaintainers(@RequestParam(value = "name", required = false) String name,
+            @RequestParam(value = "limit", required = false) Integer limit,
+            @RequestParam(value = "offset", required = false) Integer offset) {
+        LOG.info("GET /maintainers called with the following parameters: name = '{}, limit = '{}', offset = '{}'", name, limit, offset);
+
+        return ResponseEntity.ok(maintainersService.searchMaintainers(name, limit, offset));
     }
 }

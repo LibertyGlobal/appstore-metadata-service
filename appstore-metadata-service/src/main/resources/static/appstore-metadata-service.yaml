@@ -139,6 +139,56 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
   /maintainers:
+    get:
+      operationId: getMaintainers
+      tags:
+        - Maintainer
+      parameters:
+        - name: name
+          in: query
+          schema:
+            tyep: string
+          description: name of the searched maintainer (search is prefix based, not FTS)
+          required: false
+          example: lgi
+        - name: limit
+          in: query
+          schema:
+            tyep: int
+          description: The numbers of items to return
+          required: false
+          example: 10
+        - name: offset
+          in: query
+          schema:
+            tyep: int
+          description: The number of items to skip before starting to collect the result set
+          required: false
+          example: 10
+        - name: x-maintainer-id
+          in: header
+          schema:
+            type: string
+          description: Identifier of the requesting maintainer. Value should be set by intermediate proxies/api gateways
+          required: false
+          example: 1234abcd
+      responses:
+        200:
+          description: Requested maintainer details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MaintainerList'
+        403:
+          description: Access denied
+        5XX:
+          description: Unexpected error
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
     post:
       operationId: createMaintainer
       tags:
@@ -908,6 +958,11 @@ components:
           type: string
           description: Maintainer's email address
           example: developer@libertyglobal.com
+    MaintainerList:
+      type: array
+      description: list of found maintainers
+      items:
+        $ref: '#/components/schemas/Maintainer'
     ErrorResponse:
       type: object
       required:

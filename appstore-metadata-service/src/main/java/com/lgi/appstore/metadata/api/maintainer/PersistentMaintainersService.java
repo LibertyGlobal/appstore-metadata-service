@@ -28,7 +28,10 @@ import com.lgi.appstore.metadata.api.error.MaintainerAlreadyExistsException;
 import com.lgi.appstore.metadata.api.error.MaintainerNotFoundException;
 import com.lgi.appstore.metadata.model.Maintainer;
 import com.lgi.appstore.metadata.model.MaintainerForUpdate;
+import java.util.List;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
+import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.impl.DSL;
 import org.slf4j.Logger;
@@ -147,5 +150,19 @@ public class PersistentMaintainersService implements MaintainersService {
 
             return affectedRows > 0;
         });
+    }
+
+    @Override
+    public List<Maintainer> searchMaintainers(final String name, Integer limit, Integer offset) {
+
+        final Condition whereCondition = StringUtils.isNoneEmpty(name)
+                ? MAINTAINER.NAME.startsWith(name)
+                : DSL.noCondition();
+
+        return dslContext.selectFrom(MAINTAINER)
+                .where(whereCondition)
+                .limit(limit)
+                .offset(offset)
+                .fetchInto(Maintainer.class);
     }
 }
