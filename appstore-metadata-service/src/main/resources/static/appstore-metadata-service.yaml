@@ -141,6 +141,7 @@ paths:
   /maintainers:
     get:
       operationId: getMaintainers
+      summary: Search maintainers using specified name prefix
       tags:
         - Maintainer
       parameters:
@@ -191,6 +192,7 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
     post:
       operationId: createMaintainer
+      summary: Create new maintainer
       tags:
         - Maintainer
       parameters:
@@ -224,6 +226,7 @@ paths:
   /maintainers/{maintainerCode}:
     get:
       operationId: getMaintainer
+      summary: Returns details of the specified maintainer
       tags:
         - Maintainer
       parameters:
@@ -262,6 +265,7 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
     put:
       operationId: replaceMaintainer
+      summary: Update details of the specified maintainer
       tags:
         - Maintainer
       parameters:
@@ -297,6 +301,7 @@ paths:
           description: Unexpected error
     delete:
       operationId: deleteMaintainer
+      summary: Delete the specified maintainer
       tags:
         - Maintainer
       parameters:
