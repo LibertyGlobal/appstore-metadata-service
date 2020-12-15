@@ -41,6 +41,8 @@ public class MaintainerPerspectiveAsmsClient extends ServiceClientBase {
     private static final String PATH_MAINTAINER_DELETE = "/maintainers/{maintainerCode}";
 
     private static final String PATH_MAINTAINER_POST_APP = "/maintainers/{maintainerCode}/apps/";
+    private static final String PATH_MAINTAINER_GET_APP = "/maintainers/{maintainerCode}/apps/{applicationId}";
+    private static final String PATH_MAINTAINER_GET_APP_LIST = "/maintainers/{maintainerCode}/apps";
     private static final String PATH_MAINTAINER_GET_APP = "/maintainers/{maintainerCode}/apps/{applicationId}?platformName={platformName}&firmwareVer={firmwareVer}";
     private static final String PATH_MAINTAINER_GET_APPS = "/maintainers/{maintainerCode}/apps";
     private static final String PATH_MAINTAINER_GET_APP_LIST = "/maintainers/{maintainerCode}/apps";
