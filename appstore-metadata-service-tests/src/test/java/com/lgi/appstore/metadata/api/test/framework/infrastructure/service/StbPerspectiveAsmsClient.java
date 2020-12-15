@@ -37,7 +37,7 @@ public class StbPerspectiveAsmsClient extends ServiceClientBase {
                 .contentType(ContentType.JSON)
                 .when().log().uri().log().method().log().body()
                 .get(PATH_MAINTAINER_GET_APP, appKey, platformName, firmwareVer)
-                .then().log().status().log().body();
+                .then().log().status().log().body().log().headers();
     }
 
     public ValidatableResponse getApps(Map<String, ?> queryParams) {
@@ -47,6 +47,6 @@ public class StbPerspectiveAsmsClient extends ServiceClientBase {
                 .params(queryParams)
                 .when().log().uri().log().method().log().body()
                 .get(PATH_MAINTAINER_READ_APPS)
-                .then().log().status().log().body();
+                .then().log().status().log().body().log().headers();
     }
 }

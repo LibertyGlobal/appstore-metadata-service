@@ -32,8 +32,10 @@ class AsmsIntegrationSpecBase extends Specification {
     protected TestSession testSession
 
     def setup() {
+        testSession.reinitializeTestSessionId()
         LOG.info("-----------------------------------------------------------------------------------------------------")
         LOG.info("Starting test: {}", specificationContext.currentIteration.name)
+        LOG.info("Test session: {}", testSession.getTestSessionId())
         LOG.info("-----------------------------------------------------------------------------------------------------")
     }
 
