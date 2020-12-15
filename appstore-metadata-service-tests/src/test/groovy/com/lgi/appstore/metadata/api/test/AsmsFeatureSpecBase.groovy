@@ -21,10 +21,10 @@ package com.lgi.appstore.metadata.api.test
 
 import com.lgi.appstore.metadata.api.test.framework.TestSession
 import com.lgi.appstore.metadata.api.test.framework.base.DataSourceInitializer
-import com.lgi.appstore.metadata.api.testing.framework.base.EnvPropertiesInitializer
 import com.lgi.appstore.metadata.api.test.framework.steps.DbSteps
 import com.lgi.appstore.metadata.api.test.framework.steps.MaintainerViewSteps
 import com.lgi.appstore.metadata.api.test.framework.steps.StbViewSteps
+import com.lgi.appstore.metadata.api.testing.framework.base.EnvPropertiesInitializer
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -66,10 +66,12 @@ class AsmsFeatureSpecBase extends Specification {
     }
 
     def setup() {
+        testSession.setTestType(TestSession.TestType.LOCAL)
+        testSession.reinitializeTestSessionId()
         LOG.info("-----------------------------------------------------------------------------------------------------")
         LOG.info("Starting test: {}", specificationContext.currentIteration.name)
+        LOG.info("Test session: {}", testSession.getTestSessionId())
         LOG.info("-----------------------------------------------------------------------------------------------------")
-        testSession.setTestType(TestSession.TestType.LOCAL)
         initLocalTestEnv()
     }
 

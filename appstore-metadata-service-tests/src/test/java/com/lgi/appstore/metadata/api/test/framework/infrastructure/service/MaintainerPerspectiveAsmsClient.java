@@ -55,7 +55,7 @@ public class MaintainerPerspectiveAsmsClient extends ServiceClientBase {
                 .contentType(ContentType.JSON)
                 .when().log().uri().log().method().log().body()
                 .post(PATH_MAINTAINER_POST)
-                .then().log().status().log().body();
+                .then().log().status().log().body().log().headers();
     }
 
     public ValidatableResponse getMaintainer(String maintainerCode) {
@@ -64,7 +64,7 @@ public class MaintainerPerspectiveAsmsClient extends ServiceClientBase {
                 .contentType(ContentType.JSON)
                 .when().log().uri().log().method().log().body()
                 .get(PATH_MAINTAINER_GET, maintainerCode)
-                .then().log().status().log().body();
+                .then().log().status().log().body().log().headers();
     }
 
     public ValidatableResponse getMaintainers(Map<String, ?> queryParams) {
@@ -84,7 +84,7 @@ public class MaintainerPerspectiveAsmsClient extends ServiceClientBase {
                 .contentType(ContentType.JSON)
                 .when().log().uri().log().method().log().body()
                 .put(PATH_MAINTAINER_PUT, maintainerCode)
-                .then().log().status().log().body();
+                .then().log().status().log().body().log().headers();
     }
 
     public ValidatableResponse deleteMaintainer(String maintainerCode) {
@@ -93,7 +93,7 @@ public class MaintainerPerspectiveAsmsClient extends ServiceClientBase {
                 .contentType(ContentType.JSON)
                 .when().log().uri().log().method().log().body()
                 .delete(PATH_MAINTAINER_DELETE, maintainerCode)
-                .then().log().status().log().body();
+                .then().log().status().log().body().log().headers();
     }
 
     public ValidatableResponse postApp(String maintainerCode, Application app) {
@@ -103,7 +103,7 @@ public class MaintainerPerspectiveAsmsClient extends ServiceClientBase {
                 .contentType(ContentType.JSON)
                 .when().log().uri().log().method().log().body()
                 .post(PATH_MAINTAINER_POST_APP, maintainerCode)
-                .then().log().status().log().body();
+                .then().log().status().log().body().log().headers();
     }
 
     public ValidatableResponse putApp(String maintainerCode, String applicationKey, ApplicationForUpdate appForUpdate) {
@@ -113,7 +113,7 @@ public class MaintainerPerspectiveAsmsClient extends ServiceClientBase {
                 .contentType(ContentType.JSON)
                 .when().log().uri().log().method().log().body()
                 .put(PATH_MAINTAINER_PUT_APP, maintainerCode, applicationKey)
-                .then().log().status().log().body();
+                .then().log().status().log().body().log().headers();
     }
 
     public ValidatableResponse deleteApp(String maintainerCode, String applicationKey) {
@@ -122,7 +122,7 @@ public class MaintainerPerspectiveAsmsClient extends ServiceClientBase {
                 .contentType(ContentType.JSON)
                 .when().log().uri().log().method().log().body()
                 .delete(PATH_MAINTAINER_DELETE_APP, maintainerCode, applicationKey)
-                .then().log().status().log().body();
+                .then().log().status().log().body().log().headers();
     }
 
     public ValidatableResponse getApp(String maintainerCode, String applicationKey, String platformName, String firmwareVer) {
@@ -135,7 +135,7 @@ public class MaintainerPerspectiveAsmsClient extends ServiceClientBase {
                 .queryParams(queryParams)
                 .when().log().uri().log().method().log().body()
                 .get(PATH_MAINTAINER_GET_APP, maintainerCode, applicationKey)
-                .then().log().status().log().body();
+                .then().log().status().log().body().log().headers();
     }
 
     public ValidatableResponse getApps(String maintainerCode, Map<String, ?> queryParams) {
@@ -145,6 +145,6 @@ public class MaintainerPerspectiveAsmsClient extends ServiceClientBase {
                 .params(queryParams)
                 .when().log().uri().log().method().log().body()
                 .get(PATH_MAINTAINER_GET_APP_LIST, maintainerCode)
-                .then().log().status().log().body();
+                .then().log().status().log().body().log().headers();
     }
 }

@@ -39,6 +39,7 @@ public class ServiceClientBase {
     private TestSession testSession;
 
     private static final Integer REST_QUERY_TIMEOUT_FOR_TESTING_MS = 10000;
+    private static final String HEADER_CORRELATION_ID = "x-request-id";
 
     private static final AllureRestAssured ALLURE_REPORTING_FILTER;
     private static final RestAssuredConfig REST_ASSURED_CONFIG;
@@ -64,6 +65,7 @@ public class ServiceClientBase {
     protected RequestSpecification given() {
         return RestAssured.given()
                 .config(REST_ASSURED_CONFIG)
-                .filter(ALLURE_REPORTING_FILTER);
+                .filter(ALLURE_REPORTING_FILTER)
+                .header(HEADER_CORRELATION_ID, testSession.getTestSessionId());
     }
 }

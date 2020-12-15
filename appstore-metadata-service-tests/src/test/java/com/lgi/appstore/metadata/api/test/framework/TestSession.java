@@ -1,6 +1,7 @@
 package com.lgi.appstore.metadata.api.test.framework;
 
 import com.lgi.appstore.metadata.api.test.framework.infrastructure.service.base.ServiceClientBase;
+import com.lgi.appstore.metadata.api.test.framework.utils.DataUtils;
 import org.junit.AssumptionViolatedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,6 +32,8 @@ public class TestSession {
 
     @Autowired
     private Environment environment;
+
+    private String testSessionId;
 
     public void addAppsToCleanUp(String maintainerCode, String appKey) {
         appsToCleanUp.add(new AppToCleanup(maintainerCode, appKey));
@@ -84,6 +87,14 @@ public class TestSession {
 
     private TestType getTestType() {
         return testType;
+    }
+
+    public void reinitializeTestSessionId() {
+        testSessionId = DataUtils.newTestSessionId();
+    }
+
+    public String getTestSessionId() {
+        return testSessionId;
     }
 
     private Integer getLocalhostServicePort() {

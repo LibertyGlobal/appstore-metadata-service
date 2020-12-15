@@ -165,4 +165,8 @@ public class DataUtils {
     public static String devAddress() {
         return FAKER.address().fullAddress();
     }
+
+    public static String newTestSessionId() {
+        return FAKER.code().isbn10(true);
+    }
 }
