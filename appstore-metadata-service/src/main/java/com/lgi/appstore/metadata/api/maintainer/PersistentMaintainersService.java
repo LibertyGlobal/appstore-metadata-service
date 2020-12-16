@@ -161,7 +161,7 @@ public class PersistentMaintainersService implements MaintainersService {
         final int effectiveLimit = limit != null ? limit : 10;
 
         final Condition whereCondition = StringUtils.isNoneEmpty(name)
-                ? MAINTAINER.NAME.startsWith(name)
+                ? MAINTAINER.NAME.startsWithIgnoreCase(name)
                 : DSL.noCondition();
 
         final List<Maintainer> maintainers = dslContext.selectFrom(MAINTAINER)

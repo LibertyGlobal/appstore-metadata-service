@@ -149,7 +149,7 @@ paths:
           in: query
           schema:
             type: string
-          description: name of the searched maintainer (search is prefix based, not FTS)
+          description: name of the searched maintainer (search is prefix based, not FTS and case insensitive)
           required: false
           example: lgi
         - name: limit
@@ -165,7 +165,7 @@ paths:
             type: int
           description: The number of items to skip before starting to collect the result set
           required: false
-          example: 10
+          example: 0
         - name: x-maintainer-id
           in: header
           schema:
