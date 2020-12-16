@@ -128,7 +128,7 @@ class ManageMaintainerApiFTSpec extends AsmsFeatureSpecBase {
         scenario                                       | nameQueryParam        || count
         "can find single item that starts with"        | "Lib"                 || 1
         "can find multiple items that start with"      | "D"                   || 2
-        "is case sensitive"                            | "De"                  || 1
+        "is case insensitive"                          | "dE"                  || 2
         "empty list returned when nothing starts with" | "Liberty Global Inc." || 0
         "empty value results in all returned"          | ""                    || 3
         "does not use regex nor common * wildcard"     | "*"                   || 0
