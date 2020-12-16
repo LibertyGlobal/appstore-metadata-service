@@ -132,7 +132,7 @@ public class DataUtils {
 
     private static String randomReversedDomainName() {
         int domainFirstWordIdx = 1;
-        int domainMaxWords = 2 + FAKER.random().nextInt(3); // min 2, max 5
+        int domainMaxWords = 3 + FAKER.random().nextInt(3); // min 2, max 5
         return String.format("%s.%s", FAKER.internet().domainSuffix(), IntStream.range(domainFirstWordIdx, domainMaxWords).boxed()
                 .map(i -> FAKER.internet().domainWord())
                 .collect(Collectors.joining(".")));
