@@ -120,8 +120,15 @@ class ManageMaintainerApiFTSpec extends AsmsFeatureSpecBase {
 
         and: "the amount of items is as desired"
         if (count > 0) {
+            Comparator<String> caseInsensitiveComparator = new Comparator<String>() {
+                @Override
+                int compare(String s1, String s2) {
+                    return s1.toString().toLowerCase().compareTo(s2.toString().toLowerCase());
+                }
+            };
+
             field().meta().resultSet().count().from(jsonBody) == count
-            assertThat(field().maintainers().name().at(0).from(jsonBody)).asString().startsWith(nameQueryParam)
+            assertThat(field().maintainers().name().at(0).from(jsonBody)).asString().usingComparator(caseInsensitiveComparator).startsWith(nameQueryParam.toLowerCase())
         }
 
         where:
