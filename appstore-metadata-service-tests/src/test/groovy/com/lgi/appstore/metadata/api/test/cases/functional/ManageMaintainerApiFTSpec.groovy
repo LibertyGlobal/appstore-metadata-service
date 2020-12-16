@@ -7,6 +7,8 @@ import io.restassured.response.ExtractableResponse
 import io.restassured.response.Response
 import spock.lang.Unroll
 
+import java.util.function.Function
+
 import static com.lgi.appstore.metadata.api.test.framework.model.request.ApiMaintainerQueryParams.LIMIT
 import static com.lgi.appstore.metadata.api.test.framework.model.request.ApiMaintainerQueryParams.NAME
 import static com.lgi.appstore.metadata.api.test.framework.model.request.ApiMaintainerQueryParams.OFFSET
@@ -22,6 +24,7 @@ import static org.apache.http.HttpStatus.SC_OK
 import static org.assertj.core.api.Assertions.assertThat
 
 class ManageMaintainerApiFTSpec extends AsmsFeatureSpecBase {
+    def static final IGNORE_CASE = Comparator.comparing(Function.identity(), String.CASE_INSENSITIVE_ORDER)
     def static final DEFAULT_LIMIT = 10
 
     @Unroll
@@ -106,6 +109,18 @@ class ManageMaintainerApiFTSpec extends AsmsFeatureSpecBase {
                 .address(dev2address)
         maintainerSteps.createNewMaintainer_expectSuccess(dev2Details)
 
+        def dev3name = "\u0304\u0304\u0304" // NOTE: char \u0304 has same lowercase that char \u0007
+        def dev3email = devEmail()
+        def dev3homepage = devHomepage()
+        def dev3address = devAddress()
+        def dev3Details = new Maintainer()
+                .code(devCode())
+                .name(dev3name)
+                .email(dev3email)
+                .homepage(dev3homepage)
+                .address(dev3address)
+        maintainerSteps.createNewMaintainer_expectSuccess(dev3Details)
+
         when: "maintainer asks for list of developers specifying name pattern"
         Map<String, Object> queryParams = queryParams(
                 mapping(NAME, nameQueryParam)
@@ -120,15 +135,8 @@ class ManageMaintainerApiFTSpec extends AsmsFeatureSpecBase {
 
         and: "the amount of items is as desired"
         if (count > 0) {
-            Comparator<String> caseInsensitiveComparator = new Comparator<String>() {
-                @Override
-                int compare(String s1, String s2) {
-                    return s1.toString().toLowerCase().compareTo(s2.toString().toLowerCase());
-                }
-            };
-
             field().meta().resultSet().count().from(jsonBody) == count
-            assertThat(field().maintainers().name().at(0).from(jsonBody)).asString().usingComparator(caseInsensitiveComparator).startsWith(nameQueryParam.toLowerCase())
+            assertThat(field().maintainers().name().at(0).from(jsonBody)).usingComparator(IGNORE_CASE).startsWith(nameQueryParam.toLowerCase())
         }
 
         where:
@@ -136,8 +144,9 @@ class ManageMaintainerApiFTSpec extends AsmsFeatureSpecBase {
         "can find single item that starts with"        | "Lib"                 || 1
         "can find multiple items that start with"      | "D"                   || 2
         "is case insensitive"                          | "dE"                  || 2
+        "is case insensitive both ways"                | "\u0007"              || 0 // even that \u0304 has same lowercase that char \u0007
         "empty list returned when nothing starts with" | "Liberty Global Inc." || 0
-        "empty value results in all returned"          | ""                    || 3
+        "empty value results in all returned"          | ""                    || 4 // assuming 1 is a default 'lgi'
         "does not use regex nor common * wildcard"     | "*"                   || 0
     }
 }

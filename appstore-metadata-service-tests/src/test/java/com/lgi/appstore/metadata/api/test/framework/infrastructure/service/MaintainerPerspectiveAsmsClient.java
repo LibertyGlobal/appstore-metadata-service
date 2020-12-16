@@ -28,7 +28,9 @@ import io.restassured.http.ContentType;
 import io.restassured.response.ValidatableResponse;
 import org.springframework.stereotype.Component;
 
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import static com.lgi.appstore.metadata.api.test.framework.utils.Serialization.toJson;
 
@@ -42,9 +44,6 @@ public class MaintainerPerspectiveAsmsClient extends ServiceClientBase {
 
     private static final String PATH_MAINTAINER_POST_APP = "/maintainers/{maintainerCode}/apps/";
     private static final String PATH_MAINTAINER_GET_APP = "/maintainers/{maintainerCode}/apps/{applicationId}";
-    private static final String PATH_MAINTAINER_GET_APP_LIST = "/maintainers/{maintainerCode}/apps";
-    private static final String PATH_MAINTAINER_GET_APP = "/maintainers/{maintainerCode}/apps/{applicationId}?platformName={platformName}&firmwareVer={firmwareVer}";
-    private static final String PATH_MAINTAINER_GET_APPS = "/maintainers/{maintainerCode}/apps";
     private static final String PATH_MAINTAINER_GET_APP_LIST = "/maintainers/{maintainerCode}/apps";
     private static final String PATH_MAINTAINER_PUT_APP = "/maintainers/{maintainerCode}/apps/{applicationId}";
     private static final String PATH_MAINTAINER_DELETE_APP = "/maintainers/{maintainerCode}/apps/{applicationId}";
@@ -127,11 +126,15 @@ public class MaintainerPerspectiveAsmsClient extends ServiceClientBase {
     }
 
     public ValidatableResponse getApp(String maintainerCode, String applicationKey, String platformName, String firmwareVer) {
+        Map<String, String> queryParams = new HashMap<>();
+        Optional.ofNullable(platformName).ifPresent(value -> queryParams.put("platformName", value));
+        Optional.ofNullable(firmwareVer).ifPresent(value -> queryParams.put("firmwareVer", value));
         return given()
                 .baseUri(getBaseUri())
                 .contentType(ContentType.JSON)
+                .queryParams(queryParams)
                 .when().log().uri().log().method().log().body()
-                .get(PATH_MAINTAINER_GET_APP, maintainerCode, applicationKey, platformName, firmwareVer)
+                .get(PATH_MAINTAINER_GET_APP, maintainerCode, applicationKey)
                 .then().log().status().log().body();
     }
 
