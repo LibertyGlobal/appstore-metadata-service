@@ -78,6 +78,11 @@ public class MaintainerViewSteps {
     }
 
     @Step
+    public ValidatableResponse getMaintainersList(Map<String, ?> queryParams) {
+        return maintainerPerspectiveAsmsClient.getMaintainers(queryParams);
+    }
+
+    @Step
     public ValidatableResponse updateMaintainer(String maintainerCode, MaintainerForUpdate newMaintainer) {
         return maintainerPerspectiveAsmsClient.putMaintainer(maintainerCode, newMaintainer);
     }

@@ -139,8 +139,60 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
   /maintainers:
+    get:
+      operationId: getMaintainers
+      summary: Search maintainers using specified name prefix
+      tags:
+        - Maintainer
+      parameters:
+        - name: name
+          in: query
+          schema:
+            type: string
+          description: name of the searched maintainer (search is prefix based, not FTS and case insensitive)
+          required: false
+          example: lgi
+        - name: limit
+          in: query
+          schema:
+            type: int
+          description: The numbers of items to return
+          required: false
+          example: 10
+        - name: offset
+          in: query
+          schema:
+            type: int
+          description: The number of items to skip before starting to collect the result set
+          required: false
+          example: 0
+        - name: x-maintainer-id
+          in: header
+          schema:
+            type: string
+          description: Identifier of the requesting maintainer. Value should be set by intermediate proxies/api gateways
+          required: false
+          example: 1234abcd
+      responses:
+        200:
+          description: Requested maintainer details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MaintainerList'
+        403:
+          description: Access denied
+        5XX:
+          description: Unexpected error
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
     post:
       operationId: createMaintainer
+      summary: Create new maintainer
       tags:
         - Maintainer
       parameters:
@@ -174,6 +226,7 @@ paths:
   /maintainers/{maintainerCode}:
     get:
       operationId: getMaintainer
+      summary: Returns details of the specified maintainer
       tags:
         - Maintainer
       parameters:
@@ -212,6 +265,7 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
     put:
       operationId: replaceMaintainer
+      summary: Update details of the specified maintainer
       tags:
         - Maintainer
       parameters:
@@ -247,6 +301,7 @@ paths:
           description: Unexpected error
     delete:
       operationId: deleteMaintainer
+      summary: Delete the specified maintainer
       tags:
         - Maintainer
       parameters:
@@ -908,6 +963,19 @@ components:
           type: string
           description: Maintainer's email address
           example: developer@libertyglobal.com
+    MaintainerList:
+      type: object
+      required:
+        - maintainers
+        - meta
+      properties:
+        maintainers:
+          type: array
+          description: list of found maintainers
+          items:
+            $ref: '#/components/schemas/Maintainer'
+        meta:
+          $ref: '#/components/schemas/Meta'
     ErrorResponse:
       type: object
       required:

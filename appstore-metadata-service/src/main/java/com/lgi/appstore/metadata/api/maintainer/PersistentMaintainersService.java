@@ -28,7 +28,13 @@ import com.lgi.appstore.metadata.api.error.MaintainerAlreadyExistsException;
 import com.lgi.appstore.metadata.api.error.MaintainerNotFoundException;
 import com.lgi.appstore.metadata.model.Maintainer;
 import com.lgi.appstore.metadata.model.MaintainerForUpdate;
+import com.lgi.appstore.metadata.model.MaintainerList;
+import com.lgi.appstore.metadata.model.Meta;
+import com.lgi.appstore.metadata.model.ResultSetMeta;
+import java.util.List;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
+import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.impl.DSL;
 import org.slf4j.Logger;
@@ -147,5 +153,39 @@ public class PersistentMaintainersService implements MaintainersService {
 
             return affectedRows > 0;
         });
+    }
+
+    @Override
+    public MaintainerList searchMaintainers(final String name, Integer limit, Integer offset) {
+        final int effectiveOffset = offset != null ? offset : 0;
+        final int effectiveLimit = limit != null ? limit : 10;
+
+        final Condition whereCondition = StringUtils.isNoneEmpty(name)
+                ? MAINTAINER.NAME.startsWithIgnoreCase(name)
+                : DSL.noCondition();
+
+        final List<Maintainer> maintainers = dslContext.selectFrom(MAINTAINER)
+                .where(whereCondition)
+                .limit(effectiveLimit)
+                .offset(effectiveOffset)
+                .fetchInto(Maintainer.class);
+
+        final int total = dslContext.selectCount()
+                .from(MAINTAINER)
+                .where(whereCondition)
+                .fetchOne(0, int.class);
+
+        final Meta meta = new Meta()
+                .resultSet(
+                        new ResultSetMeta()
+                                .offset(effectiveOffset)
+                                .limit(effectiveLimit)
+                                .count(maintainers.size())
+                                .total(total)
+                );
+
+        return new MaintainerList()
+                .maintainers(maintainers)
+                .meta(meta);
     }
 }

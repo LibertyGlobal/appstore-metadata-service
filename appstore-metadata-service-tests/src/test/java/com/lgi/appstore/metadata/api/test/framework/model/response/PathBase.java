@@ -33,6 +33,12 @@ public abstract class PathBase {
         return response.get(this.toString());
     }
 
+    void atPosition(int idx) {
+        int lastElementIndex = fields.size() - 1;
+        String mostRecentFieldName = fields.get(lastElementIndex);
+        fields.set(lastElementIndex, String.format("%s[%d]", mostRecentFieldName, idx));
+    }
+
     private String assemblePath() {
         StringJoiner pathBuilder = new StringJoiner(".");
         fields.forEach(pathBuilder::add);

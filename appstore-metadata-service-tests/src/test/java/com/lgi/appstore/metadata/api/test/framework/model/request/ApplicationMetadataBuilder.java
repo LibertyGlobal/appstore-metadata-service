@@ -56,6 +56,8 @@ public class ApplicationMetadataBuilder {
     private Hardware hardware;
     private Requirements requirements;
 
+    private ApplicationMetadataBuilder() {}
+
     public static ApplicationMetadataBuilder builder() {
         return new ApplicationMetadataBuilder();
     }

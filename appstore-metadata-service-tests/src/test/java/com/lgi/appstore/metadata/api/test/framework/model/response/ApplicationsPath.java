@@ -19,16 +19,10 @@
 
 package com.lgi.appstore.metadata.api.test.framework.model.response;
 
-public class ApplicationsPath extends PathBase {
+public class ApplicationsPath extends ListPathBase {
     private static final String FIELD_APPLICATIONS = "applications";
     private static final String FIELD_ID = "id";
     private static final String FIELD_VERSION = "version";
-    private static final String FIELD_META = "meta";
-    private static final String FIELD_RESULT_SET = "resultSet";
-    private static final String FIELD_COUNT = "count";
-    private static final String FIELD_TOTAL = "total";
-    private static final String FIELD_LIMIT = "limit";
-    private static final String FIELD_OFFSET = "offset";
 
     private ApplicationsPath() {
     }
@@ -79,9 +73,7 @@ public class ApplicationsPath extends PathBase {
     }
 
     public ApplicationsPath at(int idx) {
-        int lastElementIndex = fields.size() - 1;
-        String mostRecentFieldName = fields.get(lastElementIndex);
-        fields.set(lastElementIndex, String.format("%s[%d]", mostRecentFieldName, idx));
+        atPosition(idx);
         return this;
     }
 

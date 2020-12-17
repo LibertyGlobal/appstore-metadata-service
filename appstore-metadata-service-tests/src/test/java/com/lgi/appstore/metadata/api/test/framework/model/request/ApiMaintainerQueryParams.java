@@ -17,22 +17,10 @@
  * limitations under the License.
  */
 
-package com.lgi.appstore.metadata.api.maintainer;
+package com.lgi.appstore.metadata.api.test.framework.model.request;
 
-import com.lgi.appstore.metadata.model.Maintainer;
-import com.lgi.appstore.metadata.model.MaintainerForUpdate;
-import com.lgi.appstore.metadata.model.MaintainerList;
-import java.util.List;
-
-public interface MaintainersService {
-
-    Maintainer getMaintainer(String maintainerCode);
-
-    void createMaintainer(Maintainer maintainer);
-
-    boolean updateMaintainer(String maintainerCode, MaintainerForUpdate maintainerForUpdate);
-
-    boolean deleteMaintainer(String maintainerCode);
-
-    MaintainerList searchMaintainers(String name, Integer limit, Integer offset);
+public class ApiMaintainerQueryParams extends QueryParams {
+    public static final String LIMIT = "limit";
+    public static final String OFFSET = "offset";
+    public static final String NAME = "name";
 }

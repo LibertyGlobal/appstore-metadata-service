@@ -21,7 +21,7 @@ NOTE: This profile disables unit tests.
 There are 3 test suites located in appropriate packages (functional, sanity, smoke),
  which get triggered in different combinations depending on env. variables:
 
- * when `BASE_URL=<host:port>` is set (e.g. on CI) then framework assumes execution towards master deployment and considers only:
+ * when `BASE_URL_MASTER=<host:port>` is set (e.g. on CI) then framework assumes execution towards master deployment and considers only:
     * functional test suite
     * smoke test suite
  * when `BASE_URL_PR=<host:port>` is set then it considers:  
