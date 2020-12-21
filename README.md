@@ -2,7 +2,6 @@
 
 Appstore Metadata Service is a group of components purposed to serve the needs of RDK to store and provide the Applications metadata.
 
-
 ## Perspectives
 
 The primary component Appstore Metadata Service (ASMS) provides its functionality in a form of REST API.
