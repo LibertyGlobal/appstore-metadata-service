@@ -28,7 +28,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 class AppIdWithVersionTest {
 
     @Test
-    public void supportsAppIdWithExplicitVersion() {
+    void supportsAppIdWithExplicitVersion() {
         // GIVEN
         final String appId = "com.lgi.app";
         final String version = "1.2.3";
@@ -45,7 +45,7 @@ class AppIdWithVersionTest {
     }
 
     @Test
-    public void supportsAppIdWithLatestVersion() {
+    void supportsAppIdWithLatestVersion() {
         // GIVEN
         final String appId = "com.lgi.app";
         final String version = "latest";
@@ -62,7 +62,7 @@ class AppIdWithVersionTest {
     }
 
     @Test
-    public void supportsAppIdWithoutVersion() {
+    void supportsAppIdWithoutVersion() {
         // GIVEN
         final String appId = "com.lgi.app";
 
@@ -77,7 +77,7 @@ class AppIdWithVersionTest {
     }
 
     @Test
-    public void supportsAppIdWithAllVersion() {
+    void supportsAppIdWithAllVersion() {
         // GIVEN
         final String appId = "com.lgi.app";
         final String version = "all";
@@ -94,7 +94,7 @@ class AppIdWithVersionTest {
     }
 
     @Test()
-    public void willThrowAnExceptionIfMoreThanTwoTokensArePresent() {
+    void willThrowAnExceptionIfMoreThanTwoTokensArePresent() {
         // GIVEN
         final String appId = "com.lgi.app:1.2.3:fake";
 
@@ -109,7 +109,7 @@ class AppIdWithVersionTest {
     }
 
     @Test()
-    public void willThrowAnExceptionIfLessThanTwoTokensArePresent() {
+    void willThrowAnExceptionIfLessThanTwoTokensArePresent() {
         // GIVEN
         final String appId = "com.lgi.app:";
 

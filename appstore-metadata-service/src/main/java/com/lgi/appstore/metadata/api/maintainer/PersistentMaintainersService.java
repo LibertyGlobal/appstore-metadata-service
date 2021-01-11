@@ -31,7 +31,9 @@ import com.lgi.appstore.metadata.model.MaintainerForUpdate;
 import com.lgi.appstore.metadata.model.MaintainerList;
 import com.lgi.appstore.metadata.model.Meta;
 import com.lgi.appstore.metadata.model.ResultSetMeta;
+
 import java.util.List;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jooq.Condition;
@@ -82,7 +84,7 @@ public class PersistentMaintainersService implements MaintainersService {
                     .from(MAINTAINER)
                     .where(MAINTAINER.CODE.eq(maintainer.getCode()))
                     .fetchOptional()
-                    .ifPresent((record) -> {
+                    .ifPresent(record -> {
                         throw new MaintainerAlreadyExistsException(maintainer.getCode());
                     });
 
