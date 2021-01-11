@@ -422,7 +422,6 @@
                             <inputSpec>${project.basedir}/src/main/resources/static/appstore-metadata-service.yaml
                             </inputSpec>
                             <generatorName>spring</generatorName>
-                            <library>spring-boot</library>
                             <modelPackage>${generated.source.package}.model</modelPackage>
                             <generateApis>false</generateApis>
                             <generateModelDocumentation>false</generateModelDocumentation>
