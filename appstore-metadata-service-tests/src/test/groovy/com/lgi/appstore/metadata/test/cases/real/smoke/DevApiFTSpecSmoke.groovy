@@ -19,7 +19,6 @@
 
 package com.lgi.appstore.metadata.test.cases.real.smoke
 
-
 import com.lgi.appstore.metadata.test.AsmsSmokeSpecBase
 import com.lgi.appstore.metadata.test.framework.model.response.ApplicationsPath
 import io.restassured.path.json.JsonPath
