@@ -1,5 +1,5 @@
 
-Lists of 165 third-party dependencies.
+Lists of 167 third-party dependencies.
      (Eclipse Public License - v 1.0) (GNU Lesser General Public License) Logback Classic Module (ch.qos.logback:logback-classic:1.2.3 - http://logback.qos.ch/logback-classic)
      (Eclipse Public License - v 1.0) (GNU Lesser General Public License) Logback Core Module (ch.qos.logback:logback-core:1.2.3 - http://logback.qos.ch/logback-core)
      (The Apache License, Version 2.0) spock-reports (com.athaydes:spock-reports:1.7.1 - https://github.com/renatoathaydes/spock-reports)
@@ -92,6 +92,8 @@ Lists of 165 third-party dependencies.
      (Apache License, Version 2.0) Plexus Classworlds (org.codehaus.plexus:plexus-classworlds:2.6.0 - http://codehaus-plexus.github.io/plexus-classworlds/)
      (The Apache Software License, Version 2.0) Plexus :: Component Annotations (org.codehaus.plexus:plexus-component-annotations:1.5.5 - http://plexus.codehaus.org/plexus-containers/plexus-component-annotations/)
      (Apache License, Version 2.0) Plexus Common Utilities (org.codehaus.plexus:plexus-utils:3.2.1 - http://codehaus-plexus.github.io/plexus-utils/)
+     (Eclipse Public License, Version 1.0) org.eclipse.sisu.inject (org.eclipse.sisu:org.eclipse.sisu.inject:0.3.4 - http://www.eclipse.org/sisu/org.eclipse.sisu.inject/)
+     (Eclipse Public License, Version 1.0) org.eclipse.sisu.plexus (org.eclipse.sisu:org.eclipse.sisu.plexus:0.3.4 - http://www.eclipse.org/sisu/org.eclipse.sisu.plexus/)
      (Apache License, Version 2.0) flyway-core (org.flywaydb:flyway-core:6.4.4 - https://flywaydb.org/flyway-core)
      (Apache License, Version 2.0) Apache FreeMarker (org.freemarker:freemarker:2.3.30 - https://freemarker.apache.org/)
      (EPL 2.0) (GPL2 w/ CPE) Jakarta Expression Language 3.0 (org.glassfish:jakarta.el:3.0.3 - https://projects.eclipse.org/projects/ee4j.el)
