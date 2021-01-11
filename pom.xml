@@ -63,10 +63,9 @@
             MIT|${line.separator}
             MIT License|${line.separator}
             The MIT License|${line.separator}
-            The MIT License (MIT)
+            The MIT License (MIT)|${line.separator}
+            Eclipse Public License, Version 1.0
         </license.includedLicenses>
-        <license.excludedGroups>(^org\.eclipse\.sisu)|(^com\.sun\.xml\.bind)
-        </license.excludedGroups> <!-- dependencies of maven-plugin-api -->
     </properties>
 
     <distributionManagement>
