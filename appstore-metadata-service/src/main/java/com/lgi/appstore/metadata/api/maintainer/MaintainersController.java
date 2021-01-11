@@ -22,8 +22,9 @@ package com.lgi.appstore.metadata.api.maintainer;
 import com.lgi.appstore.metadata.model.Maintainer;
 import com.lgi.appstore.metadata.model.MaintainerForUpdate;
 import com.lgi.appstore.metadata.model.MaintainerList;
-import java.util.List;
+
 import javax.validation.Valid;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -71,7 +72,7 @@ public class MaintainersController {
 
     @PutMapping(value = "/{maintainerCode}", produces = {"application/json"})
     public ResponseEntity<Void> updateMaintainer(@PathVariable("maintainerCode") String maintainerCode,
-            @Valid @RequestBody MaintainerForUpdate maintainerForUpdate) {
+                                                 @Valid @RequestBody MaintainerForUpdate maintainerForUpdate) {
 
         LOG.info(
                 "PUT /maintainers/{maintainerCode} called with the following parameters: maintainerCode = '{}, maintainer = '{}'",
@@ -98,8 +99,8 @@ public class MaintainersController {
 
     @GetMapping(produces = {"application/json"})
     public ResponseEntity<MaintainerList> searchMaintainers(@RequestParam(value = "name", required = false) String name,
-            @RequestParam(value = "limit", required = false) Integer limit,
-            @RequestParam(value = "offset", required = false) Integer offset) {
+                                                            @RequestParam(value = "limit", required = false) Integer limit,
+                                                            @RequestParam(value = "offset", required = false) Integer offset) {
         LOG.info("GET /maintainers called with the following parameters: name = '{}, limit = '{}', offset = '{}'", name, limit, offset);
 
         return ResponseEntity.ok(maintainersService.searchMaintainers(name, limit, offset));

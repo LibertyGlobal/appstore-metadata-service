@@ -62,7 +62,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
 @ExtendWith(MockitoExtension.class)
-public class MaintainerAppsControllerTest {
+class MaintainerAppsControllerTest {
 
     private MockMvc mvc;
 
@@ -329,7 +329,7 @@ public class MaintainerAppsControllerTest {
             );
 
     @Test
-    public void canListMaintainersAppsWhenThereAreSomePresent() throws Exception {
+    void canListMaintainersAppsWhenThereAreSomePresent() throws Exception {
         // given
         given(appsService.listApplications(any(), any(), any(), any(), any(), any(), any(), any(), any()))
                 .willReturn(EMPTY_APPLICATIONS_LIST);
@@ -348,7 +348,7 @@ public class MaintainerAppsControllerTest {
     }
 
     @Test
-    public void canListAppsWhenThereAreNoPresent() throws Exception {
+    void canListAppsWhenThereAreNoPresent() throws Exception {
         // given
         given(appsService.listApplications(any(), any(), any(), any(), any(), any(), any(), any(), any()))
                 .willReturn(EMPTY_APPLICATIONS_LIST);
@@ -367,7 +367,7 @@ public class MaintainerAppsControllerTest {
     }
 
     @Test
-    public void canListAppsByNameWhenThereAreSomeAppsPresent() throws Exception {
+    void canListAppsByNameWhenThereAreSomeAppsPresent() throws Exception {
         // given
         given(appsService.listApplications(any(), any(), any(), any(), any(), any(), any(), any(), any()))
                 .willReturn(EMPTY_APPLICATIONS_LIST);
@@ -386,7 +386,7 @@ public class MaintainerAppsControllerTest {
     }
 
     @Test
-    public void canListAppsByDescriptionWhenThereAreSomeAppsPresent() throws Exception {
+    void canListAppsByDescriptionWhenThereAreSomeAppsPresent() throws Exception {
         // given
         given(appsService.listApplications(any(), any(), any(), any(), any(), any(), any(), any(), any()))
                 .willReturn(EMPTY_APPLICATIONS_LIST);
@@ -406,7 +406,7 @@ public class MaintainerAppsControllerTest {
     }
 
     @Test
-    public void canListAppsByVersionWhenThereAreSomeAppsPresent() throws Exception {
+    void canListAppsByVersionWhenThereAreSomeAppsPresent() throws Exception {
         // given
         given(appsService.listApplications(any(), any(), any(), any(), any(), any(), any(), any(), any()))
                 .willReturn(EMPTY_APPLICATIONS_LIST);
@@ -425,7 +425,7 @@ public class MaintainerAppsControllerTest {
     }
 
     @Test
-    public void canListAppsByTypeWhenThereAreSomeAppsPresent() throws Exception {
+    void canListAppsByTypeWhenThereAreSomeAppsPresent() throws Exception {
         // given
         given(appsService.listApplications(any(), any(), any(), any(), any(), any(), any(), any(), any()))
                 .willReturn(EMPTY_APPLICATIONS_LIST);
@@ -444,7 +444,7 @@ public class MaintainerAppsControllerTest {
     }
 
     @Test
-    public void canListAppsByPlatformWhenThereAreSomeAppsPresent() throws Exception {
+    void canListAppsByPlatformWhenThereAreSomeAppsPresent() throws Exception {
         // given
         final Platform platform = new Platform().architecture("arm").variant("v7").os("linux");
 
@@ -465,7 +465,7 @@ public class MaintainerAppsControllerTest {
     }
 
     @Test
-    public void cannotListAppsByIncorrectPlatformWhenThereAreSomeAppsPresent() throws Exception {
+    void cannotListAppsByIncorrectPlatformWhenThereAreSomeAppsPresent() throws Exception {
         // given
 
         // when
@@ -479,7 +479,7 @@ public class MaintainerAppsControllerTest {
     }
 
     @Test
-    public void canListAppsByCategoryWhenThereAreSomeAppsPresent() throws Exception {
+    void canListAppsByCategoryWhenThereAreSomeAppsPresent() throws Exception {
         // given
         given(appsService.listApplications(eq(MAINTAINER_CODE), any(), any(), any(), any(), any(), any(), any(), any()))
                 .willReturn(EMPTY_APPLICATIONS_LIST);
@@ -498,7 +498,7 @@ public class MaintainerAppsControllerTest {
     }
 
     @Test
-    public void cannotListAppsByIncorrectCategoryWhenThereAreSomeAppsPresent() throws Exception {
+    void cannotListAppsByIncorrectCategoryWhenThereAreSomeAppsPresent() throws Exception {
         // given
 
         // when
@@ -512,7 +512,7 @@ public class MaintainerAppsControllerTest {
     }
 
     @Test
-    public void canListAppsByOffsetWhenThereAreSomeAppsPresent() throws Exception {
+    void canListAppsByOffsetWhenThereAreSomeAppsPresent() throws Exception {
         // given
         given(appsService.listApplications(eq(MAINTAINER_CODE), any(), any(), any(), any(), any(), any(), any(), any()))
                 .willReturn(EMPTY_APPLICATIONS_LIST);
@@ -531,7 +531,7 @@ public class MaintainerAppsControllerTest {
     }
 
     @Test
-    public void canListAppsByLimitWhenThereAreSomeAppsPresent() throws Exception {
+    void canListAppsByLimitWhenThereAreSomeAppsPresent() throws Exception {
         // given
         given(appsService.listApplications(eq(MAINTAINER_CODE), any(), any(), any(), any(), any(), any(), any(), any()))
                 .willReturn(EMPTY_APPLICATIONS_LIST);
@@ -550,7 +550,7 @@ public class MaintainerAppsControllerTest {
     }
 
     @Test
-    public void canGetDetailsByJustApplicationIdOfAnExistingApplication() throws Exception {
+    void canGetDetailsByJustApplicationIdOfAnExistingApplication() throws Exception {
         // given
         final String platformName = UUID.randomUUID().toString();
         final String firmwareVer = UUID.randomUUID().toString();
@@ -572,7 +572,7 @@ public class MaintainerAppsControllerTest {
     }
 
     @Test
-    public void canGetDetailsByApplicationIdAndVersionOfAnExistingApplication() throws Exception {
+    void canGetDetailsByApplicationIdAndVersionOfAnExistingApplication() throws Exception {
         // given
         final String platformName = UUID.randomUUID().toString();
         final String firmwareVer = UUID.randomUUID().toString();
@@ -594,7 +594,7 @@ public class MaintainerAppsControllerTest {
     }
 
     @Test
-    public void canGetDetailsByApplicationIdAndLatestVersionOfAnExistingApplication() throws Exception {
+    void canGetDetailsByApplicationIdAndLatestVersionOfAnExistingApplication() throws Exception {
         // given
         final String platformName = UUID.randomUUID().toString();
         final String firmwareVer = UUID.randomUUID().toString();
@@ -616,7 +616,7 @@ public class MaintainerAppsControllerTest {
     }
 
     @Test
-    public void cannotGetDetailsOfANonExistingApplication() throws Exception {
+    void cannotGetDetailsOfANonExistingApplication() throws Exception {
         // given
 
         // when
@@ -630,7 +630,7 @@ public class MaintainerAppsControllerTest {
     }
 
     @Test
-    public void canAddApplication() throws Exception {
+    void canAddApplication() throws Exception {
         // given
 
         // when
@@ -647,7 +647,7 @@ public class MaintainerAppsControllerTest {
     }
 
     @Test
-    public void cannotAddApplicationWithoutAVersion() throws Exception {
+    void cannotAddApplicationWithoutAVersion() throws Exception {
         // given
 
         // when
@@ -665,7 +665,7 @@ public class MaintainerAppsControllerTest {
     }
 
     @Test
-    public void cannotGetApplicationDetailsWithoutPlatformName() throws Exception {
+    void cannotGetApplicationDetailsWithoutPlatformName() throws Exception {
         // given
 
         // when
@@ -680,7 +680,7 @@ public class MaintainerAppsControllerTest {
     }
 
     @Test
-    public void cannotGetApplicationDetailsWithoutFirmwareVer() throws Exception {
+    void cannotGetApplicationDetailsWithoutFirmwareVer() throws Exception {
         // given
 
         // when

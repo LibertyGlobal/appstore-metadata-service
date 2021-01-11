@@ -30,7 +30,7 @@ class StringToCategoryConverterTest {
     private static final StringToCategoryConverter STRING_TO_CATEGORY_CONVERTER = new StringToCategoryConverter();
 
     @Test
-    public void canInstantiateCategoryApplication() {
+    void canInstantiateCategoryApplication() {
         //GIVEN
         final String categoryAsString = "application";
 
@@ -42,7 +42,7 @@ class StringToCategoryConverterTest {
     }
 
     @Test
-    public void canInstantiateCategoryDev() {
+    void canInstantiateCategoryDev() {
         //GIVEN
         final String categoryAsString = "dev";
 
@@ -54,7 +54,7 @@ class StringToCategoryConverterTest {
     }
 
     @Test
-    public void canInstantiateCategoryService() {
+    void canInstantiateCategoryService() {
         //GIVEN
         final String categoryAsString = "service";
 
@@ -66,7 +66,7 @@ class StringToCategoryConverterTest {
     }
 
     @Test
-    public void canInstantiateCategoryResource() {
+    void canInstantiateCategoryResource() {
         //GIVEN
         final String categoryAsString = "resource";
 
@@ -78,7 +78,7 @@ class StringToCategoryConverterTest {
     }
 
     @Test
-    public void canInstantiateCategoryPlugin() {
+    void canInstantiateCategoryPlugin() {
         //GIVEN
         final String categoryAsString = "plugin";
 
@@ -90,7 +90,7 @@ class StringToCategoryConverterTest {
     }
 
     @Test
-    public void invalidCategoryResultsInAProperException() {
+    void invalidCategoryResultsInAProperException() {
         //GIVEN
         final String categoryAsString = "fakeCategory";
 
@@ -105,7 +105,7 @@ class StringToCategoryConverterTest {
     }
 
     @Test
-    public void missingCategoryResultsInAProperException() {
+    void missingCategoryResultsInAProperException() {
         //GIVEN
         final String categoryAsString = null;
 

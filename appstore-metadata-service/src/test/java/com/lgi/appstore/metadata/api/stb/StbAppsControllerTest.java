@@ -60,7 +60,7 @@ import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
 @ExtendWith(MockitoExtension.class)
-public class StbAppsControllerTest {
+class StbAppsControllerTest {
 
     private MockMvc mvc;
 
@@ -208,7 +208,7 @@ public class StbAppsControllerTest {
             );
 
     @Test
-    public void canListAppsWhenThereAreSomePresent() throws Exception {
+    void canListAppsWhenThereAreSomePresent() throws Exception {
         // given
         given(appsService.listApplications(any(), any(), any(), any(), any(), any(), any(), any(), any()))
                 .willReturn(EMPTY_APPLICATIONS_LIST);
@@ -227,7 +227,7 @@ public class StbAppsControllerTest {
     }
 
     @Test
-    public void canListAppsWhenThereAreNoPresent() throws Exception {
+    void canListAppsWhenThereAreNoPresent() throws Exception {
         // given
         given(appsService.listApplications(any(), any(), any(), any(), any(), any(), any(), any(), any()))
                 .willReturn(EMPTY_APPLICATIONS_LIST);
@@ -246,7 +246,7 @@ public class StbAppsControllerTest {
     }
 
     @Test
-    public void canListAppsByNameWhenThereAreSomeAppsPresent() throws Exception {
+    void canListAppsByNameWhenThereAreSomeAppsPresent() throws Exception {
         // given
         given(appsService.listApplications(any(), any(), any(), any(), any(), any(), any(), any(), any()))
                 .willReturn(EMPTY_APPLICATIONS_LIST);
@@ -266,7 +266,7 @@ public class StbAppsControllerTest {
     }
 
     @Test
-    public void canListAppsByDescriptionWhenThereAreSomeAppsPresent() throws Exception {
+    void canListAppsByDescriptionWhenThereAreSomeAppsPresent() throws Exception {
         // given
         given(appsService.listApplications(any(), any(), any(), any(), any(), any(), any(), any(), any()))
                 .willReturn(EMPTY_APPLICATIONS_LIST);
@@ -285,7 +285,7 @@ public class StbAppsControllerTest {
     }
 
     @Test
-    public void canListAppsByVersionWhenThereAreSomeAppsPresent() throws Exception {
+    void canListAppsByVersionWhenThereAreSomeAppsPresent() throws Exception {
         // given
         given(appsService.listApplications(any(), any(), any(), any(), any(), any(), any(), any(), any()))
                 .willReturn(EMPTY_APPLICATIONS_LIST);
@@ -304,7 +304,7 @@ public class StbAppsControllerTest {
     }
 
     @Test
-    public void canListAppsByTypeWhenThereAreSomeAppsPresent() throws Exception {
+    void canListAppsByTypeWhenThereAreSomeAppsPresent() throws Exception {
         // given
         given(appsService.listApplications(any(), any(), any(), any(), any(), any(), any(), any(), any()))
                 .willReturn(EMPTY_APPLICATIONS_LIST);
@@ -323,7 +323,7 @@ public class StbAppsControllerTest {
     }
 
     @Test
-    public void canListAppsByPlatformWhenThereAreSomeAppsPresent() throws Exception {
+    void canListAppsByPlatformWhenThereAreSomeAppsPresent() throws Exception {
         // given
         given(appsService.listApplications(any(), any(), any(), any(), any(), any(), any(), any(), any()))
                 .willReturn(EMPTY_APPLICATIONS_LIST);
@@ -342,7 +342,7 @@ public class StbAppsControllerTest {
     }
 
     @Test
-    public void cannotListAppsByIncorrectPlatformWhenThereAreSomeAppsPresent() throws Exception {
+    void cannotListAppsByIncorrectPlatformWhenThereAreSomeAppsPresent() throws Exception {
         // given
 
         // when
@@ -356,7 +356,7 @@ public class StbAppsControllerTest {
     }
 
     @Test
-    public void canListAppsByCategoryWhenThereAreSomeAppsPresent() throws Exception {
+    void canListAppsByCategoryWhenThereAreSomeAppsPresent() throws Exception {
         // given
         given(appsService.listApplications(any(), any(), any(), any(), any(), any(), any(), any(), any()))
                 .willReturn(EMPTY_APPLICATIONS_LIST);
@@ -375,7 +375,7 @@ public class StbAppsControllerTest {
     }
 
     @Test
-    public void cannotListAppsByIncorrectCategoryWhenThereAreSomeAppsPresent() throws Exception {
+    void cannotListAppsByIncorrectCategoryWhenThereAreSomeAppsPresent() throws Exception {
         // given
 
         // when
@@ -389,7 +389,7 @@ public class StbAppsControllerTest {
     }
 
     @Test
-    public void canListAppsByMaintainerNameWhenThereAreSomeAppsPresent() throws Exception {
+    void canListAppsByMaintainerNameWhenThereAreSomeAppsPresent() throws Exception {
         // given
         given(appsService.listApplications(any(), any(), any(), any(), any(), any(), any(), any(), any()))
                 .willReturn(EMPTY_APPLICATIONS_LIST);
@@ -408,7 +408,7 @@ public class StbAppsControllerTest {
     }
 
     @Test
-    public void canListAppsByOffsetWhenThereAreSomeAppsPresent() throws Exception {
+    void canListAppsByOffsetWhenThereAreSomeAppsPresent() throws Exception {
         // given
         given(appsService.listApplications(any(), any(), any(), any(), any(), any(), any(), any(), any()))
                 .willReturn(EMPTY_APPLICATIONS_LIST);
@@ -427,7 +427,7 @@ public class StbAppsControllerTest {
     }
 
     @Test
-    public void canListAppsByLimitWhenThereAreSomeAppsPresent() throws Exception {
+    void canListAppsByLimitWhenThereAreSomeAppsPresent() throws Exception {
         // given
         given(appsService.listApplications(any(), any(), any(), any(), any(), any(), any(), any(), any()))
                 .willReturn(EMPTY_APPLICATIONS_LIST);
@@ -446,7 +446,7 @@ public class StbAppsControllerTest {
     }
 
     @Test
-    public void canGetDetailsByJustApplicationIdOfAnExistingApplication() throws Exception {
+    void canGetDetailsByJustApplicationIdOfAnExistingApplication() throws Exception {
         // given
         final String platformName = UUID.randomUUID().toString();
         final String firmwareVer = UUID.randomUUID().toString();
@@ -467,7 +467,7 @@ public class StbAppsControllerTest {
     }
 
     @Test
-    public void canGetDetailsByApplicationIdAndVersionOfAnExistingApplication() throws Exception {
+    void canGetDetailsByApplicationIdAndVersionOfAnExistingApplication() throws Exception {
         // given
         final String platformName = UUID.randomUUID().toString();
         final String firmwareVer = UUID.randomUUID().toString();
@@ -489,7 +489,7 @@ public class StbAppsControllerTest {
     }
 
     @Test
-    public void canGetDetailsByApplicationIdAndLatestVersionOfAnExistingApplication() throws Exception {
+    void canGetDetailsByApplicationIdAndLatestVersionOfAnExistingApplication() throws Exception {
         // given
         final String platformName = UUID.randomUUID().toString();
         final String firmwareVer = UUID.randomUUID().toString();
@@ -511,7 +511,7 @@ public class StbAppsControllerTest {
     }
 
     @Test
-    public void cannotGetDetailsOfANonExistingApplication() throws Exception {
+    void cannotGetDetailsOfANonExistingApplication() throws Exception {
         // given
 
         // when
@@ -525,7 +525,7 @@ public class StbAppsControllerTest {
     }
 
     @Test
-    public void cannotGetApplicationDetailsWithoutPlatformName() throws Exception {
+    void cannotGetApplicationDetailsWithoutPlatformName() throws Exception {
         // given
 
         // when
@@ -540,7 +540,7 @@ public class StbAppsControllerTest {
     }
 
     @Test
-    public void cannotGetApplicationDetailsWithoutFirmwareVer() throws Exception {
+    void cannotGetApplicationDetailsWithoutFirmwareVer() throws Exception {
         // given
 
         // when

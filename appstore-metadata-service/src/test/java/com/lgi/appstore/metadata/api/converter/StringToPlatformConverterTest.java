@@ -31,7 +31,7 @@ class StringToPlatformConverterTest {
     private static final StringToPlatformConverter STRING_TO_PLATFORM_CONVERTER = new StringToPlatformConverter();
 
     @Test
-    public void canInstantiatePlatformWithArchitectureVariantAndOsPresent() {
+    void canInstantiatePlatformWithArchitectureVariantAndOsPresent() {
         //GIVEN
         final String architecture = "arch";
         final String variant = "variant";
@@ -49,7 +49,7 @@ class StringToPlatformConverterTest {
     }
 
     @Test
-    public void canInstantiatePlatformWithMissingOs() {
+    void canInstantiatePlatformWithMissingOs() {
         //GIVEN
         final String architecture = "arch";
         final String variant = "variant";
@@ -67,7 +67,7 @@ class StringToPlatformConverterTest {
     }
 
     @Test
-    public void canInstantiatePlatformWithMissingVariantAndOs() {
+    void canInstantiatePlatformWithMissingVariantAndOs() {
         //GIVEN
         final String architecture = "arch";
         final String variant = "";
@@ -85,7 +85,7 @@ class StringToPlatformConverterTest {
     }
 
     @Test
-    public void cannotInstantiatePlatformWithAllComponetsMissing() {
+    void cannotInstantiatePlatformWithAllComponetsMissing() {
         //GIVEN
         final String architecture = "";
         final String variant = "";
@@ -104,7 +104,7 @@ class StringToPlatformConverterTest {
     }
 
     @Test
-    public void cannotInstantiatePlatformWithoutArchitecture() {
+    void cannotInstantiatePlatformWithoutArchitecture() {
         //GIVEN
         final String architecture = "";
         final String variant = "variant";
@@ -123,7 +123,7 @@ class StringToPlatformConverterTest {
     }
 
     @Test
-    public void cannotInstantiatePlatformWithTooManyComponents() {
+    void cannotInstantiatePlatformWithTooManyComponents() {
         //GIVEN
         final String architecture = "architecture";
         final String variant = "variant";
