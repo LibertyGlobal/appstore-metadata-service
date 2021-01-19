@@ -233,11 +233,12 @@
                     <mapping>
                         <conf>SCRIPT_STYLE</conf>
                         <Dockerfile>SCRIPT_STYLE</Dockerfile>
+                        <tpl>SCRIPT_STYLE</tpl>
                     </mapping>
                     <licenseSets>
                         <licenseSet>
                             <header>LICENSE-HEADER-TEMPLATE.txt</header>
-                            <includes>**/*.java,**/*.sql,**/*.conf,**/Dockerfile,**/*.yaml,**/*.groovy,**/*.yml</includes>
+                            <includes>**/*.java,**/*.sql,**/*.conf,**/Dockerfile,**/*.yaml,**/*.groovy,**/*.yml,**/*.tpl</includes>
                         </licenseSet>
                     </licenseSets>
                 </configuration>

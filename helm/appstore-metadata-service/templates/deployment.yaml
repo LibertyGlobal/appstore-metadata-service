@@ -1,0 +1,143 @@
+#
+# If not stated otherwise in this file or this component's LICENSE file the
+# following copyright and licenses apply:
+#
+# Copyright 2021 Liberty Global Technology Services BV
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "appstore-metadata-charts.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: {{ include "appstore-metadata-charts.fullname" . }}
+    helm.sh/chart: {{ include "appstore-metadata-charts.chart" . }}
+spec:
+  replicas: 1
+  revisionHistoryLimit: 0
+  selector:
+    matchLabels:
+      app: {{ include "appstore-metadata-charts.fullname" . }}
+  template:
+    metadata:
+      labels:
+        app: {{ include "appstore-metadata-charts.fullname" . }}
+      annotations:
+        prometheus.io/path: /prometheus
+        prometheus.io/port: "8080"
+        prometheus.io/scrape: "true"
+    spec:
+      containers:
+      - name: {{ include "appstore-metadata-charts.name" . }}
+        image: {{ required "Missing `.Values.image.repository`" .Values.image.repository }}:{{ .Chart.AppVersion }}
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8080
+        resources:
+          requests:
+            memory: "1024Mi"
+            cpu: "250m"
+          limits:
+            memory: "1024Mi"
+            cpu: "1000m"
+        env:
+        - name: JDBC_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "appstore-metadata-charts.fullname" . }}
+              key: JDBC_HOST
+        - name: JDBC_DATABASE_NAME
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "appstore-metadata-charts.fullname" . }}
+              key: JDBC_DATABASE_NAME
+        - name: JDBC_SCHEMA
+          value: {{ include "appstore-metadata-charts.fullname" . }}
+        - name: JDBC_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "appstore-metadata-charts.fullname" . }}
+              key: JDBC_PORT
+        - name: JDBC_USER
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.sealedSecretName }}
+              key: JDBC_USER
+        - name: JDBC_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.sealedSecretName }}
+              key: JDBC_PASSWORD
+        - name: STACK_NAME
+          value: {{ include "appstore-metadata-charts.fullname" . }}-{{ .Release.Namespace }}
+        - name: HOST_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: NAMESPACE
+          value: {{ .Release.Namespace }}
+        - name: PROMETHEUS_METRICS
+          value: "true"
+        - name: BUNDLES_STORAGE_PROTOCOL
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "appstore-metadata-charts.fullname" . }}
+              key: BUNDLES_STORAGE_PROTOCOL
+        - name: BUNDLES_STORAGE_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "appstore-metadata-charts.fullname" . }}
+              key: BUNDLES_STORAGE_HOST
+      {{- if eq .Values.deleteSchema "true" }}
+      - image: governmentpaas/psql
+        name: schema-cleanup
+        imagePullPolicy: IfNotPresent
+        command: [ "/bin/sh", "-c", "--" ]
+        args: [ "while true; do sleep 30; done;" ]
+        resources: {}
+        env:
+          - name: JDBC_HOST
+            valueFrom:
+              configMapKeyRef:
+                name: {{ include "appstore-metadata-charts.fullname" . }}
+                key: JDBC_HOST
+          - name: JDBC_DATABASE_NAME
+            valueFrom:
+              configMapKeyRef:
+                name: {{ include "appstore-metadata-charts.fullname" . }}
+                key: JDBC_DATABASE_NAME
+          - name: JDBC_SCHEMA
+            value: {{ include "appstore-metadata-charts.fullname" . }}
+          - name: JDBC_PORT
+            valueFrom:
+              configMapKeyRef:
+                name: {{ include "appstore-metadata-charts.fullname" . }}
+                key: JDBC_PORT
+          - name: JDBC_USER
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.sealedSecretName }}
+                key: JDBC_USER
+          - name: JDBC_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.sealedSecretName }}
+                key: JDBC_PASSWORD
+        lifecycle:
+          preStop:
+            exec:
+              command: [ "/bin/sh","-c","echo ${JDBC_HOST}:${JDBC_PORT}:${JDBC_DATABASE_NAME}:${JDBC_USER}:${JDBC_PASSWORD} > ~/.pgpass; chmod 0600 ~/.pgpass; psql -c 'DROP SCHEMA IF EXISTS \"'${JDBC_SCHEMA}'\" CASCADE;' postgresql://${JDBC_USER}@${JDBC_HOST}:${JDBC_PORT}/${JDBC_DATABASE_NAME}" ]
+      {{- end }}
