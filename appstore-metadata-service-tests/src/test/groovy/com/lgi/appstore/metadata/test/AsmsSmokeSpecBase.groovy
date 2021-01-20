@@ -19,7 +19,6 @@
 
 package com.lgi.appstore.metadata.test
 
-import com.lgi.appstore.metadata.test.AsmsIntegrationSpecBase
 import com.lgi.appstore.metadata.test.framework.ITCaseContext
 import com.lgi.appstore.metadata.test.framework.TestSession
 import org.junit.jupiter.api.extension.ExtendWith
