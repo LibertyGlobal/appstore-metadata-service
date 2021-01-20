@@ -4,12 +4,6 @@ AppStore Metadata Service
 In order to build the service you need to run:
 
 ```
-mvn -pl tcp-msg-maven-plugin clean install plugin:descriptor
-```
-
-Then execute to package it:
-
-```
 mvn package
 ```
 

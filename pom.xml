@@ -17,7 +17,6 @@
     <modules>
         <module>appstore-metadata-service</module>
         <module>appstore-metadata-service-tests</module>
-        <module>tcp-msg-maven-plugin</module>
     </modules>
 
     <properties>
@@ -81,6 +80,13 @@
         </snapshotRepository>
     </distributionManagement>
 
+    <pluginRepositories>
+        <pluginRepository>
+            <id>local-plugins-repo</id>
+            <url>file://${project.basedir}/lib</url>
+        </pluginRepository>
+    </pluginRepositories>
+
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -133,6 +139,12 @@
                         <groupId>junit</groupId>
                     </exclusion>
                 </exclusions>
+            </dependency>
+
+            <dependency>
+                <groupId>com.lgi.common.maven</groupId>
+                <artifactId>tcp-msg-maven-plugin</artifactId>
+                <version>0.0.1-SNAPSHOT</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

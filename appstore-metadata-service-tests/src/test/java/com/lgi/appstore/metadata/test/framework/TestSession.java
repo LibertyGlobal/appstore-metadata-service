@@ -96,8 +96,10 @@ public class TestSession {
             String urlForSanity = environment.getProperty(ENV_VAR_URL_FOR_SANITY_TESTS);
 
             if (currentTestType == TestType.INTEGRATION_SANITY) {
+                LOG.info("Service location for local/mocked smoke tests (usually on master branch): {}", urlForSmoke);
                 return Optional.ofNullable(urlForSanity).orElseThrow(() -> new AssumptionViolatedException(String.format("There was no var %s specified to locate the service for sanity testing.", ENV_VAR_URL_FOR_SANITY_TESTS)));
             } else if (currentTestType == TestType.INTEGRATION_SMOKE) {
+                LOG.info("Service location for local/mocked sanity tests (usually on PR branch): {}", urlForSmoke);
                 return Optional.ofNullable(urlForSmoke).orElseThrow(() -> new AssumptionViolatedException(String.format("There was no var %s specified to locate the service for smoke testing.", ENV_VAR_URL_FOR_SMOKE_TESTS)));
             } else {
                 throw new NotImplementedException(String.format("Base URL not specified for test type=%s", currentTestType));
