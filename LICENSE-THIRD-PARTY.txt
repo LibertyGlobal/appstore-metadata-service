@@ -1,5 +1,5 @@
 
-Lists of 167 third-party dependencies.
+Lists of 168 third-party dependencies.
      (Eclipse Public License - v 1.0) (GNU Lesser General Public License) Logback Classic Module (ch.qos.logback:logback-classic:1.2.3 - http://logback.qos.ch/logback-classic)
      (Eclipse Public License - v 1.0) (GNU Lesser General Public License) Logback Core Module (ch.qos.logback:logback-core:1.2.3 - http://logback.qos.ch/logback-core)
      (The Apache License, Version 2.0) spock-reports (com.athaydes:spock-reports:1.7.1 - https://github.com/renatoathaydes/spock-reports)
@@ -82,6 +82,7 @@ Lists of 167 third-party dependencies.
      (Apache License 2.0) TagSoup (org.ccil.cowan.tagsoup:tagsoup:1.2.1 - http://home.ccil.org/~cowan/XML/tagsoup/)
      (The MIT License) Checker Qual (org.checkerframework:checker-qual:3.5.0 - https://checkerframework.org)
      (The Apache Software License, Version 2.0) Apache Groovy (org.codehaus.groovy:groovy:2.5.13 - https://groovy-lang.org)
+     (The Apache Software License, Version 2.0) Apache Groovy (org.codehaus.groovy:groovy:2.5.14 - https://groovy-lang.org)
      (The Apache Software License, Version 2.0) Apache Groovy (org.codehaus.groovy:groovy-json:2.5.13 - https://groovy-lang.org)
      (The Apache Software License, Version 2.0) Apache Groovy (org.codehaus.groovy:groovy-macro:2.5.13 - https://groovy-lang.org)
      (The Apache Software License, Version 2.0) Apache Groovy (org.codehaus.groovy:groovy-nio:2.5.13 - https://groovy-lang.org)

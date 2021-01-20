@@ -20,7 +20,6 @@
         <groovy-version>2.5.14</groovy-version>
         <allure-version>2.13.6</allure-version>
         <skipFTs>true</skipFTs>
-        <dev-depl-url/>
         <db.schema>appstore_metadata_service</db.schema>
     </properties>
 
@@ -37,7 +36,6 @@
                 <maven-surefire-version>${maven-test-plugins-version}</maven-surefire-version>
                 <skipUTs>true</skipUTs>
                 <skipFTs>false</skipFTs>
-                <dev-depl-url>appstore-metadata-service.dac.appdev.io</dev-depl-url>
             </properties>
         </profile>
     </profiles>

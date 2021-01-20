@@ -56,6 +56,7 @@
             CDDL/GPLv2+CE|${line.separator}
             Eclipse Public License 1.0|${line.separator}
             Eclipse Public License - v 1.0|${line.separator}
+            Eclipse Public License, Version 1.0|${line.separator}
             Eclipse Public License v2.0|${line.separator}
             EDL 1.0|${line.separator}
             Eclipse Distribution License - v 1.0|${line.separator}
@@ -63,8 +64,7 @@
             MIT|${line.separator}
             MIT License|${line.separator}
             The MIT License|${line.separator}
-            The MIT License (MIT)|${line.separator}
-            Eclipse Public License, Version 1.0
+            The MIT License (MIT)
         </license.includedLicenses>
     </properties>
 
