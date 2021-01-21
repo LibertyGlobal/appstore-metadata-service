@@ -194,10 +194,6 @@
                 <configuration>
                     <systemProperties>
                         <property>
-                            <name>BASE_URL</name>
-                            <value>${dev-depl-url}</value>
-                        </property>
-                        <property>
                             <name>db.schema</name>
                             <value>${db.schema}</value>
                         </property>
