@@ -108,6 +108,24 @@
             <activation>
                 <activeByDefault>true</activeByDefault>
             </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>com.mycila</groupId>
+                        <artifactId>license-maven-plugin</artifactId>
+                        <version>4.0.rc2</version>
+                        <executions>
+                            <execution>
+                                <id>add-license-headers</id>
+                                <goals>
+                                    <goal>format</goal>
+                                </goals>
+                                <phase>process-sources</phase>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
         </profile>
         <profile>
             <id>prod</id>
@@ -160,6 +178,24 @@
                 </configuration>
             </plugin>
             <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>3.2.0</version>
+                <executions>
+                    <execution>
+                        <id>timestamp-property</id>
+                        <goals>
+                            <goal>timestamp-property</goal>
+                        </goals>
+                        <phase>validate</phase>
+                        <configuration>
+                            <name>current.year</name>
+                            <pattern>yyyy</pattern>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>${maven-surefire-version}</version>
@@ -179,6 +215,39 @@
                             <goal>aggregate-add-third-party</goal>
                         </goals>
                         <phase>validate</phase>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>com.mycila</groupId>
+                <artifactId>license-maven-plugin</artifactId>
+                <version>4.0.rc2</version>
+                <configuration>
+                    <defaultProperties>
+                        <!--suppress UnresolvedMavenProperty -->
+                        <license.year>${current.year}</license.year>
+                        <license.owner>Liberty Global Technology Services BV</license.owner>
+                    </defaultProperties>
+                    <failIfUnknown>true</failIfUnknown>
+                    <aggregate>true</aggregate>
+                    <mapping>
+                        <conf>SCRIPT_STYLE</conf>
+                        <Dockerfile>SCRIPT_STYLE</Dockerfile>
+                    </mapping>
+                    <licenseSets>
+                        <licenseSet>
+                            <header>LICENSE-HEADER-TEMPLATE.txt</header>
+                            <includes>**/*.java,**/*.sql,**/*.conf,**/Dockerfile,**/*.yaml,**/*.groovy,**/*.yml</includes>
+                        </licenseSet>
+                    </licenseSets>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>check-license-headers</id>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                        <phase>prepare-package</phase>
                     </execution>
                 </executions>
             </plugin>
