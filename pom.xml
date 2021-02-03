@@ -65,6 +65,7 @@
             The MIT License|${line.separator}
             The MIT License (MIT)
         </license.includedLicenses>
+        <license.skipExistingHeaders>true</license.skipExistingHeaders>
     </properties>
 
     <distributionManagement>
