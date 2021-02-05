@@ -22,6 +22,7 @@ appSuffix: ''
 image:
   repository: appstore-metadata-service
 
+useSeparateSchemaPerDeployment: "false"
 deleteSchema: "false"
 addIngressesAndSecretsForSTBAndAS3: "true"
 
