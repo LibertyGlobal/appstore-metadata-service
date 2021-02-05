@@ -64,8 +64,16 @@ spec:
             configMapKeyRef:
               name: {{ include "appstore-metadata-charts.fullname" . }}
               key: JDBC_DATABASE_NAME
+        {{- if eq .Values.useSeparateSchemaPerDeployment "true" }}
         - name: JDBC_SCHEMA
           value: {{ include "appstore-metadata-charts.fullname" . }}
+        {{- else }}
+        - name: JDBC_SCHEMA
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "appstore-metadata-charts.fullname" . }}
+              key: JDBC_SCHEMA
+        {{- end }}
         - name: JDBC_PORT
           valueFrom:
             configMapKeyRef:
