@@ -28,7 +28,7 @@ import static com.lgi.appstore.metadata.test.framework.model.response.Maintainer
 import static org.apache.http.HttpStatus.SC_OK
 
 class ManageMaintainerApiFTSpecSmoke extends AsmsSmokeSpecBase {
-    def "CRUD operations check (POST, GET, PUT, DELETE)"() {
+    def "smoke check of default maintainer"() {
         given: "assuming some sample test data exists on test env"
         def devCode = MaintainerViewSteps.DEFAULT_DEV_CODE
 
