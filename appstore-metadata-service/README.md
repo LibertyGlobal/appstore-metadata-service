@@ -45,6 +45,7 @@ docker run -d -p 8080:8080 -e JDBC_HOST=asmsdb --network=asms_network --name app
 Docker compose
 ---
 
+On the root folder, execute
 ```
 mvn clean install
 docker-compose -f docker-compose/docker-compose.yml build

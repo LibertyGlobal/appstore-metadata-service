@@ -39,22 +39,57 @@ API is specified in a form of [yaml swagger file](./appstore-metadata-service/sr
 
 ## Request samples.
 
+### Create maintainer
+
+Request:
+```http
+curl --location --request POST 'http://localhost:8081/as3/maintainers' \
+--header 'Authorization: Basic YXMzOmFzMw==' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+  "code": "lgi",
+  "name": "Liberty Global",
+  "address": "Liberty Global B.V., Boeing Avenue 53, 1119 PE Schiphol Rijk, The Netherlands",
+  "homepage": "https://www.libertyglobal.com",
+  "email": "developer@libertyglobal.com"
+}'
+```
+Response:
+```http
+HTTP/1.1 201 Created
+```
+### Get maintainer
+Request:
+```
+curl --location --request GET 'http://localhost:8081/as3/maintainers/lgi' \
+--header 'Content-Type: application/json' \
+--header 'Authorization: Basic YXMzOmFzMw==' \
+--data-raw ''
+```
+Response:
+```http
+{
+    "code": "lgi",
+    "name": "Liberty Global",
+    "address": "Liberty Global B.V., Boeing Avenue 53, 1119 PE Schiphol Rijk, The Netherlands",
+    "homepage": "https://www.libertyglobal.com",
+    "email": "developer@libertyglobal.com"
+}
+
+HTTP/1.1 200 OK
+```
 
 ### Create application
 
 Create application in ASMS using AS3 API:
 
+Request:
 ```http
-
-POST http://as3.server:8080/lgi/apps
-Authorization: Basic YXMzOmFzMw==
-Content-Type: application/json
-Accept-Language: fr-CH, fr;q=0.9
-
-{
-    "specVersion": 1,
-    "application": {
-        "header": {
+curl --location --request POST 'http://localhost:8081/as3/maintainers/lgi/apps' \
+--header 'Content-Type: application/json' \
+--header 'Authorization: Basic YXMzOmFzMw==' \
+--data-raw '{
+    "header": {
             "id": "demo.id.appl",
             "version": "2.2",
             "icon": "http://pretty.url/icon3.png",
@@ -106,61 +141,54 @@ Accept-Language: fr-CH, fr;q=0.9
             "homepage": "http://homepage",
             "email": "email@mail.org"
         }
-    }
-}
-
+    }'
 ```
-
 Response:
-
 ```http
 HTTP/1.1 201 Created
-Date: Sat, 02 Apr 2016 12:22:40 GMT
 ```
-
 
 ### Search application
 
 A sample of request that is used by STBs to the search an application with the name starting 'Fancy' and provided by the 'Liberty Global' maintainer.
 
 Request:
-
 ```http
-GET  http://asms.server:8082/maintainers/apps?name=Fancy&maintainerName=Liberty%20Global
-Authorization: Basic c3RiOnN0Yg==
-
+curl --location --request GET 'http://localhost:8082/asms/apps?name=Fancy&maintainerName=Liberty%20Global' \
+--header 'Content-Type: application/json' \
+--header 'Authorization: Basic c3RiOnN0Yg==' \
+--data-raw ''
 ```
-
 Response:
-
 ```http
 {
-  "applications": [
-    {
-      "icon": "http://pretty.url/icon3.png",
-      "name": "FancyApp",
-      "description": "Description of Fancy application",
-      "url": "http://url/fancyappl",
-      "type": "application/vnd.rdk-app.dac.native",
-      "category": "application",
-      "localisations": [
+    "applications": [
         {
-            "languageCode": "en",
-            "name": "Fancy application",
-            "description": "description"
+            "icon": "http://pretty.url/icon3.png",
+            "name": "FancyApp",
+            "description": "Description of Fancy application",
+            "type": "fancy_applications",
+            "category": "application",
+            "localisations": [
+                {
+                    "languageCode": "en",
+                    "name": "Fancy application",
+                    "description": "description"
+                }
+            ],
+            "id": "demo.id.appl",
+            "version": "2.2"
         }
-      ],
-      "id": "demo.id.appl",
-      "version": "1.2.3"
+    ],
+    "meta": {
+        "resultSet": {
+            "count": 1,
+            "offset": 0,
+            "limit": 10,
+            "total": 1
+        }
     }
-  ],
-  "meta": {
-    "resultSet": {
-      "count": 1,
-      "offset": 0,
-      "limit": 10,
-      "total": 1
-    }
-  }
 }
+
+HTTP/1.1 200 OK
 ```

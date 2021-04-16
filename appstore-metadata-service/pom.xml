@@ -382,6 +382,7 @@
                             <goal>copy-resources</goal>
                         </goals>
                         <configuration>
+                            <overwrite>true</overwrite>
                             <outputDirectory>./docker-compose/asms/target</outputDirectory>
                             <resources>
                                 <resource>
