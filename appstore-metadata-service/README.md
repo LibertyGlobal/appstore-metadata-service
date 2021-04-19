@@ -1,53 +1,14 @@
 AppStore Metadata Service
 ---
 
-In order to build the service you need to run:
-
-```
-mvn package
-```
-
-Then to run it you need to be in `target` directory:
-
-```
-cd target
-java -jar appstore-metadata-service-0.0.1-SNAPSHOT.jar
-```
-
-The service is available by default at:
- 
-```
-http://localhost:8080
-```
-
-Docker
----
-
-In order to dockerize the service a plugin jib-maven-plugin is provided, which can be used to build a docker image:
-
-```
-mvn compile jib:dockerBuild -Djib.to.image=appstore-metadata-service:0.0.1-SNAPSHOT
-```
-
-Because service needs a database to connect, next step is to create a docker network and run database inside it: 
-
-```
-docker network create asms_network
-docker run -e POSTGRES_HOST_AUTH_METHOD=trust --name asmsdb --network asms_network postgres:11
-```
-
-At the end, application can be run:
-
-```
-docker run -d -p 8080:8080 -e JDBC_HOST=asmsdb --network=asms_network --name appstore-metadata-service appstore-metadata-service:0.0.1-SNAPSHOT
-```
+Though, there several ways to run the source codes mentioned in the current repository,
+this manual uses the docker-compose as the most simple approach.
 
 Docker compose
 ---
 
 On the root folder, execute
 ```
-mvn clean install
 docker-compose -f docker-compose/docker-compose.yml build
 docker-compose -f docker-compose/docker-compose.yml up
 ```
