@@ -7,7 +7,7 @@ this manual uses the docker-compose as the most simple approach.
 Docker compose
 ---
 
-On the root folder, execute
+In order to run the docker-compose stack please execute:
 ```
 docker-compose -f docker-compose/docker-compose.yml build
 docker-compose -f docker-compose/docker-compose.yml up

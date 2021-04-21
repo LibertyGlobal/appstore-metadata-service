@@ -31,7 +31,11 @@ Functions provided by ASMS components are split between:
 
 ## Packaging
 
-Current artifacts can be deployed in a form of docker-compose [stack](./appstore-metadata-service/docker-compose).
+In order build and package the solution please execute the command:
+```
+mvn clean install
+```
+Later the built artifacts can be deployed in a form of docker-compose [stack](./appstore-metadata-service/docker-compose).
 
 ## REST API
 
