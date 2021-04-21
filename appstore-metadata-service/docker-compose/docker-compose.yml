@@ -57,6 +57,7 @@ services:
       - JDBC_PASSWORD=asms
       - BUNDLES_STORAGE_HOST=rdk-tarballs-some-binary-storage.s3.eu-central-1.amazonaws.com
       - BUNDLES_STORAGE_PROTOCOL=http
+      - SPRING_DEVTOOLS_RESTART_ENABLED=false
     ports:
       # for debug purposes
       - 8080:8080
