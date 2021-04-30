@@ -411,7 +411,7 @@
             <plugin>
                 <groupId>org.openapitools</groupId>
                 <artifactId>openapi-generator-maven-plugin</artifactId>
-                <version>5.0.0-beta3</version>
+                <version>5.1.0</version>
                 <executions>
                     <execution>
                         <id>openapi-generate-spring</id>
