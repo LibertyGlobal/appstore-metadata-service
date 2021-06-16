@@ -72,7 +72,7 @@
         <repository>
             <id>${jar.repository.id}</id>
             <name>${jar.repository.name} releases</name>
-            <url>${jar.repository.url/releases</url>
+            <url>${jar.repository.url}/releases</url>
         </repository>
         <snapshotRepository>
             <id>${jar.repository.id}</id>
