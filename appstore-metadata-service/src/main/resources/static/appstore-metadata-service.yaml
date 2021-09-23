@@ -22,7 +22,7 @@ openapi: 3.0.0
 info:
   title: ASMS API
   description: AppStore Metadata Service REST API. MAS API in RDK.
-  version: 0.1.5
+  version: 0.2.0
   license:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
@@ -670,6 +670,12 @@ components:
           type: string
           description: Application type (example&#58; application/vnd.rdk-app.dac.lightning)
           example: application/vnd.rdk-app.dac.native
+        size:
+          type: integer
+          description: Size in bytes
+          example: 10000000
+          minimum: 0
+          maximum: 2147483647
         category:
           $ref: '#/components/schemas/Category'
         localisations:

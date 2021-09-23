@@ -48,6 +48,7 @@ import static com.lgi.appstore.metadata.test.framework.model.response.Applicatio
 import static com.lgi.appstore.metadata.test.framework.model.response.ApplicationDetailsPath.FIELD_ICON
 import static com.lgi.appstore.metadata.test.framework.model.response.ApplicationDetailsPath.FIELD_NAME
 import static com.lgi.appstore.metadata.test.framework.model.response.ApplicationDetailsPath.FIELD_TYPE
+import static com.lgi.appstore.metadata.test.framework.model.response.ApplicationDetailsPath.FIELD_SIZE
 import static com.lgi.appstore.metadata.test.framework.model.response.ApplicationDetailsPath.FIELD_URL
 import static com.lgi.appstore.metadata.test.framework.model.response.ApplicationDetailsPath.FIELD_VISIBLE
 import static com.lgi.appstore.metadata.test.framework.model.response.ApplicationDetailsPath.extract
@@ -210,6 +211,7 @@ class MaintainerApiFTSpec extends AsmsFeatureSpecBase {
         def v1Description = "v1Description"
         def v1Icon = "v1Icon"
         def v1Type = "v1Type"
+        def v1Size = 10000000
         def v1Category = pickRandomCategory()
         def v1PlatformArch = "v1PlatformArch"
         def v1PlatformOs = "v1PlatformOs"
@@ -237,6 +239,7 @@ class MaintainerApiFTSpec extends AsmsFeatureSpecBase {
                 .withDescription(v1Description)
                 .withIcon(v1Icon)
                 .withType(v1Type)
+                .withSize(v1Size)
                 .withCategory(v1Category)
                 .withPlatform(v1PlatformArch, v1PlatformOs, v1PlatformVariant)
                 .withHardware(v1HardwareCache, v1HardwareDmips, v1HardwarePersistent, v1HardwareRam, v1HardwareImage)
@@ -252,6 +255,7 @@ class MaintainerApiFTSpec extends AsmsFeatureSpecBase {
         def v2Description = "v2NewDescription"
         def v2Icon = "v2NewIcon"
         def v2Type = "v2NewType"
+        def v2Size = 20000000
         def v2Category = pickRandomCategoryExcluding(v1Category)
         def v2PlatformArch = "v2PlatformArch"
         def v2PlatformOs = "v2PlatformOs"
@@ -278,6 +282,7 @@ class MaintainerApiFTSpec extends AsmsFeatureSpecBase {
                 .withDescription(v2Description)
                 .withIcon(v2Icon)
                 .withType(v2Type)
+                .withSize(v2Size)
                 .withCategory(v2Category)
                 .withPlatform(v2PlatformArch, v2PlatformOs, v2PlatformVariant)
                 .withHardware(v2HardwareCache, v2HardwareDmips, v2HardwarePersistent, v2HardwareRam, v2HardwareImage)
@@ -313,6 +318,7 @@ class MaintainerApiFTSpec extends AsmsFeatureSpecBase {
                 .contains(DEFAULT_FIRMWARE_VER)
         field().header().description().from(theBody1) == v1Description
         field().header().type().from(theBody1) == v1Type
+        field().header().size().from(theBody1) == v1Size
         field().header().icon().from(theBody1) == v1Icon
 
         and: "the body exposes maintainer section with his details"
@@ -363,6 +369,7 @@ class MaintainerApiFTSpec extends AsmsFeatureSpecBase {
         field().header().name().from(theBody2) == v2Name
         field().header().description().from(theBody2) == v2Description
         field().header().type().from(theBody2) == v2Type
+        field().header().size().from(theBody2) == v2Size
         field().header().icon().from(theBody2) == v2Icon
 
         and: "the body exposes maintainer section with his details"
@@ -431,6 +438,7 @@ class MaintainerApiFTSpec extends AsmsFeatureSpecBase {
         FIELD_DESCRIPTION | "Description Before ąćęłóśżź" || "Description After €\\€\\€\\€\\"
         FIELD_CATEGORY    | String.valueOf(Category.DEV)  || String.valueOf(pickRandomCategory())
         FIELD_TYPE        | "typeBefore"                  || "typeAfter"
+        FIELD_SIZE        | 10000000                      || 20000000
         FIELD_ICON        | "c:\\Icon.before.png"         || "//home/alwi/Icon.after"
     }
 
@@ -489,6 +497,7 @@ class MaintainerApiFTSpec extends AsmsFeatureSpecBase {
         FIELD_DESCRIPTION | "Description Before ąćęłóśżź" || "Description After €\\€\\€\\€\\"
         FIELD_CATEGORY    | String.valueOf(Category.DEV)  || String.valueOf(Category.RESOURCE)
         FIELD_TYPE        | "typeBefore"                  || "typeAfter"
+        FIELD_SIZE        | 10000000                      || 20000000
         FIELD_ICON        | "c:\\Icon.before.png"         || "//home/alwi/Icon.after"
     }
 

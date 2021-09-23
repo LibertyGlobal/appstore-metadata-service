@@ -126,6 +126,7 @@ curl -v -X POST -H "Content-type: application/json" -d '{
     "name": "Awesome Application",
     "description": "This is Awesome App.",
     "type": "application/vnd.rdk-app.dac.native",
+    "size": "10000000",
     "category": "application",
     "localisations": [
       {
@@ -161,6 +162,7 @@ curl -v -X POST -H "Content-type: application/json" -d '{
     "name": "you.i1",
     "description": "Showcase application from the company youi.tv. The container package contains both the react native application and the You.i TV react native Gfx engine beneath.",
     "type": "application/vnd.rdk-app.dac.native",
+    "size": "10000000",
     "category": "application",
     "localisations": [
       {
@@ -200,6 +202,7 @@ curl -v -X POST -H "Content-type: application/json" -d '{
     "name": "flutter",
     "description": "Container contains both Flutter application and Flutter engine running on wayland-egl, developed by Liberty Global while evaluating Google Flutter UI toolkit.",
     "type": "application/vnd.rdk-app.dac.native",
+    "size": "10000000",
     "category": "application",
     "localisations": [
       {

@@ -179,13 +179,13 @@ class PersistentAppsServiceTest extends BaseServiceTest {
     }
 
     private void verifyStbApplicationDetails(Optional<StbApplicationDetails> maybeStbApplicationDetails,
-            MaintainerRecord maintainerRecord,
-            ApplicationRecord applicationRecord,
-            Localisation localisation,
-            Hardware hardware,
-            Platform platform,
-            Dependency dependency,
-            Feature feature) {
+                                             MaintainerRecord maintainerRecord,
+                                             ApplicationRecord applicationRecord,
+                                             Localisation localisation,
+                                             Hardware hardware,
+                                             Platform platform,
+                                             Dependency dependency,
+                                             Feature feature) {
         assertThat(maybeStbApplicationDetails).isPresent();
         final StbApplicationDetails stbApplicationDetails = maybeStbApplicationDetails.get();
         final StbSingleApplicationHeader header = stbApplicationDetails.getHeader();
@@ -206,24 +206,30 @@ class PersistentAppsServiceTest extends BaseServiceTest {
         assertThat(versions).isNotNull().containsExactly(new StbVersion().version(applicationRecord.getVersion()));
     }
 
-    private void verifyStbApplicationHeader(StbApplicationHeader header, ApplicationRecord applicationRecord, Localisation localisation) {
+    private void verifyStbApplicationHeader(StbApplicationHeader header,
+                                            ApplicationRecord applicationRecord,
+                                            Localisation localisation) {
         assertThat(header).isNotNull();
         assertThat(header.getCategory()).isEqualTo(Category.fromValue(applicationRecord.getCategory()));
         assertThat(header.getDescription()).isEqualTo(applicationRecord.getDescription());
         assertThat(header.getIcon()).isEqualTo(applicationRecord.getIcon());
         assertThat(header.getName()).isEqualTo(applicationRecord.getName());
         assertThat(header.getType()).isEqualTo(applicationRecord.getType());
+        assertThat(header.getSize()).isEqualTo(applicationRecord.getSize());
         assertThat(header.getVersion()).isEqualTo(applicationRecord.getVersion());
         assertThat(header.getLocalisations()).containsExactly(localisation);
     }
 
-    private void verifyStbSingleApplicationHeader(StbSingleApplicationHeader header, ApplicationRecord applicationRecord, Localisation localisation) {
+    private void verifyStbSingleApplicationHeader(StbSingleApplicationHeader header,
+                                                  ApplicationRecord applicationRecord,
+                                                  Localisation localisation) {
         assertThat(header).isNotNull();
         assertThat(header.getCategory()).isEqualTo(Category.fromValue(applicationRecord.getCategory()));
         assertThat(header.getDescription()).isEqualTo(applicationRecord.getDescription());
         assertThat(header.getIcon()).isEqualTo(applicationRecord.getIcon());
         assertThat(header.getName()).isEqualTo(applicationRecord.getName());
         assertThat(header.getType()).isEqualTo(applicationRecord.getType());
+        assertThat(header.getSize()).isEqualTo(applicationRecord.getSize());
         assertThat(header.getUrl()).isNotNull();
         assertThat(header.getVersion()).isEqualTo(applicationRecord.getVersion());
         assertThat(header.getLocalisations()).containsExactly(localisation);

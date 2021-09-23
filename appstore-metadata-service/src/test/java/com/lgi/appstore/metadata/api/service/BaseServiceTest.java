@@ -109,7 +109,8 @@ public abstract class BaseServiceTest {
                 .setPlatform(JSONB.valueOf(objectMapper.writeValueAsString(platform)))
                 .setVersion(version)
                 .setName(UUID.randomUUID().toString())
-                .setType(UUID.randomUUID().toString());
+                .setType(UUID.randomUUID().toString())
+                .setSize(10000000);
 
         applicationRecord.attach(context.configuration());
         applicationRecord.insert();

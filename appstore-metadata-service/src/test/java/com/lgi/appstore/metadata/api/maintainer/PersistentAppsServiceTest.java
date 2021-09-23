@@ -42,12 +42,12 @@ import com.lgi.appstore.metadata.model.Requirements;
 import com.lgi.appstore.metadata.model.ResultSetMeta;
 import com.lgi.appstore.metadata.util.ApplicationUrlCreator;
 import com.lgi.appstore.metadata.util.JsonProcessorHelper;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 import org.jooq.DSLContext;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -370,6 +370,7 @@ class PersistentAppsServiceTest extends BaseServiceTest {
                 .id(applicationId)
                 .name(UUID.randomUUID().toString())
                 .type(UUID.randomUUID().toString())
+                .size(10000000)
                 .version(version)
                 .localisations(Collections.singletonList(localisation))
                 .visible(true);
@@ -382,13 +383,14 @@ class PersistentAppsServiceTest extends BaseServiceTest {
                 .icon(UUID.randomUUID().toString())
                 .name(UUID.randomUUID().toString())
                 .type(UUID.randomUUID().toString())
+                .size(10000000)
                 .localisations(Collections.singletonList(localisation))
                 .visible(true);
     }
 
     private void verifyMaintainerApplicationDetails(Optional<MaintainerApplicationDetails> maybeMaintainerApplicationDetails,
-            MaintainerRecord maintainerRecord,
-            ApplicationForUpdate applicationForUpdate) {
+                                                    MaintainerRecord maintainerRecord,
+                                                    ApplicationForUpdate applicationForUpdate) {
         assertThat(maybeMaintainerApplicationDetails).isPresent();
         final MaintainerApplicationDetails maintainerApplicationDetails = maybeMaintainerApplicationDetails.get();
         final @NotNull @Valid MaintainerSingleApplicationHeader header = maintainerApplicationDetails.getHeader();
@@ -397,6 +399,7 @@ class PersistentAppsServiceTest extends BaseServiceTest {
                 "name",
                 "description",
                 "type",
+                "size",
                 "category",
                 "localisations",
                 "visible");
@@ -415,8 +418,8 @@ class PersistentAppsServiceTest extends BaseServiceTest {
     }
 
     private void verifyMaintainerApplicationDetails(Optional<MaintainerApplicationDetails> maybeMaintainerApplicationDetails,
-            MaintainerRecord maintainerRecord,
-            Application application) {
+                                                    MaintainerRecord maintainerRecord,
+                                                    Application application) {
         assertThat(maybeMaintainerApplicationDetails).isPresent();
         final MaintainerApplicationDetails maintainerApplicationDetails = maybeMaintainerApplicationDetails.get();
         final @NotNull @Valid MaintainerSingleApplicationHeader header = maintainerApplicationDetails.getHeader();
@@ -439,11 +442,13 @@ class PersistentAppsServiceTest extends BaseServiceTest {
                 .visible(application.getHeader().isVisible()));
     }
 
-    private void verifyMaintainerHeader(MaintainerSingleApplicationHeader header, MaintainerApplicationHeader applicationHeader) {
+    private void verifyMaintainerHeader(MaintainerSingleApplicationHeader header,
+                                        MaintainerApplicationHeader applicationHeader) {
         assertThat(header.getIcon()).isEqualTo(applicationHeader.getIcon());
         assertThat(header.getName()).isEqualTo(applicationHeader.getName());
         assertThat(header.getDescription()).isEqualTo(applicationHeader.getDescription());
         assertThat(header.getUrl()).isNotNull();
+        assertThat(header.getSize()).isNotNull();
         assertThat(header.getCategory()).isEqualTo(applicationHeader.getCategory());
         assertThat(header.getLocalisations()).isEqualTo(applicationHeader.getLocalisations());
         assertThat(header.getId()).isEqualTo(applicationHeader.getId());

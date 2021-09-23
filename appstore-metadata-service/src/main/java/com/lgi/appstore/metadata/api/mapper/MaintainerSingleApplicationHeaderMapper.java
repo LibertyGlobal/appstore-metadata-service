@@ -55,6 +55,7 @@ public class MaintainerSingleApplicationHeaderMapper {
                 .visible(applicationMetadataRecord.get(APPLICATION.VISIBLE))
                 .url(url)
                 .type(applicationMetadataRecord.get(APPLICATION.TYPE))
+                .size(applicationMetadataRecord.get(APPLICATION.SIZE))
                 .category(Category.fromValue(applicationMetadataRecord.get(APPLICATION.CATEGORY)))
                 .localisations(localisations);
     }

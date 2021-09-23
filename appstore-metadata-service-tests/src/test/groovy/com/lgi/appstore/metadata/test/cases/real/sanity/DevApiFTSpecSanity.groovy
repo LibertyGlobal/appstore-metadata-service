@@ -54,6 +54,7 @@ class DevApiFTSpecSanity extends AsmsSanitySpecBase {
         def v1Description = "v1Description"
         def v1Icon = "v1Icon"
         def v1Type = "v1Type"
+        def v1Size = 10000000
         def v1Category = pickRandomCategory()
         def v1PlatformArch = "v1PlatformArch"
         def v1PlatformOs = "v1PlatformOs"
@@ -87,6 +88,7 @@ class DevApiFTSpecSanity extends AsmsSanitySpecBase {
                 .withDescription(v1Description)
                 .withIcon(v1Icon)
                 .withType(v1Type)
+                .withSize(v1Size)
                 .withCategory(v1Category)
                 .withLocalisation(v1Localisation1Name, v1Localisation1Lang, v1Localisation1Description)
                 .withLocalisation(v1Localisation2Name, v1Localisation2Lang, v1Localisation2Description)
@@ -104,6 +106,7 @@ class DevApiFTSpecSanity extends AsmsSanitySpecBase {
         def v2Description = "v2NewDescription"
         def v2Icon = "v2NewIcon"
         def v2Type = "v2NewType"
+        def v2Size = 10000000
         def v2Category = pickRandomCategoryExcluding(v1Category)
         def v2PlatformArch = "v2PlatformArch"
         def v2PlatformOs = "v2PlatformOs"
@@ -136,6 +139,7 @@ class DevApiFTSpecSanity extends AsmsSanitySpecBase {
                 .withDescription(v2Description)
                 .withIcon(v2Icon)
                 .withType(v2Type)
+                .withSize(v2Size)
                 .withCategory(v2Category)
                 .withLocalisation(v2Localisation1Name, v2Localisation1Lang, v2Localisation1Description)
                 .withLocalisation(v2Localisation2Name, v2Localisation2Lang, v2Localisation2Description)
@@ -172,6 +176,7 @@ class DevApiFTSpecSanity extends AsmsSanitySpecBase {
                 .contains(DEFAULT_FIRMWARE_VER)
         field().header().description().from(theBody1) == v1Description
         field().header().type().from(theBody1) == v1Type
+        field().header().size().from(theBody1) == v1Size
         field().header().icon().from(theBody1) == v1Icon
 
         and: "the body exposes localisations section with his details-header"
@@ -231,6 +236,7 @@ class DevApiFTSpecSanity extends AsmsSanitySpecBase {
         field().header().name().from(theBody2) == v2Name
         field().header().description().from(theBody2) == v2Description
         field().header().type().from(theBody2) == v2Type
+        field().header().size().from(theBody2) == v2Size
         field().header().icon().from(theBody2) == v2Icon
 
         and: "the body exposes localisations section with his details-header"

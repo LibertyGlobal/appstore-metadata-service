@@ -45,6 +45,7 @@ public class ApplicationMetadataBuilder {
     private String headerName;
     private String headerDescription;
     private String headerType;
+    private Integer headerSize;
     private String headerIcon;
     private Boolean headerVisible;
     private Category headerCategory;
@@ -55,7 +56,8 @@ public class ApplicationMetadataBuilder {
     private Hardware hardware;
     private Requirements requirements;
 
-    private ApplicationMetadataBuilder() {}
+    private ApplicationMetadataBuilder() {
+    }
 
     public static ApplicationMetadataBuilder builder() {
         return new ApplicationMetadataBuilder();
@@ -78,6 +80,11 @@ public class ApplicationMetadataBuilder {
 
     public ApplicationMetadataBuilder withType(String headerType) {
         this.headerType = headerType;
+        return this;
+    }
+
+    public ApplicationMetadataBuilder withSize(Integer headerSize) {
+        this.headerSize = headerSize;
         return this;
     }
 
@@ -155,6 +162,9 @@ public class ApplicationMetadataBuilder {
             case ApplicationDetailsPath.FIELD_TYPE:
                 headerType = String.valueOf(value);
                 break;
+            case ApplicationDetailsPath.FIELD_SIZE:
+                headerSize = (Integer) value;
+                break;
             case ApplicationDetailsPath.FIELD_ICON:
                 headerIcon = String.valueOf(value);
                 break;
@@ -170,6 +180,7 @@ public class ApplicationMetadataBuilder {
         this.headerVersion = DataUtils.randomAppVersion();
         this.headerDescription = DataUtils.randomAppDescription();
         this.headerType = DataUtils.randomAppHeaderType();
+        this.headerSize = 10000000;
         this.headerIcon = DataUtils.randomAppHeaderIcon();
         this.headerVisible = Boolean.TRUE;
         this.headerCategory = Category.APPLICATION;
@@ -188,6 +199,7 @@ public class ApplicationMetadataBuilder {
         headerCategory = existingHeader.getCategory();
         headerName = existingHeader.getName();
         headerIcon = existingHeader.getIcon();
+        headerSize = existingHeader.getSize();
         headerDescription = existingHeader.getDescription();
         headerLocalisations = copyCollection(existingHeader.getLocalisations(), this::newLocalisation).orElse(null);
         requirements = newRequirements(existingApplication.getRequirements());
@@ -207,6 +219,7 @@ public class ApplicationMetadataBuilder {
                 .name(headerName)
                 .description(headerDescription)
                 .type(headerType)
+                .size(headerSize)
                 .icon(headerIcon)
                 .visible(headerVisible)
                 .localisations(headerLocalisations);
@@ -222,6 +235,7 @@ public class ApplicationMetadataBuilder {
                 .name(headerName)
                 .description(headerDescription)
                 .type(headerType)
+                .size(headerSize)
                 .icon(headerIcon)
                 .visible(headerVisible)
                 .localisations(headerLocalisations);
