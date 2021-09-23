@@ -39,8 +39,8 @@ import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.JSONB;
 import org.jooq.Record1;
+import org.jooq.Record10;
 import org.jooq.Record2;
-import org.jooq.Record9;
 import org.jooq.SelectJoinStep;
 import org.jooq.SortField;
 import org.jooq.Table;
@@ -93,7 +93,7 @@ public class PersistentAppsService implements AppsService {
                 .map(integerRecord1 -> integerRecord1.get(MAINTAINER.ID))
                 .orElseThrow(() -> new MaintainerNotFoundException(maintainerCode));
 
-        final SelectJoinStep<Record9<String, String, String, String, String, Boolean, String, String, JSONB>> from = dslContext
+        final SelectJoinStep<Record10<String, String, String, String, String, Boolean, String, Integer, String, JSONB>> from = dslContext
                 .select(
                         APPLICATION.ID_RDOMAIN,
                         APPLICATION.VERSION,
@@ -102,6 +102,7 @@ public class PersistentAppsService implements AppsService {
                         APPLICATION.DESCRIPTION,
                         APPLICATION.VISIBLE,
                         APPLICATION.TYPE,
+                        APPLICATION.SIZE,
                         APPLICATION.CATEGORY,
                         APPLICATION.LOCALIZATIONS)
                 .from(APPLICATION);
@@ -195,25 +196,26 @@ public class PersistentAppsService implements AppsService {
                 ).collect(Collectors.toList());
 
         return dslContext.select(
-                MAINTAINER.NAME,
-                MAINTAINER.ADDRESS,
-                MAINTAINER.HOMEPAGE,
-                MAINTAINER.EMAIL,
-                APPLICATION.ID_RDOMAIN,
-                APPLICATION.VERSION,
-                APPLICATION.ICON,
-                APPLICATION.NAME,
-                APPLICATION.DESCRIPTION,
-                APPLICATION.VISIBLE,
-                APPLICATION.VERSION,
-                APPLICATION.TYPE,
-                APPLICATION.CATEGORY,
-                APPLICATION.LOCALIZATIONS,
-                APPLICATION.PLATFORM,
-                APPLICATION.HARDWARE,
-                APPLICATION.FEATURES,
-                APPLICATION.DEPENDENCIES
-        )
+                        MAINTAINER.NAME,
+                        MAINTAINER.ADDRESS,
+                        MAINTAINER.HOMEPAGE,
+                        MAINTAINER.EMAIL,
+                        APPLICATION.ID_RDOMAIN,
+                        APPLICATION.VERSION,
+                        APPLICATION.ICON,
+                        APPLICATION.NAME,
+                        APPLICATION.DESCRIPTION,
+                        APPLICATION.VISIBLE,
+                        APPLICATION.VERSION,
+                        APPLICATION.TYPE,
+                        APPLICATION.SIZE,
+                        APPLICATION.CATEGORY,
+                        APPLICATION.LOCALIZATIONS,
+                        APPLICATION.PLATFORM,
+                        APPLICATION.HARDWARE,
+                        APPLICATION.FEATURES,
+                        APPLICATION.DEPENDENCIES
+                )
 
                 .from(MAINTAINER)
                 .innerJoin(APPLICATION)
@@ -241,9 +243,9 @@ public class PersistentAppsService implements AppsService {
                 .orElseThrow(() -> new MaintainerNotFoundException(maintainerCode));
 
         final List<MaintainerVersion> versions = dslContext.select(
-                APPLICATION.VERSION,
-                APPLICATION.VISIBLE
-        )
+                        APPLICATION.VERSION,
+                        APPLICATION.VISIBLE
+                )
 
                 .from(APPLICATION)
                 .where(APPLICATION.ID_RDOMAIN.eq(appId))
@@ -256,24 +258,25 @@ public class PersistentAppsService implements AppsService {
                 ).collect(Collectors.toList());
 
         return dslContext.select(
-                MAINTAINER.NAME,
-                MAINTAINER.ADDRESS,
-                MAINTAINER.HOMEPAGE,
-                MAINTAINER.EMAIL,
-                APPLICATION.ID_RDOMAIN,
-                APPLICATION.VERSION,
-                APPLICATION.VISIBLE,
-                APPLICATION.ICON,
-                APPLICATION.NAME,
-                APPLICATION.DESCRIPTION,
-                APPLICATION.TYPE,
-                APPLICATION.CATEGORY,
-                APPLICATION.LOCALIZATIONS,
-                APPLICATION.PLATFORM,
-                APPLICATION.HARDWARE,
-                APPLICATION.FEATURES,
-                APPLICATION.DEPENDENCIES
-        )
+                        MAINTAINER.NAME,
+                        MAINTAINER.ADDRESS,
+                        MAINTAINER.HOMEPAGE,
+                        MAINTAINER.EMAIL,
+                        APPLICATION.ID_RDOMAIN,
+                        APPLICATION.VERSION,
+                        APPLICATION.VISIBLE,
+                        APPLICATION.ICON,
+                        APPLICATION.NAME,
+                        APPLICATION.DESCRIPTION,
+                        APPLICATION.TYPE,
+                        APPLICATION.SIZE,
+                        APPLICATION.CATEGORY,
+                        APPLICATION.LOCALIZATIONS,
+                        APPLICATION.PLATFORM,
+                        APPLICATION.HARDWARE,
+                        APPLICATION.FEATURES,
+                        APPLICATION.DEPENDENCIES
+                )
 
                 .from(MAINTAINER)
                 .innerJoin(APPLICATION)
@@ -307,20 +310,21 @@ public class PersistentAppsService implements AppsService {
                 final Integer maintainerId = maybeMaintainerId.orElseThrow(() -> new MaintainerNotFoundException(maintainerCode));
 
                 localDslContext.insertInto(APPLICATION,
-                        APPLICATION.MAINTAINER_ID,
-                        APPLICATION.ID_RDOMAIN,
-                        APPLICATION.VERSION,
-                        APPLICATION.VISIBLE,
-                        APPLICATION.NAME,
-                        APPLICATION.DESCRIPTION,
-                        APPLICATION.ICON,
-                        APPLICATION.TYPE,
-                        APPLICATION.CATEGORY,
-                        APPLICATION.PLATFORM,
-                        APPLICATION.HARDWARE,
-                        APPLICATION.FEATURES,
-                        APPLICATION.DEPENDENCIES,
-                        APPLICATION.LOCALIZATIONS)
+                                APPLICATION.MAINTAINER_ID,
+                                APPLICATION.ID_RDOMAIN,
+                                APPLICATION.VERSION,
+                                APPLICATION.VISIBLE,
+                                APPLICATION.NAME,
+                                APPLICATION.DESCRIPTION,
+                                APPLICATION.ICON,
+                                APPLICATION.TYPE,
+                                APPLICATION.SIZE,
+                                APPLICATION.CATEGORY,
+                                APPLICATION.PLATFORM,
+                                APPLICATION.HARDWARE,
+                                APPLICATION.FEATURES,
+                                APPLICATION.DEPENDENCIES,
+                                APPLICATION.LOCALIZATIONS)
                         .values(
                                 maintainerId,
                                 application.getHeader().getId(),
@@ -330,6 +334,7 @@ public class PersistentAppsService implements AppsService {
                                 application.getHeader().getDescription(),
                                 application.getHeader().getIcon(),
                                 application.getHeader().getType(),
+                                application.getHeader().getSize(),
                                 application.getHeader().getCategory().toString(),
                                 JSONB.valueOf(jsonProcessorHelper.writeValueAsString(JsonObjectNames.PLATFORM, application.getRequirements().getPlatform())),
                                 JSONB.valueOf(jsonProcessorHelper.writeValueAsString(JsonObjectNames.HARDWARE, application.getRequirements().getHardware())),
@@ -365,6 +370,7 @@ public class PersistentAppsService implements AppsService {
                             .set(APPLICATION.DESCRIPTION, applicationForUpdate.getHeader().getDescription())
                             .set(APPLICATION.ICON, applicationForUpdate.getHeader().getIcon())
                             .set(APPLICATION.TYPE, applicationForUpdate.getHeader().getType())
+                            .set(APPLICATION.SIZE, applicationForUpdate.getHeader().getSize())
                             .set(APPLICATION.CATEGORY, applicationForUpdate.getHeader().getCategory().toString())
                             .set(APPLICATION.LOCALIZATIONS, JSONB.valueOf(jsonProcessorHelper.writeValueAsString(JsonObjectNames.LOCALIZATIONS, applicationForUpdate.getHeader().getLocalisations())))
 
@@ -402,6 +408,7 @@ public class PersistentAppsService implements AppsService {
                             .set(APPLICATION.DESCRIPTION, applicationForUpdate.getHeader().getDescription())
                             .set(APPLICATION.ICON, applicationForUpdate.getHeader().getIcon())
                             .set(APPLICATION.TYPE, applicationForUpdate.getHeader().getType())
+                            .set(APPLICATION.SIZE, applicationForUpdate.getHeader().getSize())
                             .set(APPLICATION.CATEGORY, applicationForUpdate.getHeader().getCategory().toString())
                             .set(APPLICATION.LOCALIZATIONS, JSONB.valueOf(jsonProcessorHelper.writeValueAsString(JsonObjectNames.LOCALIZATIONS, applicationForUpdate.getHeader().getLocalisations())))
                             .set(APPLICATION.PLATFORM, JSONB.valueOf(jsonProcessorHelper.writeValueAsString(JsonObjectNames.PLATFORM, applicationForUpdate.getRequirements().getPlatform())))

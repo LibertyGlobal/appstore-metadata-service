@@ -45,6 +45,7 @@ import static com.lgi.appstore.metadata.test.framework.model.response.Applicatio
 import static com.lgi.appstore.metadata.test.framework.model.response.ApplicationDetailsPath.FIELD_ICON
 import static com.lgi.appstore.metadata.test.framework.model.response.ApplicationDetailsPath.FIELD_NAME
 import static com.lgi.appstore.metadata.test.framework.model.response.ApplicationDetailsPath.FIELD_TYPE
+import static com.lgi.appstore.metadata.test.framework.model.response.ApplicationDetailsPath.FIELD_SIZE
 import static com.lgi.appstore.metadata.test.framework.model.response.ApplicationDetailsPath.FIELD_URL
 import static com.lgi.appstore.metadata.test.framework.model.response.ApplicationDetailsPath.extract
 import static com.lgi.appstore.metadata.test.framework.model.response.ApplicationDetailsPath.field
@@ -250,6 +251,7 @@ class StbApiFTSpec extends AsmsFeatureSpecBase {
         def v1Description = "Some Description €\\€\\€\\€\\"
         def v1Category = pickRandomCategory()
         def v1Type = "someCustomType"
+        def v1Size = 10000000
         def v1Icon = "//home/alwi/Icon.png"
         def v1PlatformArch = "v1PlatformArch"
         def v1PlatformOs = "v1PlatformOs"
@@ -274,6 +276,7 @@ class StbApiFTSpec extends AsmsFeatureSpecBase {
                 .withDescription(v1Description)
                 .withCategory(v1Category)
                 .withType(v1Type)
+                .withSize(v1Size)
                 .withIcon(v1Icon)
                 .withPlatform(v1PlatformArch, v1PlatformOs, v1PlatformVariant)
                 .withHardware(v1HardwareCache, v1HardwareDmips, v1HardwarePersistent, v1HardwareRam, v1HardwareImage)
@@ -286,8 +289,10 @@ class StbApiFTSpec extends AsmsFeatureSpecBase {
         and: "application has v2 with completely different metadata"
         def v2Name = "v2Name"
         def v2Description = "v2Description"
+        def v2Category = pickRandomCategory()
         def v2Icon = "v2Icon"
         def v2Type = "v2Type"
+        def v2Size = 20000000
         def v2PlatformArch = "v2PlatformArch"
         def v2PlatformOs = "v2PlatformOs"
         def v2PlatformVariant = "v2PlatformVariant"
@@ -309,8 +314,10 @@ class StbApiFTSpec extends AsmsFeatureSpecBase {
         Application appV2 = builder().fromDefaults().withId(appId).withVersion(v2)
                 .withName(v2Name)
                 .withDescription(v2Description)
+                .withCategory(v2Category)
                 .withIcon(v2Icon)
                 .withType(v2Type)
+                .withSize(v2Size)
                 .withPlatform(v2PlatformArch, v2PlatformOs, v2PlatformVariant)
                 .withHardware(v2HardwareCache, v2HardwareDmips, v2HardwarePersistent, v2HardwareRam, v2HardwareImage)
                 .withDependency(v2Dependency1Id, v2Dependency1Version)
@@ -341,6 +348,7 @@ class StbApiFTSpec extends AsmsFeatureSpecBase {
         extract(FIELD_DESCRIPTION).from(theBody1) == v1Description
         extract(FIELD_CATEGORY).from(theBody1) == String.valueOf(v1Category)
         extract(FIELD_TYPE).from(theBody1) == v1Type
+        extract(FIELD_SIZE).from(theBody1) == v1Size
         def url = extract(FIELD_URL).from(theBody1)
         assertThat(url).isNotNull()
                 .isOfAnyClassIn(String.class)
@@ -387,6 +395,12 @@ class StbApiFTSpec extends AsmsFeatureSpecBase {
         then: "the body exposes requested version details"
         field().header().id().from(theBody2) == appId
         field().header().version().from(theBody2) == v2
+        extract(FIELD_NAME).from(theBody2) == v2Name
+        extract(FIELD_DESCRIPTION).from(theBody2) == v2Description
+        extract(FIELD_CATEGORY).from(theBody2) == String.valueOf(v2Category)
+        extract(FIELD_TYPE).from(theBody2) == v2Type
+        extract(FIELD_SIZE).from(theBody2) == v2Size
+        extract(FIELD_ICON).from(theBody2) == v2Icon
 
         and: "the body exposes maintainer section with his details"
         field().maintainer().name().from(theBody2) == DEFAULT_DEV_NAME

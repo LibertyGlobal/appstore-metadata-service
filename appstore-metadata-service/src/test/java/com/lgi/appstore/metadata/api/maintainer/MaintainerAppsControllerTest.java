@@ -104,6 +104,7 @@ class MaintainerAppsControllerTest {
             .type("application/vnd.rdk-app.dac.native")
             .version("0.0.1")
             .icon("default_app_collection.png")
+            .size(10000000)
             .description(
                     "Container contains both Flutter application and Flutter engine running on wayland-egl, developed by Liberty Global while evaluating Google Flutter UI toolkit.")
             .category(Category.APPLICATION)
@@ -115,6 +116,7 @@ class MaintainerAppsControllerTest {
             .type("application/vnd.rdk-app.dac.native")
             .version("3.2.1")
             .icon("wayland.png")
+            .size(10000000)
             .description(
                     "Source code example of simple Wayland EGL application intended as tutorial for developers. Contains the few but necessary setup code for any direct to wayland-egl client application such as how to connect to wayland server, create/use EGL surface and draw on screen via opengles api. Application shows simple rectangle on screen. Applications based on this example should run on the various wayland compositors supporting the wayland-egl protocol out there.")
             .category(Category.APPLICATION)
@@ -126,6 +128,7 @@ class MaintainerAppsControllerTest {
             .type("application/vnd.rdk-app.dac.native")
             .version("1.2.3")
             .icon("default_app_collection.png")
+            .size(10000000)
             .description(
                     "Showcase application from the company youi.tv. The container package contains both the react native application and the You.i TV react native Gfx engine beneath.")
             .category(Category.APPLICATION)
@@ -152,6 +155,7 @@ class MaintainerAppsControllerTest {
             .type("application/vnd.rdk-app.dac.native")
             .version("1.2.3")
             .icon("default_app_collection.png")
+            .size(10000000)
             .description(
                     "Showcase application from the company youi.tv. The container package contains both the react native application and the You.i TV react native Gfx engine beneath.")
             .url("https://us.icr.io/v2/appcontainerstagingrdk/you.i/manifests/latest")
@@ -205,6 +209,7 @@ class MaintainerAppsControllerTest {
                     "      \"description\": \"This is Awesome App\"," +
                     "      \"url\": \"https://$SERVER/appcontainerstagingrdk/Libertyglobal/awesome_oci_image:1.2.3\"," +
                     "      \"type\": \"application/vnd.rdk-app.dac.native\"," +
+                    "      \"size\": \"10000000\"," +
                     "      \"category\": \"application\"," +
                     "      \"localisations\": [" +
                     "        {" +
@@ -254,6 +259,7 @@ class MaintainerAppsControllerTest {
                     "      \"description\": \"This is Awesome App\"," +
                     "      \"url\": \"https://$SERVER/appcontainerstagingrdk/Libertyglobal/awesome_oci_image:1.2.3\"," +
                     "      \"type\": \"application/vnd.rdk-app.dac.native\"," +
+                    "      \"size\": \"10000000\"," +
                     "      \"category\": \"application\"," +
                     "      \"localisations\": [" +
                     "        {" +

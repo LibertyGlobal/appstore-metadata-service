@@ -37,7 +37,7 @@ import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.JSONB;
 import org.jooq.Record1;
-import org.jooq.Record8;
+import org.jooq.Record9;
 import org.jooq.SelectConditionStep;
 import org.jooq.SortField;
 import org.jooq.impl.DSL;
@@ -68,7 +68,7 @@ public class PersistentAppsService implements AppsService {
 
     @Autowired
     public PersistentAppsService(DSLContext dslContext,
-            JsonProcessorHelper jsonProcessorHelper, ApplicationUrlCreator applicationUrlCreator) {
+                                 JsonProcessorHelper jsonProcessorHelper, ApplicationUrlCreator applicationUrlCreator) {
         this.dslContext = dslContext;
         this.jsonProcessorHelper = jsonProcessorHelper;
         this.applicationUrlCreator = applicationUrlCreator;
@@ -76,23 +76,24 @@ public class PersistentAppsService implements AppsService {
 
     @Override
     public StbApplicationsList listApplications(String name,
-            String description,
-            String version,
-            String type,
-            Platform platform,
-            Category category,
-            String maintainerName,
-            Integer offset,
-            Integer limit) {
-        final SelectConditionStep<Record8<String, String, String, String, String, String, String, JSONB>> where = dslContext.select(
-                APPLICATION.ID_RDOMAIN,
-                APPLICATION.VERSION,
-                APPLICATION.ICON,
-                APPLICATION.NAME,
-                APPLICATION.DESCRIPTION,
-                APPLICATION.TYPE,
-                APPLICATION.CATEGORY,
-                APPLICATION.LOCALIZATIONS)
+                                                String description,
+                                                String version,
+                                                String type,
+                                                Platform platform,
+                                                Category category,
+                                                String maintainerName,
+                                                Integer offset,
+                                                Integer limit) {
+        final SelectConditionStep<Record9<String, String, String, String, String, String, Integer, String, JSONB>> where = dslContext.select(
+                        APPLICATION.ID_RDOMAIN,
+                        APPLICATION.VERSION,
+                        APPLICATION.ICON,
+                        APPLICATION.NAME,
+                        APPLICATION.DESCRIPTION,
+                        APPLICATION.TYPE,
+                        APPLICATION.SIZE,
+                        APPLICATION.CATEGORY,
+                        APPLICATION.LOCALIZATIONS)
                 .from(APPLICATION)
                 .leftJoin(MAINTAINER)
                 .on(APPLICATION.MAINTAINER_ID.eq(MAINTAINER.ID))
@@ -156,6 +157,7 @@ public class PersistentAppsService implements AppsService {
                         .name(applicationMetadataRecord.get(APPLICATION.NAME))
                         .description(applicationMetadataRecord.get(APPLICATION.DESCRIPTION))
                         .type(applicationMetadataRecord.get(APPLICATION.TYPE))
+                        .size(applicationMetadataRecord.get(APPLICATION.SIZE))
                         .category(Category.fromValue(applicationMetadataRecord.get(APPLICATION.CATEGORY)))
                         .localisations(jsonProcessorHelper
                                 .readValue(JsonObjectNames.LOCALIZATIONS, applicationMetadataRecord.get(APPLICATION.LOCALIZATIONS).data(),
@@ -181,8 +183,8 @@ public class PersistentAppsService implements AppsService {
     public Optional<StbApplicationDetails> getApplicationDetails(String appId, String version, String platformName, String firmwareVer) {
 
         final List<StbVersion> versions = dslContext.select(
-                APPLICATION.VERSION
-        )
+                        APPLICATION.VERSION
+                )
 
                 .from(APPLICATION)
                 .where(APPLICATION.ID_RDOMAIN.eq(appId))
@@ -193,23 +195,24 @@ public class PersistentAppsService implements AppsService {
                         .version(applicationVersionRecord.get(APPLICATION.VERSION))).collect(Collectors.toList());
 
         return dslContext.select(
-                MAINTAINER.NAME,
-                MAINTAINER.ADDRESS,
-                MAINTAINER.HOMEPAGE,
-                MAINTAINER.EMAIL,
-                APPLICATION.ID_RDOMAIN,
-                APPLICATION.VERSION,
-                APPLICATION.ICON,
-                APPLICATION.NAME,
-                APPLICATION.DESCRIPTION,
-                APPLICATION.TYPE,
-                APPLICATION.CATEGORY,
-                APPLICATION.LOCALIZATIONS,
-                APPLICATION.PLATFORM,
-                APPLICATION.HARDWARE,
-                APPLICATION.FEATURES,
-                APPLICATION.DEPENDENCIES
-        )
+                        MAINTAINER.NAME,
+                        MAINTAINER.ADDRESS,
+                        MAINTAINER.HOMEPAGE,
+                        MAINTAINER.EMAIL,
+                        APPLICATION.ID_RDOMAIN,
+                        APPLICATION.VERSION,
+                        APPLICATION.ICON,
+                        APPLICATION.NAME,
+                        APPLICATION.DESCRIPTION,
+                        APPLICATION.TYPE,
+                        APPLICATION.CATEGORY,
+                        APPLICATION.LOCALIZATIONS,
+                        APPLICATION.PLATFORM,
+                        APPLICATION.HARDWARE,
+                        APPLICATION.FEATURES,
+                        APPLICATION.DEPENDENCIES,
+                        APPLICATION.SIZE
+                )
 
                 .from(MAINTAINER)
                 .innerJoin(APPLICATION)
@@ -230,6 +233,7 @@ public class PersistentAppsService implements AppsService {
                                     platformName,
                                     firmwareVer))
                             .type(applicationMetadataRecord.get(APPLICATION.TYPE))
+                            .size(applicationMetadataRecord.get(APPLICATION.SIZE))
                             .category(Category.fromValue(applicationMetadataRecord.get(APPLICATION.CATEGORY)))
                             .localisations(jsonProcessorHelper
                                     .readValue(JsonObjectNames.LOCALIZATIONS, applicationMetadataRecord.get(APPLICATION.LOCALIZATIONS).data(),
@@ -263,8 +267,8 @@ public class PersistentAppsService implements AppsService {
     @Override
     public Optional<StbApplicationDetails> getApplicationDetails(String appId, String platformName, String firmwareVer) {
         final List<StbVersion> versions = dslContext.select(
-                APPLICATION.VERSION
-        )
+                        APPLICATION.VERSION
+                )
 
                 .from(APPLICATION)
                 .where(APPLICATION.ID_RDOMAIN.eq(appId))
@@ -275,23 +279,24 @@ public class PersistentAppsService implements AppsService {
                         .version(applicationVersionRecord.get(APPLICATION.VERSION))).collect(Collectors.toList());
 
         return dslContext.select(
-                MAINTAINER.NAME,
-                MAINTAINER.ADDRESS,
-                MAINTAINER.HOMEPAGE,
-                MAINTAINER.EMAIL,
-                APPLICATION.ID_RDOMAIN,
-                APPLICATION.VERSION,
-                APPLICATION.ICON,
-                APPLICATION.NAME,
-                APPLICATION.DESCRIPTION,
-                APPLICATION.TYPE,
-                APPLICATION.CATEGORY,
-                APPLICATION.LOCALIZATIONS,
-                APPLICATION.PLATFORM,
-                APPLICATION.HARDWARE,
-                APPLICATION.FEATURES,
-                APPLICATION.DEPENDENCIES
-        )
+                        MAINTAINER.NAME,
+                        MAINTAINER.ADDRESS,
+                        MAINTAINER.HOMEPAGE,
+                        MAINTAINER.EMAIL,
+                        APPLICATION.ID_RDOMAIN,
+                        APPLICATION.VERSION,
+                        APPLICATION.ICON,
+                        APPLICATION.NAME,
+                        APPLICATION.DESCRIPTION,
+                        APPLICATION.TYPE,
+                        APPLICATION.CATEGORY,
+                        APPLICATION.LOCALIZATIONS,
+                        APPLICATION.PLATFORM,
+                        APPLICATION.HARDWARE,
+                        APPLICATION.FEATURES,
+                        APPLICATION.DEPENDENCIES,
+                        APPLICATION.SIZE
+                )
 
                 .from(MAINTAINER)
                 .innerJoin(APPLICATION)
@@ -312,6 +317,7 @@ public class PersistentAppsService implements AppsService {
                                     platformName,
                                     firmwareVer))
                             .type(applicationMetadataRecord.get(APPLICATION.TYPE))
+                            .size(applicationMetadataRecord.get(APPLICATION.SIZE))
                             .category(Category.fromValue(applicationMetadataRecord.get(APPLICATION.CATEGORY)))
                             .localisations(jsonProcessorHelper
                                     .readValue("localizations", applicationMetadataRecord.get(APPLICATION.LOCALIZATIONS).data(), new TypeReference<>() {

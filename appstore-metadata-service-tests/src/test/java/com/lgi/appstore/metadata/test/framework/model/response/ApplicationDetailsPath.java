@@ -30,6 +30,7 @@ public class ApplicationDetailsPath extends PathBase {
     public static final String FIELD_DESCRIPTION = "description";
     public static final String FIELD_URL = "url";
     public static final String FIELD_TYPE = "type";
+    public static final String FIELD_SIZE = "size";
     public static final String FIELD_ICON = "icon";
     public static final String FIELD_CATEGORY = "category";
     public static final String FIELD_LANGUAGE_CODE = "languageCode";
@@ -94,6 +95,11 @@ public class ApplicationDetailsPath extends PathBase {
 
     public ApplicationDetailsPath type() {
         fields.add(FIELD_TYPE);
+        return this;
+    }
+
+    public ApplicationDetailsPath size() {
+        fields.add(FIELD_SIZE);
         return this;
     }
 
@@ -242,6 +248,8 @@ public class ApplicationDetailsPath extends PathBase {
                 return field().header().url();
             case FIELD_TYPE:
                 return field().header().type();
+            case FIELD_SIZE:
+                return field().header().size();
             case FIELD_ICON:
                 return field().header().icon();
             default:

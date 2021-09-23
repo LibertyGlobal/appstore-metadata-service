@@ -104,6 +104,7 @@ curl --location --request POST 'http://localhost:8081/as3/maintainers/lgi/apps' 
             "latest" : true,
             "type": "fancy_applications",
             "category": "application",
+            "size": "10000000",
             "localisations": [
                 {
                     "languageCode": "en",
@@ -172,6 +173,7 @@ Response:
             "name": "FancyApp",
             "description": "Description of Fancy application",
             "type": "fancy_applications",
+            "size": 10000000,
             "category": "application",
             "localisations": [
                 {
