@@ -47,6 +47,7 @@ import static com.lgi.appstore.metadata.test.framework.model.response.Applicatio
 import static com.lgi.appstore.metadata.test.framework.model.response.ApplicationDetailsPath.FIELD_DESCRIPTION
 import static com.lgi.appstore.metadata.test.framework.model.response.ApplicationDetailsPath.FIELD_ICON
 import static com.lgi.appstore.metadata.test.framework.model.response.ApplicationDetailsPath.FIELD_NAME
+import static com.lgi.appstore.metadata.test.framework.model.response.ApplicationDetailsPath.FIELD_OCI_IMAGE_URL
 import static com.lgi.appstore.metadata.test.framework.model.response.ApplicationDetailsPath.FIELD_TYPE
 import static com.lgi.appstore.metadata.test.framework.model.response.ApplicationDetailsPath.FIELD_SIZE
 import static com.lgi.appstore.metadata.test.framework.model.response.ApplicationDetailsPath.FIELD_URL
@@ -96,7 +97,7 @@ class MaintainerApiFTSpec extends AsmsFeatureSpecBase {
         behavior              | appId    | v1      | visible || httpStatus
         "missing id"          | null     | "1.0.0" | false   || SC_BAD_REQUEST
         "missing version"     | randId() | null    | false   || SC_BAD_REQUEST
-        "only mandatory data" | randId() | "1.0.0" | null    || SC_CREATED // mandatory is header having: id, version, type, category, name, icon, requirements (even if only empty)
+        "only mandatory data" | randId() | "1.0.0" | null    || SC_CREATED // mandatory is header having: id, version, type, category, name, icon, ociImageUrl, requirements (even if only empty)
     }
 
     def "second attempt to create same application should be rejected"() {
@@ -207,6 +208,7 @@ class MaintainerApiFTSpec extends AsmsFeatureSpecBase {
 
         and: "application has v1 with some metadata"
         def v1Visible = false
+        def v1OciImageUrl = "v1OciImageUrl"
         def v1Name = "v1Name"
         def v1Description = "v1Description"
         def v1Icon = "v1Icon"
@@ -235,6 +237,7 @@ class MaintainerApiFTSpec extends AsmsFeatureSpecBase {
                 .withId(appId)
                 .withVersion(v1)
                 .withVisible(v1Visible)
+                .withOciImageUrl(v1OciImageUrl)
                 .withName(v1Name)
                 .withDescription(v1Description)
                 .withIcon(v1Icon)
@@ -251,6 +254,7 @@ class MaintainerApiFTSpec extends AsmsFeatureSpecBase {
 
         and: "application has v2 with completely different metadata"
         def v2Visible = true
+        def v2OciImageUrl = "v2OciImageUrl"
         def v2Name = "v2NewName"
         def v2Description = "v2NewDescription"
         def v2Icon = "v2NewIcon"
@@ -278,6 +282,7 @@ class MaintainerApiFTSpec extends AsmsFeatureSpecBase {
         Application appV2 = builder().fromDefaults().withId(appId)
                 .withVersion(v2)
                 .withVisible(v2Visible)
+                .withOciImageUrl(v2OciImageUrl)
                 .withName(v2Name)
                 .withDescription(v2Description)
                 .withIcon(v2Icon)
@@ -308,6 +313,7 @@ class MaintainerApiFTSpec extends AsmsFeatureSpecBase {
         field().header().id().from(theBody1) == appId
         field().header().version().from(theBody1) == v1
         field().header().visible().from(theBody1) == v1Visible
+        field().header().ociImageUrl().from(theBody1) == v1OciImageUrl
         field().header().name().from(theBody1) == v1Name
         field().header().category().from(theBody1) == String.valueOf(v1Category)
         def url = extract(FIELD_URL).from(theBody1)
@@ -365,6 +371,7 @@ class MaintainerApiFTSpec extends AsmsFeatureSpecBase {
         field().header().id().from(theBody2) == appId
         field().header().version().from(theBody2) == v2
         field().header().visible().from(theBody2) == v2Visible
+        field().header().ociImageUrl().from(theBody2) == v2OciImageUrl
         field().header().category().from(theBody2) == String.valueOf(v2Category)
         field().header().name().from(theBody2) == v2Name
         field().header().description().from(theBody2) == v2Description
@@ -440,6 +447,7 @@ class MaintainerApiFTSpec extends AsmsFeatureSpecBase {
         FIELD_TYPE        | "typeBefore"                  || "typeAfter"
         FIELD_SIZE        | 10000000                      || 20000000
         FIELD_ICON        | "c:\\Icon.before.png"         || "//home/alwi/Icon.after"
+        FIELD_OCI_IMAGE_URL        | "myregistry.local:5000/testing/before"         || "myregistry.local:5000/testing/after"
     }
 
     @Unroll
@@ -499,6 +507,7 @@ class MaintainerApiFTSpec extends AsmsFeatureSpecBase {
         FIELD_TYPE        | "typeBefore"                  || "typeAfter"
         FIELD_SIZE        | 10000000                      || 20000000
         FIELD_ICON        | "c:\\Icon.before.png"         || "//home/alwi/Icon.after"
+        FIELD_OCI_IMAGE_URL        | "myregistry.local:5000/testing/before"         || "myregistry.local:5000/testing/after"
     }
 
     @Unroll

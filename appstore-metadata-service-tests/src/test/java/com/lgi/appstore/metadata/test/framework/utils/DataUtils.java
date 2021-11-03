@@ -168,4 +168,8 @@ public class DataUtils {
     public static String newTestSessionId() {
         return FAKER.code().isbn10(true);
     }
+
+    public static String randomOciImageUrl() {
+        return FAKER.internet().url();
+    }
 }

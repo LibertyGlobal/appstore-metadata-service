@@ -137,7 +137,8 @@ curl -v -X POST -H "Content-type: application/json" -d '{
     ],
     "id": "com.libertyglobal.app.awesome",
     "version": "1.2.3",
-    "visible": true
+    "visible": true,
+    "ociImageUrl": "myregistry.local:5000/testing/test-image"
   },
   "requirements": {
     "platform": {
@@ -178,7 +179,8 @@ curl -v -X POST -H "Content-type: application/json" -d '{
     ],
     "id": "com.libertyglobal.app.youi",
     "version": "1.2.3",
-    "visible": true
+    "visible": true,
+    "ociImageUrl": "myregistry.local:5000/testing/test-image"
   },
   "requirements": {
     "platform": {
@@ -213,7 +215,8 @@ curl -v -X POST -H "Content-type: application/json" -d '{
     ],
     "id": "com.libertyglobal.app.flutter",
     "version": "0.0.1",
-    "visible": true
+    "visible": true,
+    "ociImageUrl": "myregistry.local:5000/testing/test-image"
   },
   "requirements": {
     "platform": {

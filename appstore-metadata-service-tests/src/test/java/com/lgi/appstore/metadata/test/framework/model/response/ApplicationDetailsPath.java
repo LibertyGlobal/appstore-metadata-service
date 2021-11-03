@@ -25,8 +25,10 @@ public class ApplicationDetailsPath extends PathBase {
 
     private static final String FIELD_ID = "id";
     public static final String FIELD_VERSION = "version";
+    public static final String FIELD_OCI_IMAGE_URL = "ociImageUrl";
     public static final String FIELD_VISIBLE = "visible";
     public static final String FIELD_NAME = "name";
+    public static final String FIELD_CODE = "code";
     public static final String FIELD_DESCRIPTION = "description";
     public static final String FIELD_URL = "url";
     public static final String FIELD_TYPE = "type";
@@ -78,8 +80,18 @@ public class ApplicationDetailsPath extends PathBase {
         return this;
     }
 
+    public ApplicationDetailsPath ociImageUrl() {
+        fields.add(FIELD_OCI_IMAGE_URL);
+        return this;
+    }
+
     public ApplicationDetailsPath name() {
         fields.add(FIELD_NAME);
+        return this;
+    }
+
+    public ApplicationDetailsPath code() {
+        fields.add(FIELD_CODE);
         return this;
     }
 
@@ -234,6 +246,8 @@ public class ApplicationDetailsPath extends PathBase {
         switch (field) {
             case FIELD_VISIBLE:
                 return field().header().visible();
+            case FIELD_OCI_IMAGE_URL:
+                return field().header().ociImageUrl();
             case FIELD_VERSION:
                 return field().header().version();
             case FIELD_ID:
