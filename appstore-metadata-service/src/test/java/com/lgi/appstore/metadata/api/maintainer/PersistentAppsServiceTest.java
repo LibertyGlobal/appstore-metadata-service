@@ -373,7 +373,8 @@ class PersistentAppsServiceTest extends BaseServiceTest {
                 .size(10000000)
                 .version(version)
                 .localisations(Collections.singletonList(localisation))
-                .visible(true);
+                .visible(true)
+                .ociImageUrl("OCI_IMAGE_URL");
     }
 
     private ApplicationHeaderForUpdate createRandomApplicationHeaderForUpdate(Localisation localisation) {
@@ -385,7 +386,8 @@ class PersistentAppsServiceTest extends BaseServiceTest {
                 .type(UUID.randomUUID().toString())
                 .size(10000000)
                 .localisations(Collections.singletonList(localisation))
-                .visible(true);
+                .visible(true)
+                .ociImageUrl("UPDATED_OCI_IMAGE_URL");
     }
 
     private void verifyMaintainerApplicationDetails(Optional<MaintainerApplicationDetails> maybeMaintainerApplicationDetails,
@@ -402,7 +404,8 @@ class PersistentAppsServiceTest extends BaseServiceTest {
                 "size",
                 "category",
                 "localisations",
-                "visible");
+                "visible",
+                "ociImageUrl");
         final Maintainer maintainer = maintainerApplicationDetails.getMaintainer();
         assertThat(maintainer).isNotNull();
         assertThat(maintainer.getAddress()).isEqualTo(maintainerRecord.getAddress());
@@ -454,5 +457,6 @@ class PersistentAppsServiceTest extends BaseServiceTest {
         assertThat(header.getId()).isEqualTo(applicationHeader.getId());
         assertThat(header.getVersion()).isEqualTo(applicationHeader.getVersion());
         assertThat(header.isVisible()).isEqualTo(applicationHeader.isVisible());
+        assertThat(header.getOciImageUrl()).isEqualTo(applicationHeader.getOciImageUrl());
     }
 }

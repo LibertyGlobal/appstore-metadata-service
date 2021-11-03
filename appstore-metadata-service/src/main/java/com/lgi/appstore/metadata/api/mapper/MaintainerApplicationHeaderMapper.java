@@ -53,6 +53,7 @@ public class MaintainerApplicationHeaderMapper {
                 .name(applicationMetadataRecord.get(APPLICATION.NAME))
                 .description(applicationMetadataRecord.get(APPLICATION.DESCRIPTION))
                 .visible(applicationMetadataRecord.get(APPLICATION.VISIBLE))
+                .ociImageUrl(applicationMetadataRecord.get(APPLICATION.OCI_IMAGE_URL))
                 .type(applicationMetadataRecord.get(APPLICATION.TYPE))
                 .size(applicationMetadataRecord.get(APPLICATION.SIZE))
                 .category(Category.fromValue(applicationMetadataRecord.get(APPLICATION.CATEGORY)))

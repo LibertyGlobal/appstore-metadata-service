@@ -195,6 +195,7 @@ public class PersistentAppsService implements AppsService {
                         .version(applicationVersionRecord.get(APPLICATION.VERSION))).collect(Collectors.toList());
 
         return dslContext.select(
+                        MAINTAINER.CODE,
                         MAINTAINER.NAME,
                         MAINTAINER.ADDRESS,
                         MAINTAINER.HOMEPAGE,
@@ -243,6 +244,7 @@ public class PersistentAppsService implements AppsService {
                     return new StbApplicationDetails()
                             .header(applicationHeader)
                             .maintainer(new com.lgi.appstore.metadata.model.Maintainer()
+                                    .code(applicationMetadataRecord.get(MAINTAINER.CODE))
                                     .name(applicationMetadataRecord.get(MAINTAINER.NAME))
                                     .address(applicationMetadataRecord.get(MAINTAINER.ADDRESS))
                                     .homepage(applicationMetadataRecord.get(MAINTAINER.HOMEPAGE))
@@ -279,6 +281,7 @@ public class PersistentAppsService implements AppsService {
                         .version(applicationVersionRecord.get(APPLICATION.VERSION))).collect(Collectors.toList());
 
         return dslContext.select(
+                        MAINTAINER.CODE,
                         MAINTAINER.NAME,
                         MAINTAINER.ADDRESS,
                         MAINTAINER.HOMEPAGE,
@@ -326,6 +329,7 @@ public class PersistentAppsService implements AppsService {
                     return new StbApplicationDetails()
                             .header(applicationHeader)
                             .maintainer(new com.lgi.appstore.metadata.model.Maintainer()
+                                    .code(applicationMetadataRecord.get(MAINTAINER.CODE))
                                     .name(applicationMetadataRecord.get(MAINTAINER.NAME))
                                     .address(applicationMetadataRecord.get(MAINTAINER.ADDRESS))
                                     .homepage(applicationMetadataRecord.get(MAINTAINER.HOMEPAGE))

@@ -22,7 +22,7 @@ openapi: 3.0.0
 info:
   title: ASMS API
   description: AppStore Metadata Service REST API. MAS API in RDK.
-  version: 0.2.0
+  version: 0.3.0
   license:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
@@ -721,22 +721,34 @@ components:
         - type: object
           required:
             - visible
+            - ociImageUrl
           properties:
             visible:
               type: boolean
               description: Visible version attribute
               example: true
+            ociImageUrl:
+              type: string
+              description: OCI Image URL
+              example: "myregistry.local:5000/testing/test-image"
+              pattern: '^(?!\s*$).+' # validate for non-empty string
     ApplicationHeaderForUpdate:
       allOf:
         - $ref: '#/components/schemas/ApplicationHeader'
         - type: object
           required:
             - visible
+            - ociImageUrl
           properties:
             visible:
               type: boolean
               description: Visible version attribute
               example: true
+            ociImageUrl:
+              type: string
+              description: OCI Image URL
+              example: "myregistry.local:5000/testing/test-image"
+              pattern: '^(?!\s*$).+' # validate for non-empty string
     StbApplicationDetails:
       type: object
       required:

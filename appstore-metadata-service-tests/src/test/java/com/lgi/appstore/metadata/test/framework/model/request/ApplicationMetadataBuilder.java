@@ -48,6 +48,7 @@ public class ApplicationMetadataBuilder {
     private Integer headerSize;
     private String headerIcon;
     private Boolean headerVisible;
+    private String headerOciImageUrl;
     private Category headerCategory;
     private List<Localisation> headerLocalisations;
     private Platform platform;
@@ -108,6 +109,11 @@ public class ApplicationMetadataBuilder {
         return this;
     }
 
+    public ApplicationMetadataBuilder withOciImageUrl(String headerOciImageUrl) {
+        this.headerOciImageUrl = headerOciImageUrl;
+        return this;
+    }
+
     public ApplicationMetadataBuilder withLocalisation(String name, String languageCode, String description) {
         if (headerLocalisations == null) {
             headerLocalisations = new ArrayList<>();
@@ -150,6 +156,9 @@ public class ApplicationMetadataBuilder {
             case ApplicationDetailsPath.FIELD_VISIBLE:
                 headerVisible = Boolean.valueOf(String.valueOf(value));
                 break;
+            case ApplicationDetailsPath.FIELD_OCI_IMAGE_URL:
+                headerOciImageUrl = String.valueOf(value);
+                break;
             case ApplicationDetailsPath.FIELD_NAME:
                 headerName = String.valueOf(value);
                 break;
@@ -183,6 +192,7 @@ public class ApplicationMetadataBuilder {
         this.headerSize = 10000000;
         this.headerIcon = DataUtils.randomAppHeaderIcon();
         this.headerVisible = Boolean.TRUE;
+        this.headerOciImageUrl = DataUtils.randomOciImageUrl();
         this.headerCategory = Category.APPLICATION;
         this.platform = new Platform().architecture(DataUtils.randomPlatformArch()).os(DataUtils.randomPlatformOs());
 
@@ -195,6 +205,7 @@ public class ApplicationMetadataBuilder {
         headerId = existingHeader.getId();
         headerVersion = existingHeader.getVersion();
         headerVisible = existingHeader.isVisible();
+        headerOciImageUrl = existingHeader.getOciImageUrl();
         headerType = existingHeader.getType();
         headerCategory = existingHeader.getCategory();
         headerName = existingHeader.getName();
@@ -222,6 +233,7 @@ public class ApplicationMetadataBuilder {
                 .size(headerSize)
                 .icon(headerIcon)
                 .visible(headerVisible)
+                .ociImageUrl(headerOciImageUrl)
                 .localisations(headerLocalisations);
 
         return new Application()
@@ -238,6 +250,7 @@ public class ApplicationMetadataBuilder {
                 .size(headerSize)
                 .icon(headerIcon)
                 .visible(headerVisible)
+                .ociImageUrl(headerOciImageUrl)
                 .localisations(headerLocalisations);
 
         return new ApplicationForUpdate()

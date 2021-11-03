@@ -39,7 +39,7 @@ import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.JSONB;
 import org.jooq.Record1;
-import org.jooq.Record10;
+import org.jooq.Record11;
 import org.jooq.Record2;
 import org.jooq.SelectJoinStep;
 import org.jooq.SortField;
@@ -93,7 +93,7 @@ public class PersistentAppsService implements AppsService {
                 .map(integerRecord1 -> integerRecord1.get(MAINTAINER.ID))
                 .orElseThrow(() -> new MaintainerNotFoundException(maintainerCode));
 
-        final SelectJoinStep<Record10<String, String, String, String, String, Boolean, String, Integer, String, JSONB>> from = dslContext
+        final SelectJoinStep<Record11<String, String, String, String, String, Boolean, String, String, Integer, String, JSONB>> from = dslContext
                 .select(
                         APPLICATION.ID_RDOMAIN,
                         APPLICATION.VERSION,
@@ -101,6 +101,7 @@ public class PersistentAppsService implements AppsService {
                         APPLICATION.NAME,
                         APPLICATION.DESCRIPTION,
                         APPLICATION.VISIBLE,
+                        APPLICATION.OCI_IMAGE_URL,
                         APPLICATION.TYPE,
                         APPLICATION.SIZE,
                         APPLICATION.CATEGORY,
@@ -206,6 +207,7 @@ public class PersistentAppsService implements AppsService {
                         APPLICATION.NAME,
                         APPLICATION.DESCRIPTION,
                         APPLICATION.VISIBLE,
+                        APPLICATION.OCI_IMAGE_URL,
                         APPLICATION.VERSION,
                         APPLICATION.TYPE,
                         APPLICATION.SIZE,
@@ -265,6 +267,7 @@ public class PersistentAppsService implements AppsService {
                         APPLICATION.ID_RDOMAIN,
                         APPLICATION.VERSION,
                         APPLICATION.VISIBLE,
+                        APPLICATION.OCI_IMAGE_URL,
                         APPLICATION.ICON,
                         APPLICATION.NAME,
                         APPLICATION.DESCRIPTION,
@@ -314,6 +317,7 @@ public class PersistentAppsService implements AppsService {
                                 APPLICATION.ID_RDOMAIN,
                                 APPLICATION.VERSION,
                                 APPLICATION.VISIBLE,
+                                APPLICATION.OCI_IMAGE_URL,
                                 APPLICATION.NAME,
                                 APPLICATION.DESCRIPTION,
                                 APPLICATION.ICON,
@@ -330,6 +334,7 @@ public class PersistentAppsService implements AppsService {
                                 application.getHeader().getId(),
                                 application.getHeader().getVersion(),
                                 application.getHeader().isVisible(),
+                                application.getHeader().getOciImageUrl(),
                                 application.getHeader().getName(),
                                 application.getHeader().getDescription(),
                                 application.getHeader().getIcon(),
@@ -366,6 +371,7 @@ public class PersistentAppsService implements AppsService {
 
                     final int affectedRows = localDslContext.update(APPLICATION)
                             .set(APPLICATION.VISIBLE, applicationForUpdate.getHeader().isVisible())
+                            .set(APPLICATION.OCI_IMAGE_URL, applicationForUpdate.getHeader().getOciImageUrl())
                             .set(APPLICATION.NAME, applicationForUpdate.getHeader().getName())
                             .set(APPLICATION.DESCRIPTION, applicationForUpdate.getHeader().getDescription())
                             .set(APPLICATION.ICON, applicationForUpdate.getHeader().getIcon())
@@ -404,6 +410,7 @@ public class PersistentAppsService implements AppsService {
 
                     final int affectedRows = localDslContext.update(APPLICATION)
                             .set(APPLICATION.VISIBLE, applicationForUpdate.getHeader().isVisible())
+                            .set(APPLICATION.OCI_IMAGE_URL, applicationForUpdate.getHeader().getOciImageUrl())
                             .set(APPLICATION.NAME, applicationForUpdate.getHeader().getName())
                             .set(APPLICATION.DESCRIPTION, applicationForUpdate.getHeader().getDescription())
                             .set(APPLICATION.ICON, applicationForUpdate.getHeader().getIcon())

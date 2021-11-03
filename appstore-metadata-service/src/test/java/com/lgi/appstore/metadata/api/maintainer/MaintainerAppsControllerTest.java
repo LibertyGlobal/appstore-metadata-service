@@ -37,6 +37,8 @@ import com.lgi.appstore.metadata.model.ResultSetMeta;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -204,6 +206,7 @@ class MaintainerAppsControllerTest {
                     "      \"icon\": \"https://libertyglobal.com/s/apps/com.libertyglobal.app.awesome/1.2.3/image/1920x1080/icon.png\"," +
                     "      \"version\": \"1.2.3\"," +
                     "      \"visible\": true," +
+                    "      \"ociImageUrl\": \"${OCI_IMAGE_URL}\"," +
                     "      \"latest\": true," +
                     "      \"name\": \"Awesome Application\"," +
                     "      \"description\": \"This is Awesome App\"," +
@@ -254,6 +257,7 @@ class MaintainerAppsControllerTest {
                     "      \"id\": \"com.libertyglobal.app.awesome\"," +
                     "      \"icon\": \"https://libertyglobal.com/s/apps/com.libertyglobal.app.awesome/1.2.3/image/1920x1080/icon.png\"," +
                     "      \"visible\": true," +
+                    "      \"ociImageUrl\": \"ociImageUrl\"," +
                     "      \"latest\": true," +
                     "      \"name\": \"Awesome Application\"," +
                     "      \"description\": \"This is Awesome App\"," +
@@ -667,6 +671,43 @@ class MaintainerAppsControllerTest {
         // then
         assertThat(response.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
         assertThat(response.getContentAsString()).isEqualTo("{\"message\":\"[header.version: must not be null]\"}");
+    }
+
+    @Test
+    void cannotAddApplicationWithoutOciImageUrl() throws Exception {
+        // given
+        String aNull = CORRECT_APPLICATION_AS_JSON.replace("\"${OCI_IMAGE_URL}\"", "null");
+        // when
+        MockHttpServletResponse response = mvc
+                .perform(
+                        post("/maintainers/{maintainerCode}/apps", MAINTAINER_CODE)
+                                .content(aNull)
+                                .contentType(MediaType.APPLICATION_JSON))
+                .andReturn()
+                .getResponse();
+
+        // then
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.getContentAsString()).isEqualTo("{\"message\":\"[header.ociImageUrl: must not be null]\"}");
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"", "  ", "     "})
+    void cannotAddApplicationWithBlankOciImageUrl(String ociImageUrl) throws Exception {
+        // given
+        String aNull = CORRECT_APPLICATION_AS_JSON.replace("\"${OCI_IMAGE_URL}\"", "\"" + ociImageUrl + "\"");
+        // when
+        MockHttpServletResponse response = mvc
+                .perform(
+                        post("/maintainers/{maintainerCode}/apps", MAINTAINER_CODE)
+                                .content(aNull)
+                                .contentType(MediaType.APPLICATION_JSON))
+                .andReturn()
+                .getResponse();
+
+        // then
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.getContentAsString()).isEqualTo("{\"message\":\"[header.ociImageUrl: must match \\\"^(?!\\\\s*$).+\\\"]\"}");
     }
 
     @Test

@@ -358,6 +358,7 @@ class StbApiFTSpec extends AsmsFeatureSpecBase {
         extract(FIELD_ICON).from(theBody1) == v1Icon
 
         and: "the body exposes maintainer section with his details"
+        field().maintainer().code().from(theBody1) == DEFAULT_DEV_CODE
         field().maintainer().name().from(theBody1) == DEFAULT_DEV_NAME
         field().maintainer().address().from(theBody1) == DEFAULT_DEV_ADDRESS
         field().maintainer().homepage().from(theBody1) == DEFAULT_DEV_HOMEPAGE
@@ -367,6 +368,9 @@ class StbApiFTSpec extends AsmsFeatureSpecBase {
         assertThat(field().versions().from(theBody1)).asList().hasSize(2) // 3rd hidden version should not be exposed
         assertThat(field().versions().version().from(theBody1)).asList().containsExactly(v2, v1)
         assertThat(field().versions().visible().from(theBody1)).asList().containsExactly(null, null) // 'visible' field should not be exposed
+
+        and: "the body does not expose ociImageUrl"
+        field().header().ociImageUrl().from(theBody1) == null
 
         and: "the body exposes requirements section with dependencies information"
         assertThat(field().requirements().dependencies().id().from(theBody1)).asList().containsExactlyInAnyOrder(v1Dependency1Id, v1Dependency2Id)
@@ -402,7 +406,11 @@ class StbApiFTSpec extends AsmsFeatureSpecBase {
         extract(FIELD_SIZE).from(theBody2) == v2Size
         extract(FIELD_ICON).from(theBody2) == v2Icon
 
+        and: "the body does not expose ociImageUrl"
+        field().header().ociImageUrl().from(theBody2) == null
+
         and: "the body exposes maintainer section with his details"
+        field().maintainer().code().from(theBody1) == DEFAULT_DEV_CODE
         field().maintainer().name().from(theBody2) == DEFAULT_DEV_NAME
         field().maintainer().address().from(theBody2) == DEFAULT_DEV_ADDRESS
         field().maintainer().homepage().from(theBody2) == DEFAULT_DEV_HOMEPAGE
