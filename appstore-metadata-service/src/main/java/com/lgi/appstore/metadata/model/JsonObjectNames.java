@@ -27,5 +27,5 @@ public abstract class JsonObjectNames {
     public static final String HARDWARE = "hardware";
     public static final String FEATURES = "features";
     public static final String DEPENDENCIES = "dependencies";
-    public static final String LOCALIZATIONS = "localizations";
+    public static final String LOCALIZATIONS = "localization";
 }

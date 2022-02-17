@@ -29,7 +29,7 @@ import com.lgi.appstore.metadata.model.Category;
 import com.lgi.appstore.metadata.model.Dependency;
 import com.lgi.appstore.metadata.model.Feature;
 import com.lgi.appstore.metadata.model.Hardware;
-import com.lgi.appstore.metadata.model.Localisation;
+import com.lgi.appstore.metadata.model.Localization;
 import com.lgi.appstore.metadata.model.Maintainer;
 import com.lgi.appstore.metadata.model.MaintainerApplicationDetails;
 import com.lgi.appstore.metadata.model.MaintainerApplicationHeader;
@@ -139,7 +139,7 @@ class PersistentAppsServiceTest extends BaseServiceTest {
                 .platform(createRandomPlatform())
                 .dependencies(Collections.singletonList(createRandomDependency()))
                 .features(Collections.singletonList(createRandomFeature()));
-        final MaintainerApplicationHeader maintainerApplicationHeader = createRandomMaintainerApplicationHeader(createRandomLocalisation());
+        final MaintainerApplicationHeader maintainerApplicationHeader = createRandomMaintainerApplicationHeader(createRandomLocalization());
         final Application application = new Application()
                 .requirements(requirements)
                 .header(maintainerApplicationHeader);
@@ -159,7 +159,7 @@ class PersistentAppsServiceTest extends BaseServiceTest {
                 .platform(createRandomPlatform())
                 .dependencies(Collections.singletonList(createRandomDependency()))
                 .features(Collections.singletonList(createRandomFeature()));
-        final MaintainerApplicationHeader maintainerApplicationHeader = createRandomMaintainerApplicationHeader(createRandomLocalisation());
+        final MaintainerApplicationHeader maintainerApplicationHeader = createRandomMaintainerApplicationHeader(createRandomLocalization());
         final Application application = new Application()
                 .requirements(requirements)
                 .header(maintainerApplicationHeader);
@@ -176,7 +176,7 @@ class PersistentAppsServiceTest extends BaseServiceTest {
                 .platform(createRandomPlatform())
                 .dependencies(Collections.singletonList(createRandomDependency()))
                 .features(Collections.singletonList(createRandomFeature()));
-        final MaintainerApplicationHeader maintainerApplicationHeader = createRandomMaintainerApplicationHeader(createRandomLocalisation());
+        final MaintainerApplicationHeader maintainerApplicationHeader = createRandomMaintainerApplicationHeader(createRandomLocalization());
         final Application application = new Application()
                 .requirements(requirements)
                 .header(maintainerApplicationHeader);
@@ -191,7 +191,7 @@ class PersistentAppsServiceTest extends BaseServiceTest {
                 .dependencies(Collections.singletonList(createRandomDependency()))
                 .features(Collections.singletonList(createRandomFeature()));
         applicationForUpdate.setRequirements(updatedRequirements);
-        final ApplicationHeaderForUpdate applicationHeaderForUpdate = createRandomApplicationHeaderForUpdate(createRandomLocalisation());
+        final ApplicationHeaderForUpdate applicationHeaderForUpdate = createRandomApplicationHeaderForUpdate(createRandomLocalization());
         applicationForUpdate.setHeader(applicationHeaderForUpdate);
 
         appsService.updateLatestApplication(maintainerCode, maintainerApplicationHeader.getId(), applicationForUpdate);
@@ -217,7 +217,7 @@ class PersistentAppsServiceTest extends BaseServiceTest {
                 .dependencies(Collections.singletonList(createRandomDependency()))
                 .features(Collections.singletonList(createRandomFeature()));
         applicationForUpdate.setRequirements(updatedRequirements);
-        final ApplicationHeaderForUpdate applicationHeaderForUpdate = createRandomApplicationHeaderForUpdate(createRandomLocalisation());
+        final ApplicationHeaderForUpdate applicationHeaderForUpdate = createRandomApplicationHeaderForUpdate(createRandomLocalization());
         applicationForUpdate.setHeader(applicationHeaderForUpdate);
 
         appsService.updateApplication(maintainerCode, maintainerApplicationHeader.getId(), maintainerApplicationHeader.getVersion(), applicationForUpdate);
@@ -348,8 +348,8 @@ class PersistentAppsServiceTest extends BaseServiceTest {
                 .platform(platform)
                 .dependencies(Collections.singletonList(dependency))
                 .features(Collections.singletonList(feature));
-        final Localisation localisation = createRandomLocalisation();
-        final MaintainerApplicationHeader maintainerApplicationHeader = createRandomMaintainerApplicationHeader(localisation, applicationId, version);
+        final Localization localization = createRandomLocalization();
+        final MaintainerApplicationHeader maintainerApplicationHeader = createRandomMaintainerApplicationHeader(localization, applicationId, version);
         final Application application = new Application()
                 .requirements(requirements)
                 .header(maintainerApplicationHeader);
@@ -358,11 +358,11 @@ class PersistentAppsServiceTest extends BaseServiceTest {
         return application;
     }
 
-    private MaintainerApplicationHeader createRandomMaintainerApplicationHeader(Localisation localisation) {
-        return createRandomMaintainerApplicationHeader(localisation, UUID.randomUUID().toString(), DEFAULT_VERSION);
+    private MaintainerApplicationHeader createRandomMaintainerApplicationHeader(Localization localization) {
+        return createRandomMaintainerApplicationHeader(localization, UUID.randomUUID().toString(), DEFAULT_VERSION);
     }
 
-    private MaintainerApplicationHeader createRandomMaintainerApplicationHeader(Localisation localisation, String applicationId, String version) {
+    private MaintainerApplicationHeader createRandomMaintainerApplicationHeader(Localization localization, String applicationId, String version) {
         return new MaintainerApplicationHeader()
                 .category(Category.APPLICATION)
                 .description(UUID.randomUUID().toString())
@@ -372,12 +372,12 @@ class PersistentAppsServiceTest extends BaseServiceTest {
                 .type(UUID.randomUUID().toString())
                 .size(10000000)
                 .version(version)
-                .localisations(Collections.singletonList(localisation))
+                .localization(Collections.singletonList(localization))
                 .visible(true)
                 .ociImageUrl("OCI_IMAGE_URL");
     }
 
-    private ApplicationHeaderForUpdate createRandomApplicationHeaderForUpdate(Localisation localisation) {
+    private ApplicationHeaderForUpdate createRandomApplicationHeaderForUpdate(Localization localization) {
         return new ApplicationHeaderForUpdate()
                 .category(Category.APPLICATION)
                 .description(UUID.randomUUID().toString())
@@ -385,7 +385,7 @@ class PersistentAppsServiceTest extends BaseServiceTest {
                 .name(UUID.randomUUID().toString())
                 .type(UUID.randomUUID().toString())
                 .size(10000000)
-                .localisations(Collections.singletonList(localisation))
+                .localization(Collections.singletonList(localization))
                 .visible(true)
                 .ociImageUrl("UPDATED_OCI_IMAGE_URL");
     }
@@ -403,7 +403,7 @@ class PersistentAppsServiceTest extends BaseServiceTest {
                 "type",
                 "size",
                 "category",
-                "localisations",
+                "localization",
                 "visible",
                 "ociImageUrl");
         final Maintainer maintainer = maintainerApplicationDetails.getMaintainer();
@@ -453,7 +453,7 @@ class PersistentAppsServiceTest extends BaseServiceTest {
         assertThat(header.getUrl()).isNotNull();
         assertThat(header.getSize()).isNotNull();
         assertThat(header.getCategory()).isEqualTo(applicationHeader.getCategory());
-        assertThat(header.getLocalisations()).isEqualTo(applicationHeader.getLocalisations());
+        assertThat(header.getLocalization()).isEqualTo(applicationHeader.getLocalization());
         assertThat(header.getId()).isEqualTo(applicationHeader.getId());
         assertThat(header.getVersion()).isEqualTo(applicationHeader.getVersion());
         assertThat(header.isVisible()).isEqualTo(applicationHeader.isVisible());

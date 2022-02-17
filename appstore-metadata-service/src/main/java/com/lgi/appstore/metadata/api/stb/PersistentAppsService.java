@@ -159,7 +159,7 @@ public class PersistentAppsService implements AppsService {
                         .type(applicationMetadataRecord.get(APPLICATION.TYPE))
                         .size(applicationMetadataRecord.get(APPLICATION.SIZE))
                         .category(Category.fromValue(applicationMetadataRecord.get(APPLICATION.CATEGORY)))
-                        .localisations(jsonProcessorHelper
+                        .localization(jsonProcessorHelper
                                 .readValue(JsonObjectNames.LOCALIZATIONS, applicationMetadataRecord.get(APPLICATION.LOCALIZATIONS).data(),
                                         new TypeReference<>() {
                                         })))
@@ -236,7 +236,7 @@ public class PersistentAppsService implements AppsService {
                             .type(applicationMetadataRecord.get(APPLICATION.TYPE))
                             .size(applicationMetadataRecord.get(APPLICATION.SIZE))
                             .category(Category.fromValue(applicationMetadataRecord.get(APPLICATION.CATEGORY)))
-                            .localisations(jsonProcessorHelper
+                            .localization(jsonProcessorHelper
                                     .readValue(JsonObjectNames.LOCALIZATIONS, applicationMetadataRecord.get(APPLICATION.LOCALIZATIONS).data(),
                                             new TypeReference<>() {
                                             }));
@@ -322,8 +322,8 @@ public class PersistentAppsService implements AppsService {
                             .type(applicationMetadataRecord.get(APPLICATION.TYPE))
                             .size(applicationMetadataRecord.get(APPLICATION.SIZE))
                             .category(Category.fromValue(applicationMetadataRecord.get(APPLICATION.CATEGORY)))
-                            .localisations(jsonProcessorHelper
-                                    .readValue("localizations", applicationMetadataRecord.get(APPLICATION.LOCALIZATIONS).data(), new TypeReference<>() {
+                            .localization(jsonProcessorHelper
+                                    .readValue(JsonObjectNames.LOCALIZATIONS, applicationMetadataRecord.get(APPLICATION.LOCALIZATIONS).data(), new TypeReference<>() {
                                     }));
 
                     return new StbApplicationDetails()

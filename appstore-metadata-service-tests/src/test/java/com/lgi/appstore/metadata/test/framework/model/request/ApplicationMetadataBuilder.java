@@ -25,7 +25,7 @@ import com.lgi.appstore.metadata.model.Category;
 import com.lgi.appstore.metadata.model.Dependency;
 import com.lgi.appstore.metadata.model.Feature;
 import com.lgi.appstore.metadata.model.Hardware;
-import com.lgi.appstore.metadata.model.Localisation;
+import com.lgi.appstore.metadata.model.Localization;
 import com.lgi.appstore.metadata.model.MaintainerApplicationHeader;
 import com.lgi.appstore.metadata.model.Platform;
 import com.lgi.appstore.metadata.model.Requirements;
@@ -50,7 +50,7 @@ public class ApplicationMetadataBuilder {
     private Boolean headerVisible;
     private String headerOciImageUrl;
     private Category headerCategory;
-    private List<Localisation> headerLocalisations;
+    private List<Localization> headerLocalizations;
     private Platform platform;
     private List<Dependency> dependencies;
     private List<Feature> features;
@@ -114,11 +114,11 @@ public class ApplicationMetadataBuilder {
         return this;
     }
 
-    public ApplicationMetadataBuilder withLocalisation(String name, String languageCode, String description) {
-        if (headerLocalisations == null) {
-            headerLocalisations = new ArrayList<>();
+    public ApplicationMetadataBuilder withLocalization(String name, String languageCode, String description) {
+        if (headerLocalizations == null) {
+            headerLocalizations = new ArrayList<>();
         }
-        headerLocalisations.add(new Localisation().name(name).languageCode(languageCode).description(description));
+        headerLocalizations.add(new Localization().name(name).languageCode(languageCode).description(description));
         return this;
     }
 
@@ -212,7 +212,7 @@ public class ApplicationMetadataBuilder {
         headerIcon = existingHeader.getIcon();
         headerSize = existingHeader.getSize();
         headerDescription = existingHeader.getDescription();
-        headerLocalisations = copyCollection(existingHeader.getLocalisations(), this::newLocalisation).orElse(null);
+        headerLocalizations = copyCollection(existingHeader.getLocalization(), this::newLocalization).orElse(null);
         requirements = newRequirements(existingApplication.getRequirements());
 
         return this;
@@ -234,7 +234,7 @@ public class ApplicationMetadataBuilder {
                 .icon(headerIcon)
                 .visible(headerVisible)
                 .ociImageUrl(headerOciImageUrl)
-                .localisations(headerLocalisations);
+                .localization(headerLocalizations);
 
         return new Application()
                 .header(appHeader)
@@ -251,7 +251,7 @@ public class ApplicationMetadataBuilder {
                 .icon(headerIcon)
                 .visible(headerVisible)
                 .ociImageUrl(headerOciImageUrl)
-                .localisations(headerLocalisations);
+                .localization(headerLocalizations);
 
         return new ApplicationForUpdate()
                 .header(appHeader)
@@ -275,11 +275,11 @@ public class ApplicationMetadataBuilder {
                 .platform(Optional.ofNullable(requirements.getPlatform()).map(this::newPlatform).orElse(null));
     }
 
-    private Localisation newLocalisation(Localisation localisation) {
-        return new Localisation()
-                .name(localisation.getName())
-                .languageCode(localisation.getLanguageCode())
-                .description(localisation.getDescription());
+    private Localization newLocalization(Localization localization) {
+        return new Localization()
+                .name(localization.getName())
+                .languageCode(localization.getLanguageCode())
+                .description(localization.getDescription());
     }
 
     private <T> Optional<List<T>> copyCollection(List<T> existingCollection, Function<T, T> factoryMethod) {

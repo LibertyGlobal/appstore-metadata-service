@@ -27,7 +27,7 @@ import com.lgi.appstore.metadata.model.Category;
 import com.lgi.appstore.metadata.model.Dependency;
 import com.lgi.appstore.metadata.model.Feature;
 import com.lgi.appstore.metadata.model.Hardware;
-import com.lgi.appstore.metadata.model.Localisation;
+import com.lgi.appstore.metadata.model.Localization;
 import com.lgi.appstore.metadata.model.Platform;
 import org.jooq.DSLContext;
 import org.jooq.JSONB;
@@ -70,23 +70,23 @@ public abstract class BaseServiceTest {
     private DSLContext context;
 
     protected ApplicationRecord createRandomApplicationRecord(MaintainerRecord maintainerRecord,
-                                                              Localisation localisation,
+                                                              Localization localization,
                                                               Hardware hardware,
                                                               Platform platform,
                                                               Dependency dependency,
                                                               Feature feature) throws JsonProcessingException {
-        return createRandomApplicationRecord(maintainerRecord, localisation, hardware, platform, dependency, feature, UUID.randomUUID().toString(),
+        return createRandomApplicationRecord(maintainerRecord, localization, hardware, platform, dependency, feature, UUID.randomUUID().toString(),
                 String.valueOf(new Random().nextInt(200)), true);
     }
 
     protected ApplicationRecord createRandomApplicationRecord(MaintainerRecord maintainerRecord, String applicationId, String version, boolean latest)
             throws JsonProcessingException {
-        return createRandomApplicationRecord(maintainerRecord, createRandomLocalisation(), createRandomHardware(), createRandomPlatform(),
+        return createRandomApplicationRecord(maintainerRecord, createRandomLocalization(), createRandomHardware(), createRandomPlatform(),
                 createRandomDependency(), createRandomFeature(), applicationId, version, latest);
     }
 
     protected ApplicationRecord createRandomApplicationRecord(MaintainerRecord maintainerRecord,
-                                                              Localisation localisation,
+                                                              Localization localization,
                                                               Hardware hardware,
                                                               Platform platform,
                                                               Dependency dependency,
@@ -102,7 +102,7 @@ public abstract class BaseServiceTest {
                 .setIcon(UUID.randomUUID().toString())
                 .setVisible(true)
                 .setLatest(JSONB.valueOf("{\"stb\":" + latest + "}"))
-                .setLocalizations(JSONB.valueOf(objectMapper.writeValueAsString(Collections.singleton(localisation))))
+                .setLocalizations(JSONB.valueOf(objectMapper.writeValueAsString(Collections.singleton(localization))))
                 .setDependencies(JSONB.valueOf(objectMapper.writeValueAsString(Collections.singleton(dependency))))
                 .setFeatures(JSONB.valueOf(objectMapper.writeValueAsString(Collections.singleton(feature))))
                 .setHardware(JSONB.valueOf(objectMapper.writeValueAsString(hardware)))
@@ -161,8 +161,8 @@ public abstract class BaseServiceTest {
                 .ram(UUID.randomUUID().toString());
     }
 
-    protected Localisation createRandomLocalisation() {
-        return new Localisation()
+    protected Localization createRandomLocalization() {
+        return new Localization()
                 .name(UUID.randomUUID().toString())
                 .description(UUID.randomUUID().toString())
                 .languageCode(UUID.randomUUID().toString());

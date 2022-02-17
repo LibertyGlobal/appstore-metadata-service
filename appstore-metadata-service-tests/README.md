@@ -128,7 +128,7 @@ curl -v -X POST -H "Content-type: application/json" -d '{
     "type": "application/vnd.rdk-app.dac.native",
     "size": "10000000",
     "category": "application",
-    "localisations": [
+    "localization": [
       {
         "name": "Geweldige applicatie",
         "description": "Dit is een geweldige applicatie.",
@@ -165,7 +165,7 @@ curl -v -X POST -H "Content-type: application/json" -d '{
     "type": "application/vnd.rdk-app.dac.native",
     "size": "10000000",
     "category": "application",
-    "localisations": [
+    "localization": [
       {
         "name": "Jij.ik",
         "description": "Showcase-applicatie van het bedrijf youi.tv. Het containerpakket bevat zowel de native-toepassing reageren als de You.i TV reageren native Gfx-engine eronder.",
@@ -206,7 +206,7 @@ curl -v -X POST -H "Content-type: application/json" -d '{
     "type": "application/vnd.rdk-app.dac.native",
     "size": "10000000",
     "category": "application",
-    "localisations": [
+    "localization": [
       {
         "name": "Flutter",
         "description": "Container contains both Flutter application and Flutter engine running on wayland-egl, developed by Liberty Global while evaluating Google Flutter UI toolkit.",

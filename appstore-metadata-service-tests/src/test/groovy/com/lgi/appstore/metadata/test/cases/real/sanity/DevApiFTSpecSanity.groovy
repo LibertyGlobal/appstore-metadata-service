@@ -75,12 +75,12 @@ class DevApiFTSpecSanity extends AsmsSanitySpecBase {
         def v1Feature2Name = "v1Feature2Name"
         def v1Feature2Version = "v1Feature2Version"
         def v1Feature2Required = false
-        def v1Localisation1Name = "US"
-        def v1Localisation1Lang = "en"
-        def v1Localisation1Description = "Description for en localisation"
-        def v1Localisation2Name = "Polska"
-        def v1Localisation2Lang = "pl"
-        def v1Localisation2Description = "Opis lokalizacji dla pl"
+        def v1Localization1Name = "US"
+        def v1Localization1Lang = "en"
+        def v1Localization1Description = "Description for en localization"
+        def v1Localization2Name = "Polska"
+        def v1Localization2Lang = "pl"
+        def v1Localization2Description = "Opis lokalizacji dla pl"
         Application appV1 = builder().fromDefaults()
                 .withId(appId)
                 .withVersion(v1)
@@ -92,8 +92,8 @@ class DevApiFTSpecSanity extends AsmsSanitySpecBase {
                 .withType(v1Type)
                 .withSize(v1Size)
                 .withCategory(v1Category)
-                .withLocalisation(v1Localisation1Name, v1Localisation1Lang, v1Localisation1Description)
-                .withLocalisation(v1Localisation2Name, v1Localisation2Lang, v1Localisation2Description)
+                .withLocalization(v1Localization1Name, v1Localization1Lang, v1Localization1Description)
+                .withLocalization(v1Localization2Name, v1Localization2Lang, v1Localization2Description)
                 .withPlatform(v1PlatformArch, v1PlatformOs, v1PlatformVariant)
                 .withHardware(v1HardwareCache, v1HardwareDmips, v1HardwarePersistent, v1HardwareRam, v1HardwareImage)
                 .withDependency(v1Dependency1Id, v1Dependency1Version)
@@ -129,12 +129,12 @@ class DevApiFTSpecSanity extends AsmsSanitySpecBase {
         def v2Feature2Name = "v2Feature2Name"
         def v2Feature2Version = "v2Feature2Version"
         def v2Feature2Required = true
-        def v2Localisation1Name = "Deuchland"
-        def v2Localisation1Lang = "de"
-        def v2Localisation1Description = "Beschreibung der Lokalisierung"
-        def v2Localisation2Name = "Россия"
-        def v2Localisation2Lang = "де"
-        def v2Localisation2Description = "Описание де локализации"
+        def v2Localization1Name = "Deuchland"
+        def v2Localization1Lang = "de"
+        def v2Localization1Description = "Beschreibung der Lokalisierung"
+        def v2Localization2Name = "Россия"
+        def v2Localization2Lang = "де"
+        def v2Localization2Description = "Описание де локализации"
         ApplicationForUpdate appV2 = builder().fromDefaults()
                 .withId(appId)
                 .withVisible(v2Visible)
@@ -145,8 +145,8 @@ class DevApiFTSpecSanity extends AsmsSanitySpecBase {
                 .withType(v2Type)
                 .withSize(v2Size)
                 .withCategory(v2Category)
-                .withLocalisation(v2Localisation1Name, v2Localisation1Lang, v2Localisation1Description)
-                .withLocalisation(v2Localisation2Name, v2Localisation2Lang, v2Localisation2Description)
+                .withLocalization(v2Localization1Name, v2Localization1Lang, v2Localization1Description)
+                .withLocalization(v2Localization2Name, v2Localization2Lang, v2Localization2Description)
                 .withPlatform(v2PlatformArch, v2PlatformOs, v2PlatformVariant)
                 .withHardware(v2HardwareCache, v2HardwareDmips, v2HardwarePersistent, v2HardwareRam, v2HardwareImage)
                 .withDependency(v2Dependency1Id, v2Dependency1Version)
@@ -184,10 +184,10 @@ class DevApiFTSpecSanity extends AsmsSanitySpecBase {
         field().header().size().from(theBody1) == v1Size
         field().header().icon().from(theBody1) == v1Icon
 
-        and: "the body exposes localisations section with his details-header"
-        assertThat(field().header().localisations().name().from(theBody1)).asList().containsExactlyInAnyOrder(v1Localisation1Name, v1Localisation2Name)
-        assertThat(field().header().localisations().languageCode().from(theBody1)).asList().containsExactlyInAnyOrder(v1Localisation1Lang, v1Localisation2Lang)
-        assertThat(field().header().localisations().description().from(theBody1)).asList().containsExactlyInAnyOrder(v1Localisation1Description, v1Localisation2Description)
+        and: "the body exposes localization section with his details-header"
+        assertThat(field().header().localization().name().from(theBody1)).asList().containsExactlyInAnyOrder(v1Localization1Name, v1Localization2Name)
+        assertThat(field().header().localization().languageCode().from(theBody1)).asList().containsExactlyInAnyOrder(v1Localization1Lang, v1Localization2Lang)
+        assertThat(field().header().localization().description().from(theBody1)).asList().containsExactlyInAnyOrder(v1Localization1Description, v1Localization2Description)
 
         and: "the body exposes maintainer section with his details"
         field().maintainer().name().from(theBody1) == DEFAULT_DEV_NAME
@@ -245,10 +245,10 @@ class DevApiFTSpecSanity extends AsmsSanitySpecBase {
         field().header().size().from(theBody2) == v2Size
         field().header().icon().from(theBody2) == v2Icon
 
-        and: "the body exposes localisations section with his details-header"
-        assertThat(field().header().localisations().name().from(theBody2)).asList().containsExactlyInAnyOrder(v2Localisation1Name, v2Localisation2Name)
-        assertThat(field().header().localisations().languageCode().from(theBody2)).asList().containsExactlyInAnyOrder(v2Localisation1Lang, v2Localisation2Lang)
-        assertThat(field().header().localisations().description().from(theBody2)).asList().containsExactlyInAnyOrder(v2Localisation1Description, v2Localisation2Description)
+        and: "the body exposes localization section with his details-header"
+        assertThat(field().header().localization().name().from(theBody2)).asList().containsExactlyInAnyOrder(v2Localization1Name, v2Localization2Name)
+        assertThat(field().header().localization().languageCode().from(theBody2)).asList().containsExactlyInAnyOrder(v2Localization1Lang, v2Localization2Lang)
+        assertThat(field().header().localization().description().from(theBody2)).asList().containsExactlyInAnyOrder(v2Localization1Description, v2Localization2Description)
 
         and: "the body exposes maintainer section with his details"
         field().maintainer().name().from(theBody2) == DEFAULT_DEV_NAME
