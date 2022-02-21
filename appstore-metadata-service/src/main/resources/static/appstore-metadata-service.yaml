@@ -22,7 +22,7 @@ openapi: 3.0.0
 info:
   title: ASMS API
   description: AppStore Metadata Service REST API. MAS API in RDK.
-  version: 0.3.0
+  version: 0.4.0
   license:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
@@ -898,10 +898,6 @@ components:
           type: string
           description: Minimum DMIPS (eg. 3000)
           example: 2000
-        image:
-          type: string
-          description: Image size
-          example: 120M
         persistent:
           type: string
           description: Persistent Storage (G/M/K)

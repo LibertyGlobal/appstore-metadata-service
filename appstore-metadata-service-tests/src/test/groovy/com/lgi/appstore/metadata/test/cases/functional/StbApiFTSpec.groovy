@@ -259,7 +259,6 @@ class StbApiFTSpec extends AsmsFeatureSpecBase {
         def v1HardwareCache = "v1HardwareCache"
         def v1HardwareDmips = "v1HardwareDmips"
         def v1HardwarePersistent = "v1HardwarePersistent"
-        def v1HardwareImage = "v1HardwareImage"
         def v1HardwareRam = "v1HardwareRam"
         def v1Dependency1Id = "v1Dependency1Id"
         def v1Dependency1Version = "v1Dependency1Version"
@@ -279,7 +278,7 @@ class StbApiFTSpec extends AsmsFeatureSpecBase {
                 .withSize(v1Size)
                 .withIcon(v1Icon)
                 .withPlatform(v1PlatformArch, v1PlatformOs, v1PlatformVariant)
-                .withHardware(v1HardwareCache, v1HardwareDmips, v1HardwarePersistent, v1HardwareRam, v1HardwareImage)
+                .withHardware(v1HardwareCache, v1HardwareDmips, v1HardwarePersistent, v1HardwareRam)
                 .withDependency(v1Dependency1Id, v1Dependency1Version)
                 .withDependency(v1Dependency2Id, v1Dependency2Version)
                 .withFeature(v1Feature1Name, v1Feature1Version, v1Feature1Required)
@@ -299,7 +298,6 @@ class StbApiFTSpec extends AsmsFeatureSpecBase {
         def v2HardwareCache = "v2HardwareCache"
         def v2HardwareDmips = "v2HardwareDmips"
         def v2HardwarePersistent = "v2HardwarePersistent"
-        def v2HardwareImage = "v2HardwareImage"
         def v2HardwareRam = "v2HardwareRam"
         def v2Dependency1Id = "v2Dependency1Id"
         def v2Dependency1Version = "v2Dependency1Version"
@@ -319,7 +317,7 @@ class StbApiFTSpec extends AsmsFeatureSpecBase {
                 .withType(v2Type)
                 .withSize(v2Size)
                 .withPlatform(v2PlatformArch, v2PlatformOs, v2PlatformVariant)
-                .withHardware(v2HardwareCache, v2HardwareDmips, v2HardwarePersistent, v2HardwareRam, v2HardwareImage)
+                .withHardware(v2HardwareCache, v2HardwareDmips, v2HardwarePersistent, v2HardwareRam)
                 .withDependency(v2Dependency1Id, v2Dependency1Version)
                 .withDependency(v2Dependency2Id, v2Dependency2Version)
                 .withFeature(v2Feature1Name, v2Feature1Version, v2Feature1Required)
@@ -384,7 +382,6 @@ class StbApiFTSpec extends AsmsFeatureSpecBase {
         and: "the body exposes requirements section with hardware information"
         field().requirements().hardware().cache().from(theBody1) == v1HardwareCache
         field().requirements().hardware().dmips().from(theBody1) == v1HardwareDmips
-        field().requirements().hardware().image().from(theBody1) == v1HardwareImage
         field().requirements().hardware().ram().from(theBody1) == v1HardwareRam
         field().requirements().hardware().persistent().from(theBody1) == v1HardwarePersistent
 
@@ -433,7 +430,6 @@ class StbApiFTSpec extends AsmsFeatureSpecBase {
         and: "the body exposes requirements section with hardware information"
         field().requirements().hardware().cache().from(theBody2) == v2HardwareCache
         field().requirements().hardware().dmips().from(theBody2) == v2HardwareDmips
-        field().requirements().hardware().image().from(theBody2) == v2HardwareImage
         field().requirements().hardware().ram().from(theBody2) == v2HardwareRam
         field().requirements().hardware().persistent().from(theBody2) == v2HardwarePersistent
 

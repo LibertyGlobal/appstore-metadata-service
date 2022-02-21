@@ -123,8 +123,8 @@ public abstract class BaseServiceTest {
                 .setCode(UUID.randomUUID().toString())
                 .setName(UUID.randomUUID().toString())
                 .setAddress(UUID.randomUUID().toString())
-                .setEmail(UUID.randomUUID() + "@" + UUID.randomUUID().toString() + ".com")
-                .setHomepage("http://" + UUID.randomUUID().toString() + ".com");
+                .setEmail(UUID.randomUUID() + "@" + UUID.randomUUID() + ".com")
+                .setHomepage("http://" + UUID.randomUUID() + ".com");
 
         maintainerRecord.attach(context.configuration());
         maintainerRecord.insert();
@@ -156,7 +156,6 @@ public abstract class BaseServiceTest {
         return new Hardware()
                 .cache(UUID.randomUUID().toString())
                 .dmips(UUID.randomUUID().toString())
-                .image(UUID.randomUUID().toString())
                 .persistent(UUID.randomUUID().toString())
                 .ram(UUID.randomUUID().toString());
     }

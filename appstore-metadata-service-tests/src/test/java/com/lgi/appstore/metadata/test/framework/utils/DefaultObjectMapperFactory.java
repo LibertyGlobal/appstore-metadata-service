@@ -22,6 +22,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import com.lgi.appstore.metadata.util.ObjectMapperFactory;
 import io.restassured.mapper.factory.Jackson2ObjectMapperFactory;
 
 import java.lang.reflect.Type;
@@ -44,7 +45,7 @@ public class DefaultObjectMapperFactory implements Jackson2ObjectMapperFactory {
     }
 
     static ObjectMapper newObjectMapper() {
-        return configure(new ObjectMapper());
+        return configure(ObjectMapperFactory.create());
     }
 
     @Override

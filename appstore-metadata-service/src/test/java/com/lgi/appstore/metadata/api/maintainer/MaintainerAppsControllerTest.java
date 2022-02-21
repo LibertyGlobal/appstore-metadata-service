@@ -237,7 +237,6 @@ class MaintainerAppsControllerTest {
                     "      \"hardware\": {" +
                     "        \"ram\": \"512M\"," +
                     "        \"dmips\": 2000," +
-                    "        \"image\": \"120M\"," +
                     "        \"persistent\": \"60M\"," +
                     "        \"cache\": \"200M\"" +
                     "      }," +
@@ -288,7 +287,6 @@ class MaintainerAppsControllerTest {
                     "      \"hardware\": {" +
                     "        \"ram\": \"512M\"," +
                     "        \"dmips\": 2000," +
-                    "        \"image\": \"120M\"," +
                     "        \"persistent\": \"60M\"," +
                     "        \"cache\": \"200M\"" +
                     "      }," +
