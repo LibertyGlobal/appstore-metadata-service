@@ -11,8 +11,8 @@ class ConfigurationSpecSanity extends AsmsConfigurationSpecBase {
 
     def "Object mapper is configured not to fail on unknown properties"() {
         when:
-        boolean result = objectMapper.getDeserializationConfig().isEnabled(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+        boolean featureEnabled = objectMapper.getDeserializationConfig().isEnabled(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
         then:
-        !result
+        !featureEnabled
     }
 }
