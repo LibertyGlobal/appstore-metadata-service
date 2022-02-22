@@ -32,7 +32,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 @ExtendWith([SpringExtension.class])
 @SpringBootTest(classes = ITCaseContext.class, properties = ["BUNDLES_STORAGE_PROTOCOL=Proto", "BUNDLES_STORAGE_HOST=Host"])
 @Import(BeanConfiguration.class)
-class AsmsConfigurationSpecBase extends AsmsIntegrationSpecBase {
+class AsmsConfigurationSpecBase extends AsmsSanitySpecBase {
 
     def setup() {
         LOG.info("Starting sanity tests -> setup.")
