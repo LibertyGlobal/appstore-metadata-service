@@ -20,10 +20,10 @@ package com.lgi.appstore.metadata.test.cases.real.sanity
 
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.lgi.appstore.metadata.test.AsmsConfigurationSpecBase
+import com.lgi.appstore.metadata.test.AsmsSanitySpecBase
 import org.springframework.beans.factory.annotation.Autowired
 
-class ConfigurationSpecSanity extends AsmsConfigurationSpecBase {
+class ConfigurationSpecSanity extends AsmsSanitySpecBase {
     @Autowired
     ObjectMapper objectMapper
 
