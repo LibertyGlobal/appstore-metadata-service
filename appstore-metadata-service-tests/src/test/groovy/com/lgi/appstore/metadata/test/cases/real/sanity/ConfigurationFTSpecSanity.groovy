@@ -23,7 +23,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.lgi.appstore.metadata.test.AsmsSanitySpecBase
 import org.springframework.beans.factory.annotation.Autowired
 
-class ConfigurationSpecSanity extends AsmsSanitySpecBase {
+class ConfigurationFTSpecSanity extends AsmsSanitySpecBase {
     @Autowired
     ObjectMapper objectMapper
 
