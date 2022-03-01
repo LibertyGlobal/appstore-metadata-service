@@ -24,7 +24,7 @@ import com.lgi.appstore.metadata.api.converter.StringToPlatformConverter;
 import com.lgi.appstore.metadata.api.error.GlobalExceptionHandler;
 import com.lgi.appstore.metadata.model.Category;
 import com.lgi.appstore.metadata.model.Hardware;
-import com.lgi.appstore.metadata.model.Localisation;
+import com.lgi.appstore.metadata.model.Localization;
 import com.lgi.appstore.metadata.model.Maintainer;
 import com.lgi.appstore.metadata.model.Meta;
 import com.lgi.appstore.metadata.model.Platform;
@@ -118,14 +118,14 @@ class StbAppsControllerTest {
             .icon("default_app_collection.png")
             .description("Showcase application from the company youi.tv. The container package contains both the react native application and the You.i TV react native Gfx engine beneath.")
             .category(Category.APPLICATION)
-            .localisations(
+            .localization(
                     List.of(
-                            new Localisation()
+                            new Localization()
                                     .name("Jij.ik")
                                     .description("Showcase-applicatie van het bedrijf youi.tv. Het containerpakket bevat zowel de native-toepassing reageren als de You.i TV reageren native Gfx-engine eronder.")
                                     .languageCode("nld"),
 
-                            new Localisation()
+                            new Localization()
                                     .name("Ty.ja")
                                     .description("Prezentacja aplikacji firmy youi.tv. Kontener zawiera zarówno natywną aplikację react, jak i znajdujący się poniżej natywny silnik Gfx.")
                                     .languageCode("pol")
@@ -141,14 +141,14 @@ class StbAppsControllerTest {
             .icon("default_app_collection.png")
             .description("Showcase application from the company youi.tv. The container package contains both the react native application and the You.i TV react native Gfx engine beneath.")
             .category(Category.APPLICATION)
-            .localisations(
+            .localization(
                     List.of(
-                            new Localisation()
+                            new Localization()
                                     .name("Jij.ik")
                                     .description("Showcase-applicatie van het bedrijf youi.tv. Het containerpakket bevat zowel de native-toepassing reageren als de You.i TV reageren native Gfx-engine eronder.")
                                     .languageCode("nld"),
 
-                            new Localisation()
+                            new Localization()
                                     .name("Ty.ja")
                                     .description("Prezentacja aplikacji firmy youi.tv. Kontener zawiera zarówno natywną aplikację react, jak i znajdujący się poniżej natywny silnik Gfx.")
                                     .languageCode("pol")

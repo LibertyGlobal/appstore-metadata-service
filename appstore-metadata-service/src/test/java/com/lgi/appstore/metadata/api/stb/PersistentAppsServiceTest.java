@@ -25,7 +25,7 @@ import com.lgi.appstore.metadata.model.Category;
 import com.lgi.appstore.metadata.model.Dependency;
 import com.lgi.appstore.metadata.model.Feature;
 import com.lgi.appstore.metadata.model.Hardware;
-import com.lgi.appstore.metadata.model.Localisation;
+import com.lgi.appstore.metadata.model.Localization;
 import com.lgi.appstore.metadata.model.Maintainer;
 import com.lgi.appstore.metadata.model.Meta;
 import com.lgi.appstore.metadata.model.Platform;
@@ -64,32 +64,32 @@ class PersistentAppsServiceTest extends BaseServiceTest {
     @Test
     void canGetApplicationDetails() throws Exception {
         final MaintainerRecord maintainerRecord = createRandomMaintainerRecord();
-        final Localisation localisation = createRandomLocalisation();
+        final Localization localization = createRandomLocalization();
         final Hardware hardware = createRandomHardware();
         final Platform platform = createRandomPlatform();
         final Dependency dependency = createRandomDependency();
         final Feature feature = createRandomFeature();
-        final ApplicationRecord applicationRecord = createRandomApplicationRecord(maintainerRecord, localisation, hardware, platform, dependency, feature);
+        final ApplicationRecord applicationRecord = createRandomApplicationRecord(maintainerRecord, localization, hardware, platform, dependency, feature);
 
         final Optional<StbApplicationDetails> maybeStbApplicationDetails = appsService.getApplicationDetails(applicationRecord.getIdRdomain(), "", "");
 
-        verifyStbApplicationDetails(maybeStbApplicationDetails, maintainerRecord, applicationRecord, localisation, hardware, platform, dependency, feature);
+        verifyStbApplicationDetails(maybeStbApplicationDetails, maintainerRecord, applicationRecord, localization, hardware, platform, dependency, feature);
     }
 
     @Test
     void canGetApplicationDetailsByVersion() throws Exception {
         final MaintainerRecord maintainerRecord = createRandomMaintainerRecord();
-        final Localisation localisation = createRandomLocalisation();
+        final Localization localization = createRandomLocalization();
         final Hardware hardware = createRandomHardware();
         final Platform platform = createRandomPlatform();
         final Dependency dependency = createRandomDependency();
         final Feature feature = createRandomFeature();
-        final ApplicationRecord applicationRecord = createRandomApplicationRecord(maintainerRecord, localisation, hardware, platform, dependency, feature);
+        final ApplicationRecord applicationRecord = createRandomApplicationRecord(maintainerRecord, localization, hardware, platform, dependency, feature);
 
         final Optional<StbApplicationDetails> maybeStbApplicationDetails = appsService.getApplicationDetails(applicationRecord.getIdRdomain(),
                 applicationRecord.getVersion(), "", "");
 
-        verifyStbApplicationDetails(maybeStbApplicationDetails, maintainerRecord, applicationRecord, localisation, hardware, platform, dependency, feature);
+        verifyStbApplicationDetails(maybeStbApplicationDetails, maintainerRecord, applicationRecord, localization, hardware, platform, dependency, feature);
     }
 
     @Test
@@ -98,7 +98,7 @@ class PersistentAppsServiceTest extends BaseServiceTest {
         final int limit = 500;
         final MaintainerRecord maintainerRecord = createRandomMaintainerRecord();
         final Platform platform = createRandomPlatform();
-        final Localisation localization = createRandomLocalisation();
+        final Localization localization = createRandomLocalization();
         final ApplicationRecord applicationRecord = createRandomApplicationRecord(maintainerRecord,
                 localization,
                 createRandomHardware(),
@@ -181,7 +181,7 @@ class PersistentAppsServiceTest extends BaseServiceTest {
     private void verifyStbApplicationDetails(Optional<StbApplicationDetails> maybeStbApplicationDetails,
                                              MaintainerRecord maintainerRecord,
                                              ApplicationRecord applicationRecord,
-                                             Localisation localisation,
+                                             Localization localization,
                                              Hardware hardware,
                                              Platform platform,
                                              Dependency dependency,
@@ -189,7 +189,7 @@ class PersistentAppsServiceTest extends BaseServiceTest {
         assertThat(maybeStbApplicationDetails).isPresent();
         final StbApplicationDetails stbApplicationDetails = maybeStbApplicationDetails.get();
         final StbSingleApplicationHeader header = stbApplicationDetails.getHeader();
-        verifyStbSingleApplicationHeader(header, applicationRecord, localisation);
+        verifyStbSingleApplicationHeader(header, applicationRecord, localization);
         final Maintainer maintainer = stbApplicationDetails.getMaintainer();
         assertThat(maintainer).isNotNull();
         assertThat(maintainer.getAddress()).isEqualTo(maintainerRecord.getAddress());
@@ -208,7 +208,7 @@ class PersistentAppsServiceTest extends BaseServiceTest {
 
     private void verifyStbApplicationHeader(StbApplicationHeader header,
                                             ApplicationRecord applicationRecord,
-                                            Localisation localisation) {
+                                            Localization localization) {
         assertThat(header).isNotNull();
         assertThat(header.getCategory()).isEqualTo(Category.fromValue(applicationRecord.getCategory()));
         assertThat(header.getDescription()).isEqualTo(applicationRecord.getDescription());
@@ -217,12 +217,12 @@ class PersistentAppsServiceTest extends BaseServiceTest {
         assertThat(header.getType()).isEqualTo(applicationRecord.getType());
         assertThat(header.getSize()).isEqualTo(applicationRecord.getSize());
         assertThat(header.getVersion()).isEqualTo(applicationRecord.getVersion());
-        assertThat(header.getLocalisations()).containsExactly(localisation);
+        assertThat(header.getLocalization()).containsExactly(localization);
     }
 
     private void verifyStbSingleApplicationHeader(StbSingleApplicationHeader header,
                                                   ApplicationRecord applicationRecord,
-                                                  Localisation localisation) {
+                                                  Localization localization) {
         assertThat(header).isNotNull();
         assertThat(header.getCategory()).isEqualTo(Category.fromValue(applicationRecord.getCategory()));
         assertThat(header.getDescription()).isEqualTo(applicationRecord.getDescription());
@@ -232,6 +232,6 @@ class PersistentAppsServiceTest extends BaseServiceTest {
         assertThat(header.getSize()).isEqualTo(applicationRecord.getSize());
         assertThat(header.getUrl()).isNotNull();
         assertThat(header.getVersion()).isEqualTo(applicationRecord.getVersion());
-        assertThat(header.getLocalisations()).containsExactly(localisation);
+        assertThat(header.getLocalization()).containsExactly(localization);
     }
 }

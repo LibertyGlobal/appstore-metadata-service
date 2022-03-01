@@ -345,7 +345,7 @@ public class PersistentAppsService implements AppsService {
                                 JSONB.valueOf(jsonProcessorHelper.writeValueAsString(JsonObjectNames.HARDWARE, application.getRequirements().getHardware())),
                                 JSONB.valueOf(jsonProcessorHelper.writeValueAsString(JsonObjectNames.FEATURES, application.getRequirements().getFeatures())),
                                 JSONB.valueOf(jsonProcessorHelper.writeValueAsString(JsonObjectNames.DEPENDENCIES, application.getRequirements().getDependencies())),
-                                JSONB.valueOf(jsonProcessorHelper.writeValueAsString(JsonObjectNames.LOCALIZATIONS, application.getHeader().getLocalisations()))
+                                JSONB.valueOf(jsonProcessorHelper.writeValueAsString(JsonObjectNames.LOCALIZATIONS, application.getHeader().getLocalization()))
                         )
                         .execute();
 
@@ -378,7 +378,7 @@ public class PersistentAppsService implements AppsService {
                             .set(APPLICATION.TYPE, applicationForUpdate.getHeader().getType())
                             .set(APPLICATION.SIZE, applicationForUpdate.getHeader().getSize())
                             .set(APPLICATION.CATEGORY, applicationForUpdate.getHeader().getCategory().toString())
-                            .set(APPLICATION.LOCALIZATIONS, JSONB.valueOf(jsonProcessorHelper.writeValueAsString(JsonObjectNames.LOCALIZATIONS, applicationForUpdate.getHeader().getLocalisations())))
+                            .set(APPLICATION.LOCALIZATIONS, JSONB.valueOf(jsonProcessorHelper.writeValueAsString(JsonObjectNames.LOCALIZATIONS, applicationForUpdate.getHeader().getLocalization())))
 
                             .set(APPLICATION.PLATFORM, JSONB.valueOf(jsonProcessorHelper.writeValueAsString(JsonObjectNames.PLATFORM, applicationForUpdate.getRequirements().getPlatform())))
                             .set(APPLICATION.HARDWARE, JSONB.valueOf(jsonProcessorHelper.writeValueAsString(JsonObjectNames.HARDWARE, applicationForUpdate.getRequirements().getHardware())))
@@ -417,7 +417,7 @@ public class PersistentAppsService implements AppsService {
                             .set(APPLICATION.TYPE, applicationForUpdate.getHeader().getType())
                             .set(APPLICATION.SIZE, applicationForUpdate.getHeader().getSize())
                             .set(APPLICATION.CATEGORY, applicationForUpdate.getHeader().getCategory().toString())
-                            .set(APPLICATION.LOCALIZATIONS, JSONB.valueOf(jsonProcessorHelper.writeValueAsString(JsonObjectNames.LOCALIZATIONS, applicationForUpdate.getHeader().getLocalisations())))
+                            .set(APPLICATION.LOCALIZATIONS, JSONB.valueOf(jsonProcessorHelper.writeValueAsString(JsonObjectNames.LOCALIZATIONS, applicationForUpdate.getHeader().getLocalization())))
                             .set(APPLICATION.PLATFORM, JSONB.valueOf(jsonProcessorHelper.writeValueAsString(JsonObjectNames.PLATFORM, applicationForUpdate.getRequirements().getPlatform())))
                             .set(APPLICATION.HARDWARE, JSONB.valueOf(jsonProcessorHelper.writeValueAsString(JsonObjectNames.HARDWARE, applicationForUpdate.getRequirements().getHardware())))
                             .set(APPLICATION.FEATURES, JSONB.valueOf(jsonProcessorHelper.writeValueAsString(JsonObjectNames.FEATURES, applicationForUpdate.getRequirements().getFeatures())))

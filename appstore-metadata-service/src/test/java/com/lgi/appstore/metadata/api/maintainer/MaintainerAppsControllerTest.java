@@ -27,7 +27,7 @@ import com.lgi.appstore.metadata.model.MaintainerApplicationHeader;
 import com.lgi.appstore.metadata.model.MaintainerApplicationsList;
 import com.lgi.appstore.metadata.model.Category;
 import com.lgi.appstore.metadata.model.Hardware;
-import com.lgi.appstore.metadata.model.Localisation;
+import com.lgi.appstore.metadata.model.Localization;
 import com.lgi.appstore.metadata.model.Maintainer;
 import com.lgi.appstore.metadata.model.MaintainerSingleApplicationHeader;
 import com.lgi.appstore.metadata.model.Meta;
@@ -135,15 +135,15 @@ class MaintainerAppsControllerTest {
                     "Showcase application from the company youi.tv. The container package contains both the react native application and the You.i TV react native Gfx engine beneath.")
             .category(Category.APPLICATION)
             .visible(true)
-            .localisations(
+            .localization(
                     List.of(
-                            new Localisation()
+                            new Localization()
                                     .name("Jij.ik")
                                     .description(
                                             "Showcase-applicatie van het bedrijf youi.tv. Het containerpakket bevat zowel de native-toepassing reageren als de You.i TV reageren native Gfx-engine eronder.")
                                     .languageCode("nld"),
 
-                            new Localisation()
+                            new Localization()
                                     .name("Ty.ja")
                                     .description(
                                             "Prezentacja aplikacji firmy youi.tv. Kontener zawiera zarówno natywną aplikację react, jak i znajdujący się poniżej natywny silnik Gfx.")
@@ -163,15 +163,15 @@ class MaintainerAppsControllerTest {
             .url("https://us.icr.io/v2/appcontainerstagingrdk/you.i/manifests/latest")
             .category(Category.APPLICATION)
             .visible(true)
-            .localisations(
+            .localization(
                     List.of(
-                            new Localisation()
+                            new Localization()
                                     .name("Jij.ik")
                                     .description(
                                             "Showcase-applicatie van het bedrijf youi.tv. Het containerpakket bevat zowel de native-toepassing reageren als de You.i TV reageren native Gfx-engine eronder.")
                                     .languageCode("nld"),
 
-                            new Localisation()
+                            new Localization()
                                     .name("Ty.ja")
                                     .description(
                                             "Prezentacja aplikacji firmy youi.tv. Kontener zawiera zarówno natywną aplikację react, jak i znajdujący się poniżej natywny silnik Gfx.")
@@ -214,7 +214,7 @@ class MaintainerAppsControllerTest {
                     "      \"type\": \"application/vnd.rdk-app.dac.native\"," +
                     "      \"size\": \"10000000\"," +
                     "      \"category\": \"application\"," +
-                    "      \"localisations\": [" +
+                    "      \"localization\": [" +
                     "        {" +
                     "          \"languageCode\": \"nld\"," +
                     "          \"name\": \"Geweldige applicatie\"," +
@@ -265,7 +265,7 @@ class MaintainerAppsControllerTest {
                     "      \"type\": \"application/vnd.rdk-app.dac.native\"," +
                     "      \"size\": \"10000000\"," +
                     "      \"category\": \"application\"," +
-                    "      \"localisations\": [" +
+                    "      \"localization\": [" +
                     "        {" +
                     "          \"languageCode\": \"nld\"," +
                     "          \"name\": \"Geweldige applicatie\"," +

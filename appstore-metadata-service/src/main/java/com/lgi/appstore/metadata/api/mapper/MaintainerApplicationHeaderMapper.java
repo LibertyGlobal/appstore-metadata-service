@@ -21,7 +21,7 @@ package com.lgi.appstore.metadata.api.mapper;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.lgi.appstore.metadata.model.Category;
 import com.lgi.appstore.metadata.model.JsonObjectNames;
-import com.lgi.appstore.metadata.model.Localisation;
+import com.lgi.appstore.metadata.model.Localization;
 import com.lgi.appstore.metadata.model.MaintainerApplicationHeader;
 import com.lgi.appstore.metadata.util.JsonProcessorHelper;
 import org.jooq.JSONB;
@@ -34,14 +34,14 @@ import static com.lgi.appstore.metadata.jooq.model.tables.Application.APPLICATIO
 
 public class MaintainerApplicationHeaderMapper {
 
-    private static final TypeReference<List<Localisation>> LOCALIZATIONS_TYPE = new TypeReference<>() {
+    private static final TypeReference<List<Localization>> LOCALIZATIONS_TYPE = new TypeReference<>() {
     };
 
     private MaintainerApplicationHeaderMapper() {
     }
 
     public static MaintainerApplicationHeader map(Record applicationMetadataRecord, JsonProcessorHelper jsonProcessorHelper) {
-        final List<Localisation> localisations = Optional.ofNullable(applicationMetadataRecord.get(APPLICATION.LOCALIZATIONS))
+        final List<Localization> localizations = Optional.ofNullable(applicationMetadataRecord.get(APPLICATION.LOCALIZATIONS))
                 .map(JSONB::data)
                 .map(json -> jsonProcessorHelper.readValue(JsonObjectNames.LOCALIZATIONS, json, LOCALIZATIONS_TYPE))
                 .orElse(null);
@@ -57,7 +57,7 @@ public class MaintainerApplicationHeaderMapper {
                 .type(applicationMetadataRecord.get(APPLICATION.TYPE))
                 .size(applicationMetadataRecord.get(APPLICATION.SIZE))
                 .category(Category.fromValue(applicationMetadataRecord.get(APPLICATION.CATEGORY)))
-                .localisations(localisations);
+                .localization(localizations);
     }
 }
 

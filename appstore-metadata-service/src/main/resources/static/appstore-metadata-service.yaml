@@ -678,10 +678,10 @@ components:
           maximum: 2147483647
         category:
           $ref: '#/components/schemas/Category'
-        localisations:
+        localization:
           type: array
           items:
-            $ref: '#/components/schemas/Localisation'
+            $ref: '#/components/schemas/Localization'
     AppicationHeaderGeneratedAttributes:
       type: object
       required:
@@ -797,7 +797,7 @@ components:
           $ref: '#/components/schemas/ApplicationHeaderForUpdate'
         requirements:
           $ref: '#/components/schemas/Requirements'
-    Localisation:
+    Localization:
       type: object
       required:
         - languageCode

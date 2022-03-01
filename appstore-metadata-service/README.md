@@ -19,6 +19,28 @@ Now the relevant services should be available - which can be verified by doing:
 docker ps
 ```
 
+Running application for development purposes
+---
+
+In order to run application for development purposes, set following environment variables:
+```
+BUNDLES_STORAGE_HOST = localhost
+BUNDLES_STORAGE_PROTOCOL = http
+spring.profiles.active = dev
+```
+
+Package repository:
+```
+mvn clean package
+```
+
+Next, run DB docker image:
+```
+docker run -d --name ASMS -p 5432:5432 -e POSTGRES_HOST_AUTH_METHOD=trust postgres:12.5
+```
+
+Finally, run src/main/java/com/lgi/appstore/metadata/Application.java
+
 Pushing 'jar' files and 'docker images' to remote repository
 ---
 

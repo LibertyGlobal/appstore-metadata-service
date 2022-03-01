@@ -36,7 +36,7 @@ public class ApplicationDetailsPath extends PathBase {
     public static final String FIELD_ICON = "icon";
     public static final String FIELD_CATEGORY = "category";
     public static final String FIELD_LANGUAGE_CODE = "languageCode";
-    private static final String FIELD_LOCALISATIONS = "localisations";
+    private static final String FIELD_LOCALIZATION = "localization";
     private static final String FIELD_REQUIREMENTS = "requirements";
     private static final String FIELD_DEPENDENCIES = "dependencies";
     private static final String FIELD_FEATURES = "features";
@@ -130,8 +130,8 @@ public class ApplicationDetailsPath extends PathBase {
         return this;
     }
 
-    public ApplicationDetailsPath localisations() {
-        fields.add(FIELD_LOCALISATIONS);
+    public ApplicationDetailsPath localization() {
+        fields.add(FIELD_LOCALIZATION);
         return this;
     }
 
