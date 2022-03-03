@@ -129,7 +129,6 @@ curl --location --request POST 'http://localhost:8081/as3/maintainers/lgi/apps' 
             "hardware": {
                 "ram": "string",
                 "dmips": "string",
-                "image": "string",
                 "persistent": "string",
                 "cache": "string"
             },

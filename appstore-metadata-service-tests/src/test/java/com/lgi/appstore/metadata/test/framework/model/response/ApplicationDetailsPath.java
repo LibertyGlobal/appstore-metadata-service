@@ -45,7 +45,6 @@ public class ApplicationDetailsPath extends PathBase {
     private static final String FIELD_PLATFORM = "platform";
     private static final String FIELD_RAM = "ram";
     private static final String FIELD_DMIPS = "dmips";
-    private static final String FIELD_IMAGE = "image";
     private static final String FIELD_PERSISTENT = "persistent";
     private static final String FIELD_CACHE = "cache";
     private static final String FIELD_ARCHITECTURE = "architecture";
@@ -177,11 +176,6 @@ public class ApplicationDetailsPath extends PathBase {
 
     public ApplicationDetailsPath dmips() {
         fields.add(FIELD_DMIPS);
-        return this;
-    }
-
-    public ApplicationDetailsPath image() {
-        fields.add(FIELD_IMAGE);
         return this;
     }
 

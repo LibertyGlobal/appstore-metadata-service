@@ -18,16 +18,19 @@
  */
 package com.lgi.appstore.metadata.test
 
+import com.lgi.appstore.metadata.config.BeanConfiguration
 import com.lgi.appstore.metadata.test.framework.ITCaseContext
 import com.lgi.appstore.metadata.test.framework.TestSession
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.context.annotation.Import
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
 
 @ActiveProfiles("integration-test")
 @ExtendWith([SpringExtension.class])
-@SpringBootTest(classes = ITCaseContext.class)
+@SpringBootTest(classes = ITCaseContext.class, properties = ["BUNDLES_STORAGE_PROTOCOL=Proto", "BUNDLES_STORAGE_HOST=Host"])
+@Import(BeanConfiguration.class)
 class AsmsSanitySpecBase extends AsmsIntegrationSpecBase {
     def initialized = false
 

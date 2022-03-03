@@ -143,8 +143,8 @@ public class ApplicationMetadataBuilder {
         return this;
     }
 
-    public ApplicationMetadataBuilder withHardware(String cache, String dmpis, String persistent, String ram, String image) {
-        this.hardware = new Hardware().cache(cache).dmips(dmpis).persistent(persistent).ram(ram).image(image);
+    public ApplicationMetadataBuilder withHardware(String cache, String dmpis, String persistent, String ram) {
+        this.hardware = new Hardware().cache(cache).dmips(dmpis).persistent(persistent).ram(ram);
         return this;
     }
 
@@ -291,7 +291,6 @@ public class ApplicationMetadataBuilder {
         return new Hardware()
                 .cache(hardware.getCache())
                 .dmips(hardware.getDmips())
-                .image(hardware.getImage())
                 .persistent(hardware.getPersistent())
                 .ram(hardware.getRam());
     }

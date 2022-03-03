@@ -18,7 +18,9 @@
  */
 package com.lgi.appstore.metadata.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lgi.appstore.metadata.util.ApplicationUrlCreator;
+import com.lgi.appstore.metadata.util.ObjectMapperFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -35,5 +37,10 @@ public class BeanConfiguration {
     @Bean
     public ApplicationUrlCreator applicationUrlBuilder() {
         return new ApplicationUrlCreator(bundlesStorageProtocol, bundlesStorageHost);
+    }
+
+    @Bean
+    public ObjectMapper objectMapper() {
+        return ObjectMapperFactory.create();
     }
 }
