@@ -32,10 +32,10 @@ import java.util.List;
 
 public class PostgresContainerInitializer implements ApplicationContextInitializer<ConfigurableApplicationContext> {
 
-    private static final PostgreSQLContainer POSTGRE_SQL_CONTAINER;
+    private static final PostgreSQLContainer<?> POSTGRE_SQL_CONTAINER;
 
     static {
-        POSTGRE_SQL_CONTAINER = new PostgreSQLContainer();
+        POSTGRE_SQL_CONTAINER = new PostgreSQLContainer<>("postgres:12");
         POSTGRE_SQL_CONTAINER.start();
 
         final List<Schema> schemas = DefaultCatalog.DEFAULT_CATALOG.getSchemas();
@@ -48,7 +48,7 @@ public class PostgresContainerInitializer implements ApplicationContextInitializ
                         POSTGRE_SQL_CONTAINER.getUsername(),
                         POSTGRE_SQL_CONTAINER.getPassword())
                 .schemas(schemas.get(0).getName())
-                .locations("classpath:db.migration");
+                .locations("classpath:db/migration");
 
         Flyway flyway = new Flyway(flywayConfiguration);
         flyway.migrate();

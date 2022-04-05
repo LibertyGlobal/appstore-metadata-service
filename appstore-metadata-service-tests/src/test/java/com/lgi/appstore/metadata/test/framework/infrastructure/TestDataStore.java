@@ -38,7 +38,7 @@ public class TestDataStore extends PostgreSQLContainer<TestDataStore> {
 
     private static final String DB_SCHEMA_NAME_DEFAULT = "appstore_metadata_service";
 
-    private static final String DB_IMAGE_NAME = "postgres:11.1";
+    private static final String DB_IMAGE_NAME = "postgres:12";
     private static final String DB_NAME = "postgres";
     private static final String DB_USER = "postgres";
     private static final String DB_PASSWORD = "postgres";

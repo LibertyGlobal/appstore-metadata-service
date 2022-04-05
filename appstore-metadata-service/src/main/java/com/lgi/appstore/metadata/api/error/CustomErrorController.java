@@ -52,11 +52,6 @@ public class CustomErrorController implements ErrorController {
         return new ErrorResponse().message(message);
     }
 
-    @Override
-    public String getErrorPath() {
-        return "error";
-    }
-
     private Map<String, Object> getErrorAttributes(WebRequest webRequest) {
         return new HashMap<>(errorAttributes.getErrorAttributes(webRequest, ErrorAttributeOptions.of(ErrorAttributeOptions.Include.MESSAGE)));
     }
