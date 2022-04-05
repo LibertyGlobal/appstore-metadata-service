@@ -108,12 +108,18 @@
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-core</artifactId>
-            <version>2.11.1</version>
+            <version>2.13.2</version>
         </dependency>
 
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
             <scope>test</scope>
         </dependency>
 
@@ -207,7 +213,7 @@
                         </image>
                         <image>
                             <alias>postgres</alias>
-                            <name>postgres:11</name>
+                            <name>postgres:12</name>
                             <run>
                                 <env>
                                     <POSTGRES_PASSWORD>${db.password}</POSTGRES_PASSWORD>
