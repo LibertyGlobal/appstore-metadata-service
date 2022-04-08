@@ -121,7 +121,6 @@
                             <execution>
                                 <id>add-license-headers</id>
                                 <goals>
-                                    <goal>remove</goal>
                                     <goal>format</goal>
                                 </goals>
                                 <phase>process-sources</phase>
