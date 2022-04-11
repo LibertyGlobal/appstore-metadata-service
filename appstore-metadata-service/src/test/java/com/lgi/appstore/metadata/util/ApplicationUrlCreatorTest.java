@@ -37,13 +37,26 @@ class ApplicationUrlCreatorTest {
         final String version = UUID.randomUUID().toString();
         final String platformName = UUID.randomUUID().toString();
         final String firmwareVer = UUID.randomUUID().toString();
+        final ApplicationUrlCreator.NativeAppParams nativeAppParams = new ApplicationUrlCreator.NativeAppParams(applicationId, version, platformName, firmwareVer);
 
         //WHEN
-        final String url = APPLICATION_URL_CREATOR.createApplicationUrl(applicationId, version, platformName, firmwareVer);
+        final String url = APPLICATION_URL_CREATOR.createApplicationUrl(nativeAppParams);
 
         //THEN
         assertThat(url).matches(PROTOCOL + "://" + BUNDLES_STORAGE_HOST.replace(".", "\\.") + "/"
                 + applicationId + "/" + version + "/" + platformName + "/" + firmwareVer + "/"
                 + applicationId + "_" + version + "_" + platformName + "_" + firmwareVer + "\\.tar\\.gz");
+    }
+
+    @Test
+    void canCreateWebApplicationUrl() {
+        // GIVEN
+        final ApplicationUrlCreator.WebAppParams webAppParams = new ApplicationUrlCreator.WebAppParams("http://url");
+
+        // WHEN
+        final String url = APPLICATION_URL_CREATOR.createApplicationUrl(webAppParams);
+
+        //THEN
+        assertThat(url).isEqualTo("http://url");
     }
 }

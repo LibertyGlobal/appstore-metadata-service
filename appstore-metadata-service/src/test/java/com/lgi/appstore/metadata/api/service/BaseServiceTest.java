@@ -75,14 +75,39 @@ public abstract class BaseServiceTest {
                                                               Platform platform,
                                                               Dependency dependency,
                                                               Feature feature) throws JsonProcessingException {
-        return createRandomApplicationRecord(maintainerRecord, localization, hardware, platform, dependency, feature, UUID.randomUUID().toString(),
-                String.valueOf(new Random().nextInt(200)), true);
+        return createRandomApplicationRecord(maintainerRecord,
+                localization,
+                hardware,
+                platform,
+                dependency,
+                feature,
+                UUID.randomUUID().toString(),
+                String.valueOf(new Random().nextInt(200)),
+                UUID.randomUUID().toString(),
+                true);
     }
 
     protected ApplicationRecord createRandomApplicationRecord(MaintainerRecord maintainerRecord, String applicationId, String version, boolean latest)
             throws JsonProcessingException {
-        return createRandomApplicationRecord(maintainerRecord, createRandomLocalization(), createRandomHardware(), createRandomPlatform(),
-                createRandomDependency(), createRandomFeature(), applicationId, version, latest);
+        return createRandomApplicationRecord(maintainerRecord,
+                applicationId,
+                version,
+                UUID.randomUUID().toString(),
+                latest);
+    }
+
+    protected ApplicationRecord createRandomApplicationRecord(MaintainerRecord maintainerRecord, String applicationId, String version, String type, boolean latest)
+            throws JsonProcessingException {
+        return createRandomApplicationRecord(maintainerRecord,
+                createRandomLocalization(),
+                createRandomHardware(),
+                createRandomPlatform(),
+                createRandomDependency(),
+                createRandomFeature(),
+                applicationId,
+                version,
+                type,
+                latest);
     }
 
     protected ApplicationRecord createRandomApplicationRecord(MaintainerRecord maintainerRecord,
@@ -93,6 +118,7 @@ public abstract class BaseServiceTest {
                                                               Feature feature,
                                                               String applicationId,
                                                               String version,
+                                                              String type,
                                                               boolean latest) throws JsonProcessingException {
         final ApplicationRecord applicationRecord = new ApplicationRecord()
                 .setMaintainerId(maintainerRecord.getId())
@@ -109,7 +135,8 @@ public abstract class BaseServiceTest {
                 .setPlatform(JSONB.valueOf(objectMapper.writeValueAsString(platform)))
                 .setVersion(version)
                 .setName(UUID.randomUUID().toString())
-                .setType(UUID.randomUUID().toString())
+                .setType(type)
+                .setOciImageUrl("ociImageUrl")
                 .setSize(10000000);
 
         applicationRecord.attach(context.configuration());

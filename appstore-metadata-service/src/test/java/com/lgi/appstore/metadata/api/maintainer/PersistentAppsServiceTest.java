@@ -25,6 +25,7 @@ import com.lgi.appstore.metadata.jooq.model.tables.records.MaintainerRecord;
 import com.lgi.appstore.metadata.model.Application;
 import com.lgi.appstore.metadata.model.ApplicationForUpdate;
 import com.lgi.appstore.metadata.model.ApplicationHeaderForUpdate;
+import com.lgi.appstore.metadata.model.ApplicationType;
 import com.lgi.appstore.metadata.model.Category;
 import com.lgi.appstore.metadata.model.Dependency;
 import com.lgi.appstore.metadata.model.Feature;
@@ -41,6 +42,7 @@ import com.lgi.appstore.metadata.model.Platform;
 import com.lgi.appstore.metadata.model.Requirements;
 import com.lgi.appstore.metadata.model.ResultSetMeta;
 import com.lgi.appstore.metadata.util.ApplicationUrlCreator;
+import com.lgi.appstore.metadata.util.ApplicationUrlService;
 import com.lgi.appstore.metadata.util.JsonProcessorHelper;
 import org.jooq.DSLContext;
 import org.junit.jupiter.api.Test;
@@ -67,7 +69,8 @@ class PersistentAppsServiceTest extends BaseServiceTest {
 
     @Autowired
     public PersistentAppsServiceTest(DSLContext dslContext) {
-        appsService = new PersistentAppsService(dslContext, new JsonProcessorHelper(objectMapper), new ApplicationUrlCreator("", ""));
+        final var applicationUrlService = new ApplicationUrlService(new ApplicationUrlCreator("", ""), List.of(ApplicationType.HTML5));
+        appsService = new PersistentAppsService(dslContext, new JsonProcessorHelper(objectMapper), applicationUrlService);
     }
 
     @Test

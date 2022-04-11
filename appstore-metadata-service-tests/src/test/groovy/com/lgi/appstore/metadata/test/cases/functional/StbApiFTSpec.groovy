@@ -205,10 +205,11 @@ class StbApiFTSpec extends AsmsFeatureSpecBase {
     def "developer creates new app and stb view details for #behavior"() {
         given: "developer create 2 applications: first with 2 versions (incl. hidden latest) and second with only one version"
         Application app1v1 = builder().fromDefaults()
-                .withId(appId).withVersion(v1).forCreate()
+                .withId(appId).withVersion(v1).withType("application/vnd.rdk-app.dac.native").forCreate()
         Application app1v2 = builder().fromDefaults()
-                .withId(appId).withVersion(v2).withVisible(isV2Visible).forCreate()
-        Application app2v1 = builder().fromDefaults()
+                .withId(appId).withVersion(v2).withType("application/vnd.rdk-app.dac.native")
+                .withVisible(isV2Visible).forCreate()
+        Application app2v1 = builder().fromDefaults().withType("application/vnd.rdk-app.dac.native")
                 .withId("someOther_$appId").withVersion(v1) forCreate()
 
         maintainerSteps.createNewApplication_expectSuccess(DEFAULT_DEV_CODE, app1v1)
@@ -250,7 +251,7 @@ class StbApiFTSpec extends AsmsFeatureSpecBase {
         def v1Name = "SomeAppName"
         def v1Description = "Some Description €\\€\\€\\€\\"
         def v1Category = pickRandomCategory()
-        def v1Type = "someCustomType"
+        def v1Type = "application/vnd.rdk-app.dac.native"
         def v1Size = 10000000
         def v1Icon = "//home/alwi/Icon.png"
         def v1PlatformArch = "v1PlatformArch"
@@ -290,7 +291,7 @@ class StbApiFTSpec extends AsmsFeatureSpecBase {
         def v2Description = "v2Description"
         def v2Category = pickRandomCategory()
         def v2Icon = "v2Icon"
-        def v2Type = "v2Type"
+        def v2Type = "application/vnd.rdk-app.lightning"
         def v2Size = 20000000
         def v2PlatformArch = "v2PlatformArch"
         def v2PlatformOs = "v2PlatformOs"

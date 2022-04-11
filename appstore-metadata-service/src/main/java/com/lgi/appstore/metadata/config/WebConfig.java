@@ -18,6 +18,7 @@
  */
 package com.lgi.appstore.metadata.config;
 
+import com.lgi.appstore.metadata.api.converter.StringToApplicationTypeConverter;
 import com.lgi.appstore.metadata.api.converter.StringToCategoryConverter;
 import com.lgi.appstore.metadata.api.converter.StringToPlatformConverter;
 import org.springframework.context.annotation.Configuration;
@@ -31,5 +32,6 @@ public class WebConfig implements WebMvcConfigurer {
     public void addFormatters(FormatterRegistry registry) {
         registry.addConverter(new StringToCategoryConverter());
         registry.addConverter(new StringToPlatformConverter());
+        registry.addConverter(new StringToApplicationTypeConverter());
     }
 }

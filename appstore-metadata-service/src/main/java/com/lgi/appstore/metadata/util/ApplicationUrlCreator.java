@@ -18,10 +18,11 @@
  */
 package com.lgi.appstore.metadata.util;
 
+import java.util.Objects;
+
 import static java.util.Objects.requireNonNull;
 
 public class ApplicationUrlCreator {
-
     //protocol://host/appId/appVersion/platformName/firmwareVer/appId_appVersion_platformName_firmwareVer.tar.gz
     private static final String APPLICATION_URL_PATTERN = "%s://%s/%s/%s/%s/%s/%s_%s_%s_%s.tar.gz";
 
@@ -33,7 +34,18 @@ public class ApplicationUrlCreator {
         this.bundlesStorageHost = requireNonNull(bundlesStorageHost, "bundlesStorageHost");
     }
 
-    public String createApplicationUrl(String applicationId, String version, String platformName, String firmwareVer) {
+    public String createApplicationUrl(NativeAppParams nativeAppParams) {
+        return createNativeApplicationUrl(nativeAppParams.getApplicationId(),
+                nativeAppParams.getVersion(),
+                nativeAppParams.getPlatformName(),
+                nativeAppParams.getFirmwareVersion());
+    }
+
+    public String createApplicationUrl(WebAppParams webAppParams) {
+        return webAppParams.getSourceUrl();
+    }
+
+    private String createNativeApplicationUrl(String applicationId, String version, String platformName, String firmwareVer) {
         return String.format(APPLICATION_URL_PATTERN,
                 this.protocol,
                 this.bundlesStorageHost,
@@ -45,5 +57,73 @@ public class ApplicationUrlCreator {
                 version,
                 platformName,
                 firmwareVer);
+    }
+
+    public static class NativeAppParams {
+        private final String applicationId;
+        private final String version;
+        private final String platformName;
+        private final String firmwareVersion;
+
+        public NativeAppParams(String applicationId, String version, String platformName, String firmwareVersion) {
+            this.applicationId = applicationId;
+            this.version = version;
+            this.platformName = platformName;
+            this.firmwareVersion = firmwareVersion;
+        }
+
+        public String getApplicationId() {
+            return applicationId;
+        }
+
+        public String getVersion() {
+            return version;
+        }
+
+        public String getPlatformName() {
+            return platformName;
+        }
+
+        public String getFirmwareVersion() {
+            return firmwareVersion;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            NativeAppParams that = (NativeAppParams) o;
+            return Objects.equals(applicationId, that.applicationId) && Objects.equals(version, that.version) && Objects.equals(platformName, that.platformName) && Objects.equals(firmwareVersion, that.firmwareVersion);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(applicationId, version, platformName, firmwareVersion);
+        }
+    }
+
+    public static class WebAppParams {
+        private final String sourceUrl;
+
+        public WebAppParams(String sourceUrl) {
+            this.sourceUrl = sourceUrl;
+        }
+
+        public String getSourceUrl() {
+            return sourceUrl;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            WebAppParams that = (WebAppParams) o;
+            return Objects.equals(sourceUrl, that.sourceUrl);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(sourceUrl);
+        }
     }
 }

@@ -19,11 +19,16 @@
 package com.lgi.appstore.metadata.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.lgi.appstore.metadata.api.stb.input.validator.PlatformAndVersionOptionalForWebValidator;
+import com.lgi.appstore.metadata.model.ApplicationType;
 import com.lgi.appstore.metadata.util.ApplicationUrlCreator;
+import com.lgi.appstore.metadata.util.ApplicationUrlService;
 import com.lgi.appstore.metadata.util.ObjectMapperFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import java.util.Collection;
 
 @Configuration
 public class BeanConfiguration {
@@ -34,6 +39,9 @@ public class BeanConfiguration {
     @Value("#{environment.BUNDLES_STORAGE_HOST}")
     private String bundlesStorageHost;
 
+    @Value("${webApplications.list}")
+    private Collection<ApplicationType> webApplicationTypes;
+
     @Bean
     public ApplicationUrlCreator applicationUrlBuilder() {
         return new ApplicationUrlCreator(bundlesStorageProtocol, bundlesStorageHost);
@@ -42,5 +50,15 @@ public class BeanConfiguration {
     @Bean
     public ObjectMapper objectMapper() {
         return ObjectMapperFactory.create();
+    }
+
+    @Bean
+    public ApplicationUrlService applicationUrlService(ApplicationUrlCreator urlCreator) {
+        return new ApplicationUrlService(urlCreator, webApplicationTypes);
+    }
+
+    @Bean
+    public PlatformAndVersionOptionalForWebValidator stbAppListParamsValidator() {
+        return new PlatformAndVersionOptionalForWebValidator(webApplicationTypes);
     }
 }
