@@ -21,8 +21,8 @@ package com.lgi.appstore.metadata.util;
 
 import com.lgi.appstore.metadata.model.ApplicationType;
 
+import java.util.Arrays;
 import java.util.Collection;
-import java.util.Locale;
 import java.util.Optional;
 
 public final class ApplicationTypeHelper {
@@ -30,35 +30,24 @@ public final class ApplicationTypeHelper {
     }
 
     public static boolean isSupported(String applicationType) {
-        try {
-            fromValue(applicationType);
-            return true;
-        } catch (IllegalArgumentException illegalArgumentException) {
-            return false;
-        }
+        return fromValue(applicationType).isPresent();
     }
 
     public static boolean isNativeApplication(String applicationType, Collection<ApplicationType> webApplications) {
-        try {
-            final var type = fromValue(applicationType);
-            return !webApplications.contains(type);
-        } catch (IllegalArgumentException illegalArgumentException) {
-            return false;
-        }
+        return fromValue(applicationType).map(e -> !webApplications.contains(e)).orElse(false);
     }
 
     public static boolean isWebApplication(String applicationType, Collection<ApplicationType> webApplications) {
-        try {
-            final var type = fromValue(applicationType);
-            return webApplications.contains(type);
-        } catch (IllegalArgumentException illegalArgumentException) {
-            return false;
-        }
+        return fromValue(applicationType).map(webApplications::contains).orElse(false);
     }
 
-    private static ApplicationType fromValue(String applicationType) {
-        String lowercaseType = Optional.ofNullable(applicationType).map(type -> type.toLowerCase(Locale.ROOT)).orElse("");
-        return ApplicationType.fromValue(lowercaseType);
+    private static Optional<ApplicationType> fromValue(String applicationType) {
+        if (applicationType == null) {
+            return Optional.empty();
+        }
+        return Arrays.stream(ApplicationType.values())
+                .filter(e -> applicationType.equalsIgnoreCase(e.getValue()))
+                .findFirst();
     }
 
 }
