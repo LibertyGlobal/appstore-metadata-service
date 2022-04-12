@@ -246,11 +246,13 @@ class PersistentAppsServiceTest extends BaseServiceTest {
         final var randomMaintainerRecord = createRandomMaintainerRecord();
         final var applicationId = UUID.randomUUID().toString();
         final var latestVersion = "500";
-        final var expectedUrl = urlCreator.createApplicationUrl(new ApplicationUrlCreator.NativeAppParams(applicationId, latestVersion, null, null));
+        final var platformName = "platform";
+        final var firmwareVersion = "firmware";
+        final var expectedUrl = urlCreator.createApplicationUrl(new ApplicationUrlCreator.NativeAppParams(applicationId, latestVersion, platformName, firmwareVersion));
         createRandomApplicationRecord(randomMaintainerRecord, applicationId, latestVersion, "nativeApp", false);
 
         // WHEN
-        final var applicationType = appsService.getApplicationDetails(applicationId, latestVersion,null, null);
+        final var applicationType = appsService.getApplicationDetails(applicationId, latestVersion,platformName, firmwareVersion);
 
         // THEN
         assertThat(applicationType).isPresent();

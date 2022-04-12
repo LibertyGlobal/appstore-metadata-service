@@ -61,10 +61,10 @@ class ApplicationUrlServiceTest {
 
     private ApplicationUrlService.ApplicationUrlParams createApplicationParams(String appId) {
         return new ApplicationUrlService.ApplicationUrlParams(appId,
-                null,
-                null,
-                null,
-                null,
-                null);
+                "platform",
+                "firmware",
+                appId,
+                "version",
+                "imageUrl");
     }
 }
