@@ -23,6 +23,8 @@ import org.junit.jupiter.api.Test;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class ApplicationUrlCreatorTest {
 
@@ -59,4 +61,33 @@ class ApplicationUrlCreatorTest {
         //THEN
         assertThat(url).isEqualTo("http://url");
     }
+
+    @Test
+    void cannotCreateWebApplicationIfUrlIsAbsent() {
+        final var nullPointerException = assertThrows(NullPointerException.class,
+                () -> new ApplicationUrlCreator.WebAppParams(null));
+        assertThat(nullPointerException).hasMessage("sourceUrl");
+    }
+
+    @Test
+    void cannotCreateNativeApplicationIfAnyParameterIsNull() {
+        // WHEN
+        final var missingFirmwareVersion = assertThrows(NullPointerException.class,
+                () -> new ApplicationUrlCreator.NativeAppParams("appId", "version", "platform", null));
+        final var missingPlatformName = assertThrows(NullPointerException.class,
+                () -> new ApplicationUrlCreator.NativeAppParams("appId", "version", null, "firmware"));
+        final var missingVersion = assertThrows(NullPointerException.class,
+                () -> new ApplicationUrlCreator.NativeAppParams("appId", null, "platform", "firmware"));
+        final var missingApplicationId = assertThrows(NullPointerException.class,
+                () -> new ApplicationUrlCreator.NativeAppParams(null, "version", "platform", "firmware"));
+
+        // THEN
+        assertAll(() -> {
+            assertThat(missingFirmwareVersion).hasMessage("firmwareVersion");
+            assertThat(missingPlatformName).hasMessage("platformName");
+            assertThat(missingVersion).hasMessage("version");
+            assertThat(missingApplicationId).hasMessage("applicationId");
+        });
+    }
+
 }

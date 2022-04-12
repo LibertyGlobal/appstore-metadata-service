@@ -66,10 +66,10 @@ public class ApplicationUrlCreator {
         private final String firmwareVersion;
 
         public NativeAppParams(String applicationId, String version, String platformName, String firmwareVersion) {
-            this.applicationId = applicationId;
-            this.version = version;
-            this.platformName = platformName;
-            this.firmwareVersion = firmwareVersion;
+            this.applicationId = requireNonNull(applicationId, "applicationId");
+            this.version = requireNonNull(version, "version");
+            this.platformName = requireNonNull(platformName, "platformName");
+            this.firmwareVersion = requireNonNull(firmwareVersion, "firmwareVersion");
         }
 
         public String getApplicationId() {
@@ -106,7 +106,7 @@ public class ApplicationUrlCreator {
         private final String sourceUrl;
 
         public WebAppParams(String sourceUrl) {
-            this.sourceUrl = sourceUrl;
+            this.sourceUrl = requireNonNull(sourceUrl, "sourceUrl");
         }
 
         public String getSourceUrl() {
