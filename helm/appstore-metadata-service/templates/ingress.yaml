@@ -34,7 +34,7 @@ spec:
       - path: /
         backend:
           serviceName: {{ include "appstore-metadata-charts.fullname" . }}
-          servicePort: 8080
+          servicePort: {{ .Values.service.port }}
 {{- if eq .Values.addIngressesAndSecretsForSTBAndAS3 "true" }}
 ---
 apiVersion: extensions/v1beta1
@@ -57,7 +57,7 @@ spec:
       - path: /
         backend:
           serviceName: {{ include "appstore-metadata-charts.fullname" . }}
-          servicePort: 8080
+          servicePort: {{ .Values.service.port }}
 ---
 apiVersion: extensions/v1beta1
 kind: Ingress
@@ -79,5 +79,5 @@ spec:
       - path: /
         backend:
           serviceName: {{ include "appstore-metadata-charts.fullname" . }}
-          servicePort: 8080
+          servicePort: {{ .Values.service.port }}
 {{- end }}
