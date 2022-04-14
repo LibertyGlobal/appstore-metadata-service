@@ -27,6 +27,7 @@ import com.lgi.appstore.metadata.model.ApplicationType;
 import com.lgi.appstore.metadata.util.ApplicationTypeHelper;
 
 import java.util.Collection;
+import java.util.Objects;
 
 import static com.lgi.appstore.metadata.util.ApplicationTypeHelper.isNativeApplication;
 import static java.util.Objects.requireNonNull;
@@ -39,9 +40,9 @@ public class PlatformAndVersionOptionalForWebValidator {
         this.webApplications = requireNonNull(webApplications, "webApplications");
     }
 
-    public StbAppsListParams validate(StbAppsListParams params, AppIdWithType appIdWithType) {
-        requireNonNull(params.getAppId());
-        requireNonNull(appIdWithType);
+    public PlatformAndVersionValidationResult validate(StbAppsListParams stbAppsListParams, AppIdWithType appIdWithType) {
+        requireNonNull(stbAppsListParams.getAppId(), "stbAppsListParams");
+        requireNonNull(appIdWithType, "appIdWithType");
 
         final var applicationType = appIdWithType.getApplicationType();
 
@@ -49,15 +50,39 @@ public class PlatformAndVersionOptionalForWebValidator {
             throw new UnsupportedApplicationTypeException();
         }
         if (isNativeApplication(applicationType, webApplications)) {
-            if (isBlank(params.getPlatformName())) {
+            if (isBlank(stbAppsListParams.getPlatformName())) {
                 throw new MandatoryFieldForNativeAppNotFound("platformName");
             }
-            if (isBlank(params.getFirmwareVer())) {
+            if (isBlank(stbAppsListParams.getFirmwareVer())) {
                 throw new MandatoryFieldForNativeAppNotFound("firmwareVer");
             }
-            return params;
+            return new PlatformAndVersionValidationResult(false);
         }
-        return new StbAppsListParams(params.getAppId());
+        return new PlatformAndVersionValidationResult(true);
     }
 
+    public static class PlatformAndVersionValidationResult {
+        private final boolean platformAndVersionMustBeIgnored;
+
+        public PlatformAndVersionValidationResult(boolean platformAndVersionMustBeIgnored) {
+            this.platformAndVersionMustBeIgnored = platformAndVersionMustBeIgnored;
+        }
+
+        public boolean platformAndVersionMustBeIgnored() {
+            return platformAndVersionMustBeIgnored;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            PlatformAndVersionValidationResult that = (PlatformAndVersionValidationResult) o;
+            return platformAndVersionMustBeIgnored == that.platformAndVersionMustBeIgnored;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(platformAndVersionMustBeIgnored);
+        }
+    }
 }

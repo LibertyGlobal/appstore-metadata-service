@@ -20,6 +20,8 @@ package com.lgi.appstore.metadata.api.stb;
 
 import com.lgi.appstore.metadata.api.stb.input.StbAppsListParams;
 import com.lgi.appstore.metadata.api.stb.input.validator.PlatformAndVersionOptionalForWebValidator;
+import com.lgi.appstore.metadata.api.stb.input.validator.PlatformAndVersionOptionalForWebValidator.PlatformAndVersionValidationResult;
+import com.lgi.appstore.metadata.model.AppIdWithType;
 import com.lgi.appstore.metadata.model.AppIdWithVersion;
 import com.lgi.appstore.metadata.model.Category;
 import com.lgi.appstore.metadata.model.Platform;
@@ -56,14 +58,17 @@ public class StbAppsController {
                 appsService.getApplicationType(appIdWithVersion.getAppId()) :
                 appsService.getApplicationType(appIdWithVersion.getAppId(), appIdWithVersion.getVersion());
 
-        if (applicationType.isPresent()) {
-            appsListParams = platformAndVersionOptionalForWebValidator.validate(appsListParams, applicationType.get());
-        }
+        final boolean ignorePlatformAndFirmwareVersion = applicationType.map(appIdWithType -> validatePlatformAndVersionForWeb(appsListParams, appIdWithType))
+                .map(PlatformAndVersionValidationResult::platformAndVersionMustBeIgnored)
+                .orElse(Boolean.FALSE);
 
         LOG.info("GET /apps/{appId} called with the following parameters: appId = '{}', version = '{}'", appIdWithVersion.getAppId(), appIdWithVersion.getVersion());
+        final String platformName = ignorePlatformAndFirmwareVersion ? null : appsListParams.getPlatformName();
+        final String firmwareVer = ignorePlatformAndFirmwareVersion ? null : appsListParams.getFirmwareVer();
+        
         final Optional<StbApplicationDetails> applicationDetails = appIdWithVersion.isLatest()
-                ? appsService.getApplicationDetails(appIdWithVersion.getAppId(), appsListParams.getPlatformName(), appsListParams.getFirmwareVer())
-                : appsService.getApplicationDetails(appIdWithVersion.getAppId(), appIdWithVersion.getVersion(), appsListParams.getPlatformName(), appsListParams.getFirmwareVer());
+                ? appsService.getApplicationDetails(appIdWithVersion.getAppId(), platformName, firmwareVer)
+                : appsService.getApplicationDetails(appIdWithVersion.getAppId(), appIdWithVersion.getVersion(), platformName, firmwareVer);
 
         LOG.info("Returning: {}", applicationDetails);
 
@@ -88,5 +93,9 @@ public class StbAppsController {
         LOG.info("Returning: {}", applicationsList);
 
         return ResponseEntity.ok(applicationsList);
+    }
+
+    private PlatformAndVersionValidationResult validatePlatformAndVersionForWeb(StbAppsListParams appsListParams, AppIdWithType appIdWithType) {
+        return platformAndVersionOptionalForWebValidator.validate(appsListParams, appIdWithType);
     }
 }

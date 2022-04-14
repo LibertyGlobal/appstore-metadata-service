@@ -98,6 +98,7 @@ public class PersistentAppsService implements AppsService {
                 .and(APPLICATION.VERSION.eq(version))
                 .and(APPLICATION.VISIBLE.isTrue())
                 .orderBy(VERSION_SORT_FIELD)
+                .limit(1)
                 .fetchStream()
                 .map(sqlRecord -> getAppIdWithType(appId, sqlRecord))
                 .findFirst();

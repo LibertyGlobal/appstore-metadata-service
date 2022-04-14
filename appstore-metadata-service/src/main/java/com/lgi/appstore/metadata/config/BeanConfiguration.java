@@ -58,7 +58,7 @@ public class BeanConfiguration {
     }
 
     @Bean
-    public PlatformAndVersionOptionalForWebValidator stbAppListParamsValidator() {
+    public PlatformAndVersionOptionalForWebValidator platformAndVersionOptionalForWebValidator() {
         return new PlatformAndVersionOptionalForWebValidator(webApplicationTypes);
     }
 }

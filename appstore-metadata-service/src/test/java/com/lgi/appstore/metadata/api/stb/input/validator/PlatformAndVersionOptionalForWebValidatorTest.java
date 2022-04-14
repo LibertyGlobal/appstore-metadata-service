@@ -82,10 +82,7 @@ class PlatformAndVersionOptionalForWebValidatorTest {
         final var result = validator.validate(nativeAppParams, new AppIdWithType("native-app", ApplicationType.DAC_NATIVE.getValue()));
 
         // THEN
-        assertThat(result)
-                .hasFieldOrPropertyWithValue("appId", "native-app")
-                .hasFieldOrPropertyWithValue("firmwareVer", "firmware")
-                .hasFieldOrPropertyWithValue("platformName", "platform");
+        assertThat(result.platformAndVersionMustBeIgnored()).isFalse();
     }
 
     @Test
@@ -99,9 +96,7 @@ class PlatformAndVersionOptionalForWebValidatorTest {
         final var result = validator.validate(nativeApp,  new AppIdWithType("web-app", ApplicationType.HTML5.getValue()));
 
         // THEN
-        assertThat(result)
-                .hasAllNullFieldsOrPropertiesExcept("appId")
-                .hasFieldOrPropertyWithValue("appId", "web-app");
+        assertThat(result.platformAndVersionMustBeIgnored()).isTrue();
     }
 
     @Test
