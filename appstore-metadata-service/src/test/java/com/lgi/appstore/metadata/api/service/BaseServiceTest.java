@@ -38,7 +38,8 @@ import org.springframework.test.context.ContextConfiguration;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Random;
-import java.util.UUID;
+
+import static java.util.UUID.randomUUID;
 
 @JooqTest
 @ContextConfiguration(initializers = PostgresContainerInitializer.class)
@@ -75,14 +76,39 @@ public abstract class BaseServiceTest {
                                                               Platform platform,
                                                               Dependency dependency,
                                                               Feature feature) throws JsonProcessingException {
-        return createRandomApplicationRecord(maintainerRecord, localization, hardware, platform, dependency, feature, UUID.randomUUID().toString(),
-                String.valueOf(new Random().nextInt(200)), true);
+        return createRandomApplicationRecord(maintainerRecord,
+                localization,
+                hardware,
+                platform,
+                dependency,
+                feature,
+                randomUUID().toString(),
+                String.valueOf(new Random().nextInt(200)),
+                randomUUID().toString(),
+                true);
     }
 
     protected ApplicationRecord createRandomApplicationRecord(MaintainerRecord maintainerRecord, String applicationId, String version, boolean latest)
             throws JsonProcessingException {
-        return createRandomApplicationRecord(maintainerRecord, createRandomLocalization(), createRandomHardware(), createRandomPlatform(),
-                createRandomDependency(), createRandomFeature(), applicationId, version, latest);
+        return createRandomApplicationRecord(maintainerRecord,
+                applicationId,
+                version,
+                randomUUID().toString(),
+                latest);
+    }
+
+    protected ApplicationRecord createRandomApplicationRecord(MaintainerRecord maintainerRecord, String applicationId, String version, String type, boolean latest)
+            throws JsonProcessingException {
+        return createRandomApplicationRecord(maintainerRecord,
+                createRandomLocalization(),
+                createRandomHardware(),
+                createRandomPlatform(),
+                createRandomDependency(),
+                createRandomFeature(),
+                applicationId,
+                version,
+                type,
+                latest);
     }
 
     protected ApplicationRecord createRandomApplicationRecord(MaintainerRecord maintainerRecord,
@@ -93,13 +119,14 @@ public abstract class BaseServiceTest {
                                                               Feature feature,
                                                               String applicationId,
                                                               String version,
+                                                              String type,
                                                               boolean latest) throws JsonProcessingException {
         final ApplicationRecord applicationRecord = new ApplicationRecord()
                 .setMaintainerId(maintainerRecord.getId())
                 .setCategory(Category.APPLICATION.getValue())
                 .setIdRdomain(applicationId)
-                .setDescription(UUID.randomUUID().toString())
-                .setIcon(UUID.randomUUID().toString())
+                .setDescription(randomUUID().toString())
+                .setIcon(randomUUID().toString())
                 .setVisible(true)
                 .setLatest(JSONB.valueOf("{\"stb\":" + latest + "}"))
                 .setLocalizations(JSONB.valueOf(objectMapper.writeValueAsString(Collections.singleton(localization))))
@@ -108,8 +135,9 @@ public abstract class BaseServiceTest {
                 .setHardware(JSONB.valueOf(objectMapper.writeValueAsString(hardware)))
                 .setPlatform(JSONB.valueOf(objectMapper.writeValueAsString(platform)))
                 .setVersion(version)
-                .setName(UUID.randomUUID().toString())
-                .setType(UUID.randomUUID().toString())
+                .setName(randomUUID().toString())
+                .setType(type)
+                .setOciImageUrl("ociImageUrl")
                 .setSize(10000000);
 
         applicationRecord.attach(context.configuration());
@@ -120,11 +148,11 @@ public abstract class BaseServiceTest {
 
     protected MaintainerRecord createRandomMaintainerRecord() {
         final MaintainerRecord maintainerRecord = new MaintainerRecord()
-                .setCode(UUID.randomUUID().toString())
-                .setName(UUID.randomUUID().toString())
-                .setAddress(UUID.randomUUID().toString())
-                .setEmail(UUID.randomUUID() + "@" + UUID.randomUUID() + ".com")
-                .setHomepage("http://" + UUID.randomUUID() + ".com");
+                .setCode(randomUUID().toString())
+                .setName(randomUUID().toString())
+                .setAddress(randomUUID().toString())
+                .setEmail(randomUUID() + "@" + randomUUID() + ".com")
+                .setHomepage("http://" + randomUUID() + ".com");
 
         maintainerRecord.attach(context.configuration());
         maintainerRecord.insert();
@@ -134,36 +162,36 @@ public abstract class BaseServiceTest {
 
     protected Feature createRandomFeature() {
         return new Feature()
-                .name(UUID.randomUUID().toString())
+                .name(randomUUID().toString())
                 .required(true)
-                .version(UUID.randomUUID().toString());
+                .version(randomUUID().toString());
     }
 
     protected Dependency createRandomDependency() {
         return new Dependency()
-                .id(UUID.randomUUID().toString())
-                .version(UUID.randomUUID().toString());
+                .id(randomUUID().toString())
+                .version(randomUUID().toString());
     }
 
     protected Platform createRandomPlatform() {
         return new Platform()
-                .architecture(UUID.randomUUID().toString())
-                .os(UUID.randomUUID().toString())
-                .variant(UUID.randomUUID().toString());
+                .architecture(randomUUID().toString())
+                .os(randomUUID().toString())
+                .variant(randomUUID().toString());
     }
 
     protected Hardware createRandomHardware() {
         return new Hardware()
-                .cache(UUID.randomUUID().toString())
-                .dmips(UUID.randomUUID().toString())
-                .persistent(UUID.randomUUID().toString())
-                .ram(UUID.randomUUID().toString());
+                .cache(randomUUID().toString())
+                .dmips(randomUUID().toString())
+                .persistent(randomUUID().toString())
+                .ram(randomUUID().toString());
     }
 
     protected Localization createRandomLocalization() {
         return new Localization()
-                .name(UUID.randomUUID().toString())
-                .description(UUID.randomUUID().toString())
-                .languageCode(UUID.randomUUID().toString());
+                .name(randomUUID().toString())
+                .description(randomUUID().toString())
+                .languageCode(randomUUID().toString());
     }
 }

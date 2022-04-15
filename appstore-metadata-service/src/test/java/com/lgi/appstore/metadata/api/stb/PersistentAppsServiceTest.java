@@ -19,8 +19,11 @@
 package com.lgi.appstore.metadata.api.stb;
 
 import com.lgi.appstore.metadata.api.service.BaseServiceTest;
+import com.lgi.appstore.metadata.jooq.model.tables.Application;
 import com.lgi.appstore.metadata.jooq.model.tables.records.ApplicationRecord;
 import com.lgi.appstore.metadata.jooq.model.tables.records.MaintainerRecord;
+import com.lgi.appstore.metadata.model.AppIdWithType;
+import com.lgi.appstore.metadata.model.ApplicationType;
 import com.lgi.appstore.metadata.model.Category;
 import com.lgi.appstore.metadata.model.Dependency;
 import com.lgi.appstore.metadata.model.Feature;
@@ -37,9 +40,14 @@ import com.lgi.appstore.metadata.model.StbApplicationsList;
 import com.lgi.appstore.metadata.model.StbSingleApplicationHeader;
 import com.lgi.appstore.metadata.model.StbVersion;
 import com.lgi.appstore.metadata.util.ApplicationUrlCreator;
+import com.lgi.appstore.metadata.util.ApplicationUrlService;
 import com.lgi.appstore.metadata.util.JsonProcessorHelper;
 import org.jooq.DSLContext;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Arrays;
@@ -54,11 +62,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class PersistentAppsServiceTest extends BaseServiceTest {
 
+    private final ApplicationUrlCreator urlCreator = new ApplicationUrlCreator("", "");
     private final AppsService appsService;
 
     @Autowired
     public PersistentAppsServiceTest(DSLContext dslContext) {
-        appsService = new PersistentAppsService(dslContext, new JsonProcessorHelper(objectMapper), new ApplicationUrlCreator("", ""));
+        final var applicationUrlService = new ApplicationUrlService(urlCreator, List.of(ApplicationType.HTML5));
+        appsService = new PersistentAppsService(dslContext, new JsonProcessorHelper(objectMapper), applicationUrlService);
     }
 
     @Test
@@ -176,6 +186,77 @@ class PersistentAppsServiceTest extends BaseServiceTest {
                 .collect(Collectors.toList());
         assertThat(versions.stream().map(StbVersion::getVersion).filter(Objects::nonNull).collect(Collectors.toList()))
                 .containsExactlyElementsOf(orderedVersions);
+    }
+
+    @ParameterizedTest
+    @CsvSource({"application/vnd.rdk-app.html5,HTML5", "application/vnd.rdk-app.dac.native,DAC_NATIVE"})
+    void applicationTypeShouldBeReturnedBasedOnApplicationId(String type, ApplicationType expectedType) throws Exception {
+
+        // GIVEN
+        final var randomMaintainerRecord = createRandomMaintainerRecord();
+        final var applicationId = UUID.randomUUID().toString();
+        final var latestVersion = "500";
+        final var randomApplicationRecord = createRandomApplicationRecord(randomMaintainerRecord, applicationId, latestVersion, type, false);
+
+        // WHEN
+        final var applicationType = appsService.getApplicationType(randomApplicationRecord.getIdRdomain()).orElse(null);
+
+        // THEN
+        assertThat(applicationType).isNotNull().extracting(AppIdWithType::getApplicationType).isEqualTo(expectedType.getValue());
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = "any")
+    @NullAndEmptySource
+    void applicationTypeIsCopiedFromDB(String type) throws Exception {
+
+        // GIVEN
+        final var randomMaintainerRecord = createRandomMaintainerRecord();
+        final var applicationId = UUID.randomUUID().toString();
+        final var latestVersion = "500";
+        final var randomApplicationRecord = createRandomApplicationRecord(randomMaintainerRecord, applicationId, latestVersion, type, false);
+
+        // WHEN
+        final var applicationType = appsService.getApplicationType(randomApplicationRecord.getIdRdomain());
+
+        // THEN
+        assertThat(applicationType).isPresent();
+        assertThat(applicationType.get().getApplicationType()).isEqualTo(type);
+    }
+
+    @Test
+    void shouldReturnSourceUrlForWebApplication() throws Exception {
+        // GIVEN
+        final var randomMaintainerRecord = createRandomMaintainerRecord();
+        final var applicationId = UUID.randomUUID().toString();
+        final var latestVersion = "500";
+        final var randomApplicationRecord = createRandomApplicationRecord(randomMaintainerRecord, applicationId, latestVersion, "application/vnd.rdk-app.html5", false);
+
+        // WHEN
+        final var applicationType = appsService.getApplicationDetails(applicationId, latestVersion,null, null).orElse(null);
+
+        // THEN
+        assertThat(applicationType).isNotNull();
+        assertThat(applicationType.getHeader().getUrl()).isEqualTo(randomApplicationRecord.get(Application.APPLICATION.OCI_IMAGE_URL));
+    }
+
+    @Test
+    void shouldReturnUrlForNativeApplication() throws Exception {
+        // GIVEN
+        final var randomMaintainerRecord = createRandomMaintainerRecord();
+        final var applicationId = UUID.randomUUID().toString();
+        final var latestVersion = "500";
+        final var platformName = "platform";
+        final var firmwareVersion = "firmware";
+        final var expectedUrl = urlCreator.createApplicationUrl(new ApplicationUrlCreator.NativeAppParams(applicationId, latestVersion, platformName, firmwareVersion));
+        createRandomApplicationRecord(randomMaintainerRecord, applicationId, latestVersion, "nativeApp", false);
+
+        // WHEN
+        final var applicationType = appsService.getApplicationDetails(applicationId, latestVersion,platformName, firmwareVersion);
+
+        // THEN
+        assertThat(applicationType).isPresent();
+        assertThat(applicationType.get().getHeader().getUrl()).isEqualTo(expectedUrl);
     }
 
     private void verifyStbApplicationDetails(Optional<StbApplicationDetails> maybeStbApplicationDetails,

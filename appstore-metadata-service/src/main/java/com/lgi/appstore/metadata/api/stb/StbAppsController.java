@@ -18,6 +18,10 @@
  */
 package com.lgi.appstore.metadata.api.stb;
 
+import com.lgi.appstore.metadata.api.stb.input.StbAppsListParams;
+import com.lgi.appstore.metadata.api.stb.input.validator.PlatformAndVersionOptionalForWebValidator;
+import com.lgi.appstore.metadata.api.stb.input.validator.PlatformAndVersionOptionalForWebValidator.PlatformAndVersionValidationResult;
+import com.lgi.appstore.metadata.model.AppIdWithType;
 import com.lgi.appstore.metadata.model.AppIdWithVersion;
 import com.lgi.appstore.metadata.model.Category;
 import com.lgi.appstore.metadata.model.Platform;
@@ -28,7 +32,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -39,22 +42,30 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/apps")
 public class StbAppsController {
+    private static final Logger LOG = LoggerFactory.getLogger(StbAppsController.class);
 
     @Autowired
     private AppsService appsService;
 
-    private static final Logger LOG = LoggerFactory.getLogger(StbAppsController.class);
+    @Autowired
+    private PlatformAndVersionOptionalForWebValidator platformAndVersionOptionalForWebValidator;
 
     @GetMapping(value = "/{appId:.+}",
             produces = {"application/json"})
-    public ResponseEntity<StbApplicationDetails> getApplicationDetails(@PathVariable("appId") String appId,
-                                                                       @RequestParam String platformName,
-                                                                       @RequestParam String firmwareVer) {
+    public ResponseEntity<StbApplicationDetails> getApplicationDetails(StbAppsListParams appsListParams) {
+        final AppIdWithVersion appIdWithVersion = AppIdWithVersion.fromString(appsListParams.getAppId());
+        final var applicationType =  appIdWithVersion.isLatest() ?
+                appsService.getApplicationType(appIdWithVersion.getAppId()) :
+                appsService.getApplicationType(appIdWithVersion.getAppId(), appIdWithVersion.getVersion());
 
-        final AppIdWithVersion appIdWithVersion = AppIdWithVersion.fromString(appId);
+        final boolean ignorePlatformAndFirmwareVersion = applicationType.map(appIdWithType -> validatePlatformAndVersionForWeb(appsListParams, appIdWithType))
+                .map(PlatformAndVersionValidationResult::platformAndVersionMustBeIgnored)
+                .orElse(Boolean.FALSE);
 
         LOG.info("GET /apps/{appId} called with the following parameters: appId = '{}', version = '{}'", appIdWithVersion.getAppId(), appIdWithVersion.getVersion());
-
+        final String platformName = ignorePlatformAndFirmwareVersion ? null : appsListParams.getPlatformName();
+        final String firmwareVer = ignorePlatformAndFirmwareVersion ? null : appsListParams.getFirmwareVer();
+        
         final Optional<StbApplicationDetails> applicationDetails = appIdWithVersion.isLatest()
                 ? appsService.getApplicationDetails(appIdWithVersion.getAppId(), platformName, firmwareVer)
                 : appsService.getApplicationDetails(appIdWithVersion.getAppId(), appIdWithVersion.getVersion(), platformName, firmwareVer);
@@ -82,5 +93,9 @@ public class StbAppsController {
         LOG.info("Returning: {}", applicationsList);
 
         return ResponseEntity.ok(applicationsList);
+    }
+
+    private PlatformAndVersionValidationResult validatePlatformAndVersionForWeb(StbAppsListParams appsListParams, AppIdWithType appIdWithType) {
+        return platformAndVersionOptionalForWebValidator.validate(appsListParams, appIdWithType);
     }
 }

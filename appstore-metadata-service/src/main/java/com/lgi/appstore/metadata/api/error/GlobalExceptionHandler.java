@@ -62,6 +62,11 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return handleGenericResponse(ex, HttpStatus.CONFLICT, request);
     }
 
+    @ExceptionHandler({MandatoryFieldForNativeAppNotFound.class, UnsupportedApplicationTypeException.class})
+    public ResponseEntity<Object> handleBadRequest(Exception ex, WebRequest request) {
+        return handleGenericResponse(ex, HttpStatus.BAD_REQUEST, request);
+    }
+
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     public ResponseEntity<Object> handleMethodArgumentTypeMismatch(MethodArgumentTypeMismatchException ex, WebRequest request) {
         final ErrorResponse errorResponse = new ErrorResponse();
@@ -92,7 +97,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @Override
     protected ResponseEntity<Object> handleMissingServletRequestParameter(MissingServletRequestParameterException ex, HttpHeaders headers, HttpStatus status,
-            WebRequest request) {
+                                                                          WebRequest request) {
         final ErrorResponse errorResponse = new ErrorResponse().message(ex.getParameterName() + " parameter is missing");
 
         return handleGenericResponse(ex, errorResponse, headers, HttpStatus.BAD_REQUEST, request);
@@ -100,13 +105,13 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @Override
     protected ResponseEntity<Object> handleMissingServletRequestPart(MissingServletRequestPartException ex, HttpHeaders headers, HttpStatus status,
-            WebRequest request) {
+                                                                     WebRequest request) {
         return handleGenericResponse(ex, headers, HttpStatus.BAD_REQUEST, request);
     }
 
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatus status,
-            WebRequest request) {
+                                                                  WebRequest request) {
         final List<String> errors = new ArrayList<>();
 
         for (FieldError error : ex.getBindingResult().getFieldErrors()) {
@@ -135,7 +140,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     private ResponseEntity<Object> handleGenericResponse(Exception ex, ErrorResponse errorResponse, @Nullable HttpHeaders httpHeaders, HttpStatus httpStatus,
-            WebRequest webRequest) {
+                                                         WebRequest webRequest) {
         LOG.warn("Exception: ", ex);
         return handleExceptionInternal(ex, errorResponse, httpHeaders != null ? httpHeaders : new HttpHeaders(), httpStatus, webRequest);
     }

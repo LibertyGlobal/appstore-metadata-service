@@ -18,6 +18,7 @@
  */
 package com.lgi.appstore.metadata.api.stb;
 
+import com.lgi.appstore.metadata.model.AppIdWithType;
 import com.lgi.appstore.metadata.model.Category;
 import com.lgi.appstore.metadata.model.Platform;
 import com.lgi.appstore.metadata.model.StbApplicationDetails;
@@ -26,6 +27,10 @@ import com.lgi.appstore.metadata.model.StbApplicationsList;
 import java.util.Optional;
 
 public interface AppsService {
+    Optional<AppIdWithType> getApplicationType(String appId);
+
+    Optional<AppIdWithType> getApplicationType(String appId, String version);
+
     StbApplicationsList listApplications(String name, String description, String version, String type, Platform platform, Category category, String maintainerName, Integer offset, Integer limit);
 
     Optional<StbApplicationDetails> getApplicationDetails(String appId, String version, String platformName, String firmwareVer);

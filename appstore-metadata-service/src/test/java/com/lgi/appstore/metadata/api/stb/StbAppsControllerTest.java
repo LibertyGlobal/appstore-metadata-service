@@ -19,9 +19,13 @@
 package com.lgi.appstore.metadata.api.stb;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.lgi.appstore.metadata.api.converter.StringToApplicationTypeConverter;
 import com.lgi.appstore.metadata.api.converter.StringToCategoryConverter;
 import com.lgi.appstore.metadata.api.converter.StringToPlatformConverter;
 import com.lgi.appstore.metadata.api.error.GlobalExceptionHandler;
+import com.lgi.appstore.metadata.api.stb.input.validator.PlatformAndVersionOptionalForWebValidator;
+import com.lgi.appstore.metadata.model.AppIdWithType;
+import com.lgi.appstore.metadata.model.ApplicationType;
 import com.lgi.appstore.metadata.model.Category;
 import com.lgi.appstore.metadata.model.Hardware;
 import com.lgi.appstore.metadata.model.Localization;
@@ -38,7 +42,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.format.support.FormattingConversionService;
@@ -55,16 +60,21 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doReturn;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
 @ExtendWith(MockitoExtension.class)
 class StbAppsControllerTest {
+    private static final List<ApplicationType> WEB_APPLICATIONS = List.of(ApplicationType.HTML5);
+
+    private final AppsService appsService = Mockito.mock(AppsService.class);
+
+    @Spy
+    private final PlatformAndVersionOptionalForWebValidator platformAndVersionOptionalForWebValidator = new PlatformAndVersionOptionalForWebValidator(WEB_APPLICATIONS);
 
     private MockMvc mvc;
-
-    @Mock
-    private AppsService appsService;
 
     @InjectMocks
     private StbAppsController stbAppsController;
@@ -78,6 +88,7 @@ class StbAppsControllerTest {
         final FormattingConversionService conversionService = new FormattingConversionService();
         conversionService.addConverter(new StringToCategoryConverter());
         conversionService.addConverter(new StringToPlatformConverter());
+        conversionService.addConverter(new StringToApplicationTypeConverter());
 
         mvc = MockMvcBuilders.standaloneSetup(stbAppsController)
                 .addFilter(((request, response, chain) -> {
@@ -87,6 +98,9 @@ class StbAppsControllerTest {
                 .setControllerAdvice(new GlobalExceptionHandler())
                 .setConversionService(conversionService)
                 .build();
+
+        doReturn(Optional.of(new AppIdWithType("native-app", ApplicationType.DAC_NATIVE.getValue())))
+                .when(appsService).getApplicationType(Mockito.anyString());
     }
 
     private static final StbApplicationHeader FLUTTER_APPLICATION_HEADER = new StbApplicationHeader()
@@ -539,7 +553,7 @@ class StbAppsControllerTest {
 
         // then
         assertThat(response.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-        assertThat(response.getContentAsString()).isEqualTo("{\"message\":\"platformName parameter is missing\"}");
+        assertThat(response.getContentAsString()).isEqualTo("{\"message\":\"platformName is mandatory for native apps\"}");
     }
 
     @Test
@@ -554,6 +568,75 @@ class StbAppsControllerTest {
 
         // then
         assertThat(response.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-        assertThat(response.getContentAsString()).isEqualTo("{\"message\":\"firmwareVer parameter is missing\"}");
+        assertThat(response.getContentAsString()).isEqualTo("{\"message\":\"firmwareVer is mandatory for native apps\"}");
     }
+
+    @Test
+    void cannotListNativeApplicationWhenFirmwareVerIsAbsent() throws Exception {
+        // GIVEN
+        final String platformName = UUID.randomUUID().toString();
+
+        // WHEN
+        MockHttpServletResponse response = mvc
+                .perform(get("/apps/com.libertyglobal.app.youi:latest?platformName={platformName}", platformName))
+                .andReturn()
+                .getResponse();
+
+        // THEN
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.getContentAsString()).isEqualTo("{\"message\":\"firmwareVer is mandatory for native apps\"}");
+    }
+
+    @Test
+    void cannotListNativeApplicationWhenPlatformNameIsAbsent() throws Exception {
+        // GIVEN
+        final String firmwareVer = UUID.randomUUID().toString();
+
+        // WHEN
+        MockHttpServletResponse response = mvc
+                .perform(get("/apps/com.libertyglobal.app.youi:latest?firmwareVer={firmwareVer}", firmwareVer))
+                .andReturn()
+                .getResponse();
+
+        // THEN
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.getContentAsString()).isEqualTo("{\"message\":\"platformName is mandatory for native apps\"}");
+    }
+
+    @Test
+    void canListWebApplication() throws Exception {
+        // GIVEN
+        doReturn(Optional.of(new AppIdWithType("web-app", ApplicationType.HTML5.toString())))
+                .when(appsService).getApplicationType(Mockito.anyString());
+        doReturn(Optional.of(YOU_I_APPLICATION_DETAILS))
+                .when(appsService).getApplicationDetails(eq("com.libertyglobal.app.youi"), Mockito.any(), Mockito.any());
+
+        // WHEN
+        MockHttpServletResponse response = mvc
+                .perform(get("/apps/com.libertyglobal.app.youi:latest"))
+                .andReturn()
+                .getResponse();
+
+        // THEN
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
+    }
+
+    @Test
+    void cannotListApplicationWhenTypeIsUnsupported() throws Exception {
+        // GIVEN
+        doReturn(Optional.of(new AppIdWithType("web-app", null))).when(appsService).getApplicationType(Mockito.anyString());
+        doReturn(Optional.of(YOU_I_APPLICATION_DETAILS))
+                .when(appsService).getApplicationDetails(eq("com.libertyglobal.app.youi"), Mockito.any(), Mockito.any());
+
+        // WHEN
+        MockHttpServletResponse response = mvc
+                .perform(get("/apps/com.libertyglobal.app.youi:latest"))
+                .andReturn()
+                .getResponse();
+
+        // THEN
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.getContentAsString()).isEqualTo("{\"message\":\"Unsupported application type\"}");
+    }
+
 }

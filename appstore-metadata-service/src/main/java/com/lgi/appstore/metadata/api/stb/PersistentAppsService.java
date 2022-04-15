@@ -19,6 +19,7 @@
 package com.lgi.appstore.metadata.api.stb;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.lgi.appstore.metadata.model.AppIdWithType;
 import com.lgi.appstore.metadata.model.Category;
 import com.lgi.appstore.metadata.model.Hardware;
 import com.lgi.appstore.metadata.model.JsonObjectNames;
@@ -31,11 +32,12 @@ import com.lgi.appstore.metadata.model.StbApplicationHeader;
 import com.lgi.appstore.metadata.model.StbApplicationsList;
 import com.lgi.appstore.metadata.model.StbSingleApplicationHeader;
 import com.lgi.appstore.metadata.model.StbVersion;
-import com.lgi.appstore.metadata.util.ApplicationUrlCreator;
+import com.lgi.appstore.metadata.util.ApplicationUrlService;
 import com.lgi.appstore.metadata.util.JsonProcessorHelper;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.JSONB;
+import org.jooq.Record;
 import org.jooq.Record1;
 import org.jooq.Record9;
 import org.jooq.SelectConditionStep;
@@ -59,7 +61,7 @@ public class PersistentAppsService implements AppsService {
 
     private final DSLContext dslContext;
     private final JsonProcessorHelper jsonProcessorHelper;
-    private final ApplicationUrlCreator applicationUrlCreator;
+    private final ApplicationUrlService applicationUrlService;
 
     private static final String VERSION_PART_DELIMITER = ".";
     private static final SortField<int[]> VERSION_SORT_FIELD = PostgresDSL.stringToArray(APPLICATION.VERSION, VERSION_PART_DELIMITER)
@@ -68,10 +70,38 @@ public class PersistentAppsService implements AppsService {
 
     @Autowired
     public PersistentAppsService(DSLContext dslContext,
-                                 JsonProcessorHelper jsonProcessorHelper, ApplicationUrlCreator applicationUrlCreator) {
+                                 JsonProcessorHelper jsonProcessorHelper,
+                                 ApplicationUrlService applicationUrlService) {
         this.dslContext = dslContext;
         this.jsonProcessorHelper = jsonProcessorHelper;
-        this.applicationUrlCreator = applicationUrlCreator;
+        this.applicationUrlService = applicationUrlService;
+    }
+
+    @Override
+    public Optional<AppIdWithType> getApplicationType(String appId) {
+        return dslContext.select(APPLICATION.TYPE)
+                .from(APPLICATION)
+                .where(APPLICATION.ID_RDOMAIN.eq(appId))
+                .and(APPLICATION.VISIBLE.isTrue())
+                .orderBy(VERSION_SORT_FIELD)
+                .limit(1)
+                .fetchStream()
+                .map(sqlRecord -> getAppIdWithType(appId, sqlRecord))
+                .findFirst();
+    }
+
+    @Override
+    public Optional<AppIdWithType> getApplicationType(String appId, String version) {
+        return dslContext.select(APPLICATION.TYPE)
+                .from(APPLICATION)
+                .where(APPLICATION.ID_RDOMAIN.eq(appId))
+                .and(APPLICATION.VERSION.eq(version))
+                .and(APPLICATION.VISIBLE.isTrue())
+                .orderBy(VERSION_SORT_FIELD)
+                .limit(1)
+                .fetchStream()
+                .map(sqlRecord -> getAppIdWithType(appId, sqlRecord))
+                .findFirst();
     }
 
     @Override
@@ -212,7 +242,8 @@ public class PersistentAppsService implements AppsService {
                         APPLICATION.HARDWARE,
                         APPLICATION.FEATURES,
                         APPLICATION.DEPENDENCIES,
-                        APPLICATION.SIZE
+                        APPLICATION.SIZE,
+                        APPLICATION.OCI_IMAGE_URL
                 )
 
                 .from(MAINTAINER)
@@ -229,10 +260,7 @@ public class PersistentAppsService implements AppsService {
                             .icon(applicationMetadataRecord.get(APPLICATION.ICON))
                             .name(applicationMetadataRecord.get(APPLICATION.NAME))
                             .description(applicationMetadataRecord.get(APPLICATION.DESCRIPTION))
-                            .url(applicationUrlCreator.createApplicationUrl(applicationMetadataRecord.get(APPLICATION.ID_RDOMAIN),
-                                    applicationMetadataRecord.get(APPLICATION.VERSION),
-                                    platformName,
-                                    firmwareVer))
+                            .url(createApplicationUrlFromApplicationRecord(applicationMetadataRecord, platformName, firmwareVer))
                             .type(applicationMetadataRecord.get(APPLICATION.TYPE))
                             .size(applicationMetadataRecord.get(APPLICATION.SIZE))
                             .category(Category.fromValue(applicationMetadataRecord.get(APPLICATION.CATEGORY)))
@@ -298,7 +326,8 @@ public class PersistentAppsService implements AppsService {
                         APPLICATION.HARDWARE,
                         APPLICATION.FEATURES,
                         APPLICATION.DEPENDENCIES,
-                        APPLICATION.SIZE
+                        APPLICATION.SIZE,
+                        APPLICATION.OCI_IMAGE_URL
                 )
 
                 .from(MAINTAINER)
@@ -315,10 +344,7 @@ public class PersistentAppsService implements AppsService {
                             .icon(applicationMetadataRecord.get(APPLICATION.ICON))
                             .name(applicationMetadataRecord.get(APPLICATION.NAME))
                             .description(applicationMetadataRecord.get(APPLICATION.DESCRIPTION))
-                            .url(applicationUrlCreator.createApplicationUrl(applicationMetadataRecord.get(APPLICATION.ID_RDOMAIN),
-                                    applicationMetadataRecord.get(APPLICATION.VERSION),
-                                    platformName,
-                                    firmwareVer))
+                            .url(createApplicationUrlFromApplicationRecord(applicationMetadataRecord, platformName, firmwareVer))
                             .type(applicationMetadataRecord.get(APPLICATION.TYPE))
                             .size(applicationMetadataRecord.get(APPLICATION.SIZE))
                             .category(Category.fromValue(applicationMetadataRecord.get(APPLICATION.CATEGORY)))
@@ -349,5 +375,20 @@ public class PersistentAppsService implements AppsService {
                                     .platform(jsonProcessorHelper
                                             .readValue(JsonObjectNames.PLATFORM, applicationMetadataRecord.get(APPLICATION.PLATFORM).data(), Platform.class)));
                 });
+    }
+
+    private String createApplicationUrlFromApplicationRecord(Record applicationMetadataRecord, String platformName, String firmwareVer) {
+        return applicationUrlService.createApplicationUrlFromApplicationRecord(new ApplicationUrlService.ApplicationUrlParams(
+                applicationMetadataRecord.get(APPLICATION.TYPE),
+                platformName,
+                firmwareVer,
+                applicationMetadataRecord.get(APPLICATION.ID_RDOMAIN),
+                applicationMetadataRecord.get(APPLICATION.VERSION),
+                applicationMetadataRecord.get(APPLICATION.OCI_IMAGE_URL))
+        );
+    }
+
+    private AppIdWithType getAppIdWithType(String appId, Record sqlRecord) {
+        return new AppIdWithType(appId, sqlRecord.get(APPLICATION.TYPE));
     }
 }

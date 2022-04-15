@@ -22,7 +22,7 @@ openapi: 3.0.0
 info:
   title: ASMS API
   description: AppStore Metadata Service REST API. MAS API in RDK.
-  version: 0.4.0
+  version: 0.4.1
   license:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
@@ -131,13 +131,11 @@ paths:
           schema:
             type: string
           description: Platform name
-          required: true
         - name: firmwareVer
           in: query
           schema:
             type: string
           description: Firmware version
-          required: true
       responses:
         200:
           description: Requested application details
@@ -145,6 +143,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/StbApplicationDetails'
+        400:
+          description: |
+            Bad request. Used when
+            * platformName is mandatory for native apps (100217)
+            * firmwareVer is mandatory for native apps (100231)
+            * unsupported application type (100237)
         403:
           description: Access denied
         404:
@@ -877,7 +881,7 @@ components:
       properties:
         architecture:
           type: string
-          description: Architecture (eg. arm, mips, x86, amd64)
+          description: Architecture (eg. arm, mips, x86, amd64, web)
           example: arm
         variant:
           type: string
@@ -885,7 +889,7 @@ components:
           example: v7
         os:
           type: string
-          description: OS (eg. linux)
+          description: OS (eg. linux, all)
           example: linux
     Hardware:
       type: object
@@ -1025,3 +1029,10 @@ components:
         - resource
         - plugin
       description: Application category
+    ApplicationType:
+      type: string
+      enum:
+        - application/vnd.rdk-app.html5
+        - application/vnd.rdk-app.lightning
+        - application/vnd.rdk-app.dac.native
+      description: Application type

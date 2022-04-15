@@ -33,11 +33,12 @@ import com.lgi.appstore.metadata.model.MaintainerVersion;
 import com.lgi.appstore.metadata.model.Meta;
 import com.lgi.appstore.metadata.model.Platform;
 import com.lgi.appstore.metadata.model.ResultSetMeta;
-import com.lgi.appstore.metadata.util.ApplicationUrlCreator;
+import com.lgi.appstore.metadata.util.ApplicationUrlService;
 import com.lgi.appstore.metadata.util.JsonProcessorHelper;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.JSONB;
+import org.jooq.Record;
 import org.jooq.Record1;
 import org.jooq.Record11;
 import org.jooq.Record2;
@@ -74,13 +75,13 @@ public class PersistentAppsService implements AppsService {
 
     private final DSLContext dslContext;
     private final JsonProcessorHelper jsonProcessorHelper;
-    private final ApplicationUrlCreator applicationUrlCreator;
+    private final ApplicationUrlService applicationUrlService;
 
     @Autowired
-    public PersistentAppsService(DSLContext dslContext, JsonProcessorHelper jsonProcessorHelper, ApplicationUrlCreator applicationUrlCreator) {
+    public PersistentAppsService(DSLContext dslContext, JsonProcessorHelper jsonProcessorHelper, ApplicationUrlService applicationUrlService) {
         this.dslContext = dslContext;
         this.jsonProcessorHelper = jsonProcessorHelper;
-        this.applicationUrlCreator = applicationUrlCreator;
+        this.applicationUrlService = applicationUrlService;
     }
 
     @Override
@@ -165,7 +166,6 @@ public class PersistentAppsService implements AppsService {
                                 .total(total)
                 );
 
-
         return new MaintainerApplicationsList()
                 .applications(applicationHeaderList)
                 .meta(meta);
@@ -227,10 +227,7 @@ public class PersistentAppsService implements AppsService {
                 .and(APPLICATION.VERSION.eq(version))
                 .fetchOptional()
                 .map(applicationMetadataRecord -> {
-                    final String url = applicationUrlCreator.createApplicationUrl(applicationMetadataRecord.get(APPLICATION.ID_RDOMAIN),
-                            applicationMetadataRecord.get(APPLICATION.VERSION),
-                            platformName,
-                            firmwareVer);
+                    final String url = createApplicationUrlFromApplicationRecord(applicationMetadataRecord, platformName, firmwareVer);
                     return MaintainerApplicationDetailsMapper.map(applicationMetadataRecord, versions, jsonProcessorHelper, url);
                 });
     }
@@ -289,10 +286,7 @@ public class PersistentAppsService implements AppsService {
                 .and(DSL.condition(APPLICATION.LATEST.getQualifiedName() + " ->> 'maintainer' = 'true'"))
                 .fetchOptional()
                 .map(applicationMetadataRecord -> {
-                    final String url = applicationUrlCreator.createApplicationUrl(applicationMetadataRecord.get(APPLICATION.ID_RDOMAIN),
-                            applicationMetadataRecord.get(APPLICATION.VERSION),
-                            platformName,
-                            firmwareVer);
+                    final String url = createApplicationUrlFromApplicationRecord(applicationMetadataRecord, platformName, firmwareVer);
                     return MaintainerApplicationDetailsMapper.map(applicationMetadataRecord, versions, jsonProcessorHelper, url);
                 });
     }
@@ -517,7 +511,6 @@ public class PersistentAppsService implements AppsService {
                                 .orderBy(PostgresDSL.stringToArray(APPLICATION.VERSION, ".").cast(int[].class).desc())
                                 .limit(1)).asTable("latestVersions");
 
-
         final Map<String, Integer> latestVersions = localDslContext.select(latestVersionsTable.field("id", Integer.class), latestVersionsTable.field("latest", String.class))
                 .from(
                         latestVersionsTable
@@ -555,5 +548,16 @@ public class PersistentAppsService implements AppsService {
                     .and(APPLICATION.ID.eq(latestVersions.get("stb")))
                     .execute();
         }
+    }
+
+    private String createApplicationUrlFromApplicationRecord(Record applicationMetadataRecord, String platformName, String firmwareVer) {
+        return applicationUrlService.createApplicationUrlFromApplicationRecord(new ApplicationUrlService.ApplicationUrlParams(
+                applicationMetadataRecord.get(APPLICATION.TYPE),
+                platformName,
+                firmwareVer,
+                applicationMetadataRecord.get(APPLICATION.ID_RDOMAIN),
+                applicationMetadataRecord.get(APPLICATION.VERSION),
+                applicationMetadataRecord.get(APPLICATION.OCI_IMAGE_URL))
+        );
     }
 }

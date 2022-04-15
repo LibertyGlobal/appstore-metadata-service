@@ -54,7 +54,7 @@ class DevApiFTSpecSanity extends AsmsSanitySpecBase {
         def v1Name = "v1Name"
         def v1Description = "v1Description"
         def v1Icon = "v1Icon"
-        def v1Type = "v1Type"
+        def v1Type = "application/vnd.rdk-app.dac.native"
         def v1Size = 10000000
         def v1Category = pickRandomCategory()
         def v1PlatformArch = "v1PlatformArch"
@@ -107,7 +107,7 @@ class DevApiFTSpecSanity extends AsmsSanitySpecBase {
         def v2Name = "v2NewName"
         def v2Description = "v2NewDescription"
         def v2Icon = "v2NewIcon"
-        def v2Type = "v2NewType"
+        def v2Type = "application/vnd.rdk-app.lightning"
         def v2Size = 10000000
         def v2Category = pickRandomCategoryExcluding(v1Category)
         def v2PlatformArch = "v2PlatformArch"
