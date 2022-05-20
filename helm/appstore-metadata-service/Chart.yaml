@@ -21,7 +21,7 @@ apiVersion: v1
 appVersion: 0.0.1-SNAPSHOT
 description: Appstore Metadata Service
 home: https://github.com/LibertyGlobal/appstore-metadata-service
-kubeVersion: 1.12 - 1.16
+kubeVersion: ">=1.12.0-0"
 name: appstore-metadata-service
 sources:
   - https://github.com/LibertyGlobal/appstore-metadata-service
