@@ -20,7 +20,7 @@
     </modules>
 
     <properties>
-             <test>aa</test>
+             <test>aa1</test>
         <java.version>11</java.version>
         <swagger-annotations-version>1.5.22</swagger-annotations-version>
         <springdoc-openapi-ui-version>1.4.3</springdoc-openapi-ui-version>
