@@ -22,9 +22,9 @@ appSuffix: ''
 image:
   repository: appstore-metadata-service
 
-useSeparateSchemaPerDeployment: "false"
-deleteSchema: "false"
-addIngressesAndSecretsForSTBAndAS3: "true"
+useSeparateSchemaPerDeployment: "false" # Change value for JDBC_SCHEMA dynamically per each deployment
+deleteSchema: "false" # Drops schema before stopping container
+addIngressesAndSecretsForSTBAndAS3: "true" # Adds ingress for STB and as3
 
 ingress:
   domainName: local
@@ -35,17 +35,17 @@ service:
   containerPort: 8080
 
 configMap:
-  JDBC_HOST: "setYourPostgresHost"
-  JDBC_DATABASE_NAME: "setYourDatabaseName"
-  JDBC_SCHEMA: "appstore_metadata_service"
-  JDBC_PORT: "5432"
-  BUNDLES_STORAGE_PROTOCOL: "http"
-  BUNDLES_STORAGE_HOST: "sampleUrl"
+  JDBC_HOST: "setYourPostgresHost" # JDBC host
+  JDBC_DATABASE_NAME: "setYourDatabaseName" # Database name
+  JDBC_SCHEMA: "appstore_metadata_service" # Schema in database
+  JDBC_PORT: "5432" # JDBC port
+  BUNDLES_STORAGE_PROTOCOL: "http" # Protocol used for creating native application URL
+  BUNDLES_STORAGE_HOST: "sampleUrl" # Host used for creating native application URL
 
 sealedSecretName: appstore-metadata-service
 sealedSecret:
-  JDBC_PASSWORD: setYourSealedSecretUsingYourSealedSecretController
-  JDBC_USER: setYourSealedSecretUsingYourSealedSecretController
+  JDBC_PASSWORD: setYourSealedSecretUsingYourSealedSecretController # Sealed JDBC password
+  JDBC_USER: setYourSealedSecretUsingYourSealedSecretController # Sealed JDBC user
 sealedSecretForIngress:
-  STB: setYourSealedSecretUsingYourSealedSecretController
-  AS3: setYourSealedSecretUsingYourSealedSecretController
+  STB: setYourSealedSecretUsingYourSealedSecretController # Sealed secret for STB ingress to provide secure connection
+  AS3: setYourSealedSecretUsingYourSealedSecretController # Sealed secret for AS3 ingress to provide secure connection
