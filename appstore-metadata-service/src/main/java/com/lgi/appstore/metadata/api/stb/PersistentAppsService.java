@@ -85,7 +85,8 @@ public class PersistentAppsService implements AppsService {
                 .and(APPLICATION.VISIBLE.isTrue())
                 .orderBy(VERSION_SORT_FIELD)
                 .limit(1)
-                .fetchStream()
+                .fetch()
+                .stream()
                 .map(sqlRecord -> getAppIdWithType(appId, sqlRecord))
                 .findFirst();
     }
@@ -99,7 +100,8 @@ public class PersistentAppsService implements AppsService {
                 .and(APPLICATION.VISIBLE.isTrue())
                 .orderBy(VERSION_SORT_FIELD)
                 .limit(1)
-                .fetchStream()
+                .fetch()
+                .stream()
                 .map(sqlRecord -> getAppIdWithType(appId, sqlRecord))
                 .findFirst();
     }
@@ -179,7 +181,8 @@ public class PersistentAppsService implements AppsService {
                 .and(condition)
                 .offset(effectiveOffset)
                 .limit(effectiveLimit)
-                .fetchStream()
+                .fetch()
+                .stream()
                 .map(applicationMetadataRecord -> new StbApplicationHeader()
                         .id(applicationMetadataRecord.get(APPLICATION.ID_RDOMAIN))
                         .version(applicationMetadataRecord.get(APPLICATION.VERSION))
@@ -220,7 +223,8 @@ public class PersistentAppsService implements AppsService {
                 .where(APPLICATION.ID_RDOMAIN.eq(appId))
                 .and(APPLICATION.VISIBLE.isTrue())
                 .orderBy(VERSION_SORT_FIELD)
-                .fetchStream()
+                .fetch()
+                .stream()
                 .map(applicationVersionRecord -> new StbVersion()
                         .version(applicationVersionRecord.get(APPLICATION.VERSION))).collect(Collectors.toList());
 
@@ -304,7 +308,8 @@ public class PersistentAppsService implements AppsService {
                 .where(APPLICATION.ID_RDOMAIN.eq(appId))
                 .and(APPLICATION.VISIBLE.isTrue())
                 .orderBy(VERSION_SORT_FIELD)
-                .fetchStream()
+                .fetch()
+                .stream()
                 .map(applicationVersionRecord -> new StbVersion()
                         .version(applicationVersionRecord.get(APPLICATION.VERSION))).collect(Collectors.toList());
 
