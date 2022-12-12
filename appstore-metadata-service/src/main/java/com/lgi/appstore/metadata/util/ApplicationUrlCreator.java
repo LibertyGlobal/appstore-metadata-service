@@ -23,8 +23,8 @@ import java.util.Objects;
 import static java.util.Objects.requireNonNull;
 
 public class ApplicationUrlCreator {
-    //protocol://host/appId/appVersion/platformName/firmwareVer/appId_appVersion_platformName_firmwareVer.tar.gz
-    private static final String APPLICATION_URL_PATTERN = "%s://%s/%s/%s/%s/%s/%s_%s_%s_%s.tar.gz";
+    //protocol://host/appId/appVersion/platformName/firmwareVer/appId-appVersion-platformName-firmwareVer.tar.gz
+    private static final String APPLICATION_URL_PATTERN = "%s://%s/%s/%s/%s/%s/%s-%s-%s-%s.tar.gz";
 
     private final String protocol;
     private final String bundlesStorageHost;
