@@ -17,7 +17,7 @@ Lists of 149 third-party dependencies.
      (The Apache Software License, Version 2.0) Java Faker (com.github.javafaker:javafaker:1.0.2 - http://github.com/DiUS/java-faker)
      (The Apache Software License, Version 2.0) Generex (com.github.mifmif:generex:1.0.2 - https://github.com/mifmif/Generex/tree/master)
      (The Apache Software License, Version 2.0) project ':json-path' (com.jayway.jsonpath:json-path:2.6.0 - https://github.com/jayway/JsonPath)
-     (Apache License, Version 2.0) appstore-metadata-service (com.lgi.appstore.metadata:appstore-metadata-service:0.1.6 - https://spring.io/projects/spring-boot/appstore-metadata-service-parent/appstore-metadata-service)
+     (Apache License, Version 2.0) appstore-metadata-service (com.lgi.appstore.metadata:appstore-metadata-service:0.1.7-SNAPSHOT - https://spring.io/projects/spring-boot/appstore-metadata-service-parent/appstore-metadata-service)
      (Eclipse Distribution License - v 1.0) Old JAXB Runtime (com.sun.xml.bind:jaxb-impl:2.3.3 - https://eclipse-ee4j.github.io/jaxb-ri/jaxb-bundles/jaxb-impl)
      (Apache License 2.0) JSON library from Android SDK (com.vaadin.external.google:android-json:0.0.20131108.vaadin1 - http://developer.android.com/sdk)
      (The Apache Software License, Version 2.0) HikariCP (com.zaxxer:HikariCP:4.0.3 - https://github.com/brettwooldridge/HikariCP)
