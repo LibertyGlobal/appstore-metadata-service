@@ -47,7 +47,7 @@ class ApplicationUrlCreatorTest {
         //THEN
         assertThat(url).matches(PROTOCOL + "://" + BUNDLES_STORAGE_HOST.replace(".", "\\.") + "/"
                 + applicationId + "/" + version + "/" + platformName + "/" + firmwareVer + "/"
-                + applicationId + "_" + version + "_" + platformName + "_" + firmwareVer + "\\.tar\\.gz");
+                + applicationId + "-" + version + "-" + platformName + "-" + firmwareVer + "\\.tar\\.gz");
     }
 
     @Test
