@@ -28,6 +28,16 @@
         <scmBranch>current</scmBranch>
         <scmCommit>latest</scmCommit>
         <sock-dir-docker-host>/var/run/docker.sock</sock-dir-docker-host>
+        <sonar.coverage.exclusions>
+            src/main/java/com/lgi/appstore/metadata/api/constants/*,
+            src/main/java/com/lgi/appstore/metadata/api/error/*Exception.java,
+            src/main/java/com/lgi/appstore/metadata/api/error/MandatoryFieldForNativeAppNotFound.java
+        </sonar.coverage.exclusions>
+        <sonar.cpd.exclusions>
+            src/main/java/com/lgi/appstore/metadata/api/constants/*,
+            src/main/java/com/lgi/appstore/metadata/api/error/*Exception.java,
+            src/main/java/com/lgi/appstore/metadata/api/error/MandatoryFieldForNativeAppNotFound.java
+        </sonar.cpd.exclusions>
     </properties>
 
     <profiles>
