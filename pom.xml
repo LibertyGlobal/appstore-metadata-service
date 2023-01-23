@@ -25,8 +25,10 @@
         <springdoc-openapi-ui-version>1.4.3</springdoc-openapi-ui-version>
         <junit-version>5.8.2</junit-version>
         <maven-surefire-version>2.22.2</maven-surefire-version>
+        <maven-release-plugin.version>2.5.3</maven-release-plugin.version>
         <logstash.logback.encoder.version>6.4</logstash.logback.encoder.version>
         <skipUTs>false</skipUTs>
+        <skipJarUpload>false</skipJarUpload>
         <registry.url>set_for_pushing_docker_image</registry.url>
         <registry.namespace>set_for_pushing_docker_image</registry.namespace>
         <jar.repository.url>set_for_pushing_jar_image</jar.repository.url>
@@ -251,6 +253,21 @@
                         <phase>prepare-package</phase>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <artifactId>maven-deploy-plugin</artifactId>
+                <configuration>
+                    <skip>${skipJarUpload}</skip>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-release-plugin</artifactId>
+                <version>${maven-release-plugin.version}</version>
+                <configuration>
+                    <scmCommentPrefix>[ci skip]</scmCommentPrefix>
+                    <tagNameFormat>${project.version}</tagNameFormat>
+                </configuration>
             </plugin>
         </plugins>
     </build>

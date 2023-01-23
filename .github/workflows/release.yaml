@@ -1,0 +1,60 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+env:
+  REGISTRY_URL: docker.io
+  REGISTRY_NAMESPACE: mrutski
+
+jobs:
+
+  build:
+    runs-on: ubuntu-20.04
+    if: "!contains(github.event.head_commit.message, '[ci skip]')"
+
+    services:
+      postgres:
+        image: postgres
+        env:
+          POSTGRES_PASSWORD: postgres
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+      testcontainers:
+        image: testcontainers/ryuk:0.3.0
+        ports:
+          - 46577:46577
+        volumes:
+          - /var/run/docker.sock:/var/run/docker.sock
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup JDK
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@f054a8b539a109f9f41c372932f1ae047eff08c9
+        with:
+          username: ${{ secrets.DOCKER_REGISTRY_USERNAME }}
+          password: ${{ secrets.DOCKER_REGISTRY_PASSWORD }}
+
+      - name: Build and Test
+        run:
+          ./mvnw --batch-mode --update-snapshots deploy 
+          -DskipTests 
+          -Dregistry.url=$REGISTRY_URL -Dregistry.namespace=$REGISTRY_NAMESPACE 
+          -DskipJarUpload=true 
+          -Ddb.port=5432 
+          -Ddocker.skip=true
