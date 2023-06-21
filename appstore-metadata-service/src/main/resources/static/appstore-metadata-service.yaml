@@ -1035,4 +1035,5 @@ components:
         - application/vnd.rdk-app.html5
         - application/vnd.rdk-app.lightning
         - application/vnd.rdk-app.dac.native
+        - application/dac.native
       description: Application type
