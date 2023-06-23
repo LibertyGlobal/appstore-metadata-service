@@ -1,0 +1,101 @@
+#
+# If not stated otherwise in this file or this component's LICENSE file the
+# following copyright and licenses apply:
+#
+# Copyright 2023 Liberty Global Technology Services BV
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+name: Sets version on project
+on:
+  workflow_call:
+    inputs:
+      java-version:
+        description: "JDK Version"
+        type: string
+        required: true
+      version:
+        description: "Version to set"
+        type: string
+        required: true
+      commit:
+        description: "Commit"
+        type: boolean
+        default: false
+      commit_message:
+        description: "Commit message"
+        type: string
+      create_tag:
+        description: "Create tag"
+        type: boolean
+        default: false
+env:
+  CI_COMMIT_AUTHOR: Dac-Cloud-Bot
+  CI_COMMIT_AUTHOR_EMAIL: dac-cloud@libertyglobal.com
+  CI_COMMIT_MESSAGE: "[CI] ${{ inputs.commit_message }}"
+
+jobs:
+  set-version:
+    if: inputs.commit == false
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-java@v3
+        with:
+          java-version: ${{ inputs.java-version }}
+          distribution: 'temurin'
+          cache: maven
+      - name: Set next release version
+        run: mvn versions:set -DnewVersion=${{ inputs.version }} -DprocessAllModules
+  set-version-tag-and-commit:
+    if: inputs.commit && inputs.create_tag
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-java@v3
+        with:
+          java-version: ${{ inputs.java-version }}
+          distribution: 'temurin'
+          cache: maven
+      - name: GIT commit and push all changed files
+        run: |
+          git pull
+          mvn versions:set -DnewVersion=${{ inputs.version }} -DprocessAllModules
+          git config --global user.name "${{ env.CI_COMMIT_AUTHOR }}"
+          git config --global user.email "${{ env.CI_COMMIT_AUTHOR_EMAIL }}"
+          git commit -a -m "${{ env.CI_COMMIT_MESSAGE }}"
+          git tag -a v${{ inputs.version }} -m "Version ${{ inputs.version }}"
+          git push --tags
+  set-version-and-commit:
+    if: inputs.commit && inputs.create_tag == false
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-java@v3
+        with:
+          java-version: ${{ inputs.java-version }}
+          distribution: 'temurin'
+          cache: maven
+      - name: GIT commit and push all changed files
+        run: |
+          git pull
+          mvn versions:set -DnewVersion=${{ inputs.version }} -DprocessAllModules
+          git config --global user.name "${{ env.CI_COMMIT_AUTHOR }}"
+          git config --global user.email "${{ env.CI_COMMIT_AUTHOR_EMAIL }}"
+          git commit -a -m "${{ env.CI_COMMIT_MESSAGE }}"
+          git push

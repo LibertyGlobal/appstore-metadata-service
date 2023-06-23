@@ -278,9 +278,9 @@
                 <executions>
                     <execution>
                         <id>docker-build-and-push</id>
-                        <phase>deploy</phase>
+                        <phase>package</phase>
                         <goals>
-                            <goal>build</goal>
+                            <goal>dockerBuild</goal>
                         </goals>
                     </execution>
                 </executions>
