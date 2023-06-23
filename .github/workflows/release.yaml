@@ -1,0 +1,79 @@
+#
+# If not stated otherwise in this file or this component's LICENSE file the
+# following copyright and licenses apply:
+#
+# Copyright 2023 Liberty Global Technology Services BV
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+name: Release a new version
+on:
+  workflow_dispatch:
+    inputs:
+      nextRelease:
+        description: "Version to release"
+        type: string
+        required: true
+      nextDevelopmentVersion:
+        description: "Next development version"
+        type: string
+        required: true
+      runTests:
+        description: "Run IT tests"
+        default: true
+        type: boolean
+
+jobs:
+  test:
+    if: inputs.runTests
+    uses: ./.github/workflows/test.yaml
+    with:
+      java-version: '17'
+  set-release-version:
+    permissions: write-all
+    uses: ./.github/workflows/set-version.yaml
+    if: always() &&
+      !contains(needs.test.result, 'failure') &&
+      !contains(needs.test.result, 'cancelled')
+    with:
+      java-version: '17'
+      version: ${{ inputs.nextRelease }}
+      commit_message: "Release ${{ inputs.nextRelease }}"
+      commit: true
+      create_tag: true
+  build:
+    uses: ./.github/workflows/build.yaml
+    needs: set-release-version
+    with:
+      pushDockerImage: true
+      version: ${{ inputs.nextRelease }}
+      java-version: '17'
+    secrets: inherit
+  helm-release:
+    permissions: write-all
+    uses: ./.github/workflows/helm-release.yaml
+    needs: build
+    with:
+      version: ${{ inputs.nextRelease }}
+    secrets:
+      token: ${{ secrets.GITHUB_TOKEN }}
+  set-dev-version:
+    permissions: write-all
+    uses: ./.github/workflows/set-version.yaml
+    needs: helm-release
+    with:
+      version: ${{ inputs.nextDevelopmentVersion }}
+      commit_message: "Prepare for next development iteration ${{ inputs.nextDevelopmentVersion }}"
+      commit: true
+      java-version: '17'
