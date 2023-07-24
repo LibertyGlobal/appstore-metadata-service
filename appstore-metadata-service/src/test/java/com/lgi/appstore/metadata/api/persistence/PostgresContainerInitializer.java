@@ -18,6 +18,7 @@
  */
 package com.lgi.appstore.metadata.api.persistence;
 
+import com.lgi.appstore.metadata.api.strategy.TestContainerPostgresSQLWaitStrategy;
 import com.lgi.appstore.metadata.jooq.model.DefaultCatalog;
 import org.flywaydb.core.Flyway;
 import org.flywaydb.core.api.configuration.Configuration;
@@ -27,6 +28,7 @@ import org.springframework.context.ApplicationContextInitializer;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.test.context.support.TestPropertySourceUtils;
 import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.containers.wait.strategy.WaitStrategy;
 
 import java.util.List;
 
@@ -36,6 +38,9 @@ public class PostgresContainerInitializer implements ApplicationContextInitializ
 
     static {
         POSTGRE_SQL_CONTAINER = new PostgreSQLContainer<>("postgres:12");
+        WaitStrategy postgresSQLWaitStrategy = new TestContainerPostgresSQLWaitStrategy(POSTGRE_SQL_CONTAINER.getUsername(),
+                POSTGRE_SQL_CONTAINER.getPassword());
+        POSTGRE_SQL_CONTAINER.waitingFor(postgresSQLWaitStrategy);
         POSTGRE_SQL_CONTAINER.start();
 
         final List<Schema> schemas = DefaultCatalog.DEFAULT_CATALOG.getSchemas();
