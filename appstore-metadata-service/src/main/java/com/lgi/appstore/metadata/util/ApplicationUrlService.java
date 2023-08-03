@@ -34,9 +34,14 @@ public class ApplicationUrlService {
     }
 
     public String createApplicationUrlFromApplicationRecord(ApplicationUrlParams applicationUrlParams) {
-        return ApplicationTypeHelper.isWebApplication(applicationUrlParams.type, webApplications) ?
+        return isWebOrAndroidApplication(applicationUrlParams) ?
                 urlCreator.createApplicationUrl(applicationUrlParams.webApp()) :
                 urlCreator.createApplicationUrl(applicationUrlParams.nativeApp());
+    }
+
+    private boolean isWebOrAndroidApplication(ApplicationUrlParams applicationUrlParams) {
+        return ApplicationTypeHelper.isWebApplication(applicationUrlParams.type, webApplications)
+                || ApplicationTypeHelper.isAndroidApplication(applicationUrlParams.type);
     }
 
     public static class ApplicationUrlParams {

@@ -1072,9 +1072,11 @@ components:
         - application/vnd.rdk-app.lightning
         - application/vnd.rdk-app.dac.native
         - application/dac.native
+        - application/apk
       x-enum-varnames:
         - HTML5
         - LIGHTNING
         - DAC_NATIVE
         - RDK_DAC_NATIVE
+        - ANDROID
       description: Application type

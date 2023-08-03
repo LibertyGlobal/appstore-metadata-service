@@ -224,20 +224,21 @@ class PersistentAppsServiceTest extends BaseServiceTest {
         assertThat(applicationType.get().getApplicationType()).isEqualTo(type);
     }
 
-    @Test
-    void shouldReturnSourceUrlForWebApplication() throws Exception {
+    @ParameterizedTest
+    @ValueSource(strings = {"application/vnd.rdk-app.html5", "application/apk"})
+    void shouldReturnSourceUrlForWebAndAndroidApplication(String applicationType) throws Exception {
         // GIVEN
         final var randomMaintainerRecord = createRandomMaintainerRecord();
         final var applicationId = UUID.randomUUID().toString();
         final var latestVersion = "500";
-        final var randomApplicationRecord = createRandomApplicationRecord(randomMaintainerRecord, applicationId, latestVersion, "application/vnd.rdk-app.html5", false);
+        final var randomApplicationRecord = createRandomApplicationRecord(randomMaintainerRecord, applicationId, latestVersion, applicationType, false);
 
         // WHEN
-        final var applicationType = appsService.getApplicationDetails(applicationId, latestVersion,null, null).orElse(null);
+        final var applicationDetails = appsService.getApplicationDetails(applicationId, latestVersion,null, null).orElse(null);
 
         // THEN
         assertThat(applicationType).isNotNull();
-        assertThat(applicationType.getHeader().getUrl()).isEqualTo(randomApplicationRecord.get(Application.APPLICATION.OCI_IMAGE_URL));
+        assertThat(applicationDetails.getHeader().getUrl()).isEqualTo(randomApplicationRecord.get(Application.APPLICATION.OCI_IMAGE_URL));
     }
 
     @Test

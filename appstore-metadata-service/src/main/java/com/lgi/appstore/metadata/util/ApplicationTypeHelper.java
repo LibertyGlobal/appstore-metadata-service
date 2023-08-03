@@ -34,11 +34,15 @@ public final class ApplicationTypeHelper {
     }
 
     public static boolean isNativeApplication(String applicationType, Collection<ApplicationType> webApplications) {
-        return fromValue(applicationType).map(e -> !webApplications.contains(e)).orElse(false);
+        return !isWebApplication(applicationType, webApplications) && !isAndroidApplication(applicationType);
     }
 
     public static boolean isWebApplication(String applicationType, Collection<ApplicationType> webApplications) {
         return fromValue(applicationType).map(webApplications::contains).orElse(false);
+    }
+
+    public static boolean isAndroidApplication(String applicationType) {
+        return fromValue(applicationType).map(ApplicationType.ANDROID::equals).orElse(false);
     }
 
     private static Optional<ApplicationType> fromValue(String applicationType) {

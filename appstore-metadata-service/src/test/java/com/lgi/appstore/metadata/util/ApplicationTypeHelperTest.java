@@ -83,4 +83,15 @@ class ApplicationTypeHelperTest {
         // THEN
         assertThat(webApplication).isTrue();
     }
+
+    @Test
+    void shouldReturnAndroidApplication() {
+        // GIVEN
+        // WHEN
+        final var androidApplication = ApplicationTypeHelper.isAndroidApplication("application/apk");
+
+        // THEN
+        assertThat(androidApplication).isTrue();
+    }
+
 }

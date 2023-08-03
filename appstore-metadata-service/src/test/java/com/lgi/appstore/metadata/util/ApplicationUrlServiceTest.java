@@ -21,6 +21,8 @@ package com.lgi.appstore.metadata.util;
 
 import com.lgi.appstore.metadata.model.ApplicationType;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mockito;
 
 import java.util.List;
@@ -33,10 +35,11 @@ class ApplicationUrlServiceTest {
     private final ApplicationUrlCreator urlCreator = Mockito.mock(ApplicationUrlCreator.class);
     private final ApplicationUrlService applicationUrlService = new ApplicationUrlService(urlCreator, WEB_APPLICATIONS);
 
-    @Test
-    void shouldGetUrlForWebApplication() {
+    @ParameterizedTest
+    @ValueSource(strings = {"application/vnd.rdk-app.html5", "application/apk"})
+    void shouldGetUrlForWebAndAndroidApplication(String applicationType) {
         // GIVEN
-        final var applicationUrlParams = createApplicationParams("application/vnd.rdk-app.html5");
+        final var applicationUrlParams = createApplicationParams(applicationType);
         doReturn("http://web").when(urlCreator).createApplicationUrl(Mockito.any(ApplicationUrlCreator.WebAppParams.class));
 
         // WHEN
