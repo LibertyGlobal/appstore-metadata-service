@@ -110,7 +110,8 @@ class MaintainerAppsControllerTest {
             .description(
                     "Container contains both Flutter application and Flutter engine running on wayland-egl, developed by Liberty Global while evaluating Google Flutter UI toolkit.")
             .category(Category.APPLICATION)
-            .visible(true);
+            .visible(true)
+            .encryption(false);
 
     private static final MaintainerApplicationHeader WAYLAND_EGL_TEST_APPLICATION_HEADER = new MaintainerApplicationHeader()
             .id("com.libertyglobal.app.waylandegltest")
@@ -122,7 +123,8 @@ class MaintainerAppsControllerTest {
             .description(
                     "Source code example of simple Wayland EGL application intended as tutorial for developers. Contains the few but necessary setup code for any direct to wayland-egl client application such as how to connect to wayland server, create/use EGL surface and draw on screen via opengles api. Application shows simple rectangle on screen. Applications based on this example should run on the various wayland compositors supporting the wayland-egl protocol out there.")
             .category(Category.APPLICATION)
-            .visible(true);
+            .visible(true)
+            .encryption(false);
 
     private static final MaintainerApplicationHeader YOU_I_APPLICATION_HEADER = new MaintainerApplicationHeader()
             .id("com.libertyglobal.app.youi")
@@ -135,6 +137,7 @@ class MaintainerAppsControllerTest {
                     "Showcase application from the company youi.tv. The container package contains both the react native application and the You.i TV react native Gfx engine beneath.")
             .category(Category.APPLICATION)
             .visible(true)
+            .encryption(false)
             .localization(
                     List.of(
                             new Localization()
@@ -163,6 +166,7 @@ class MaintainerAppsControllerTest {
             .url("https://us.icr.io/v2/appcontainerstagingrdk/you.i/manifests/latest")
             .category(Category.APPLICATION)
             .visible(true)
+            .encryption(false)
             .localization(
                     List.of(
                             new Localization()
@@ -199,6 +203,9 @@ class MaintainerAppsControllerTest {
                     .email("developer@libertyglobal.com")
             );
 
+    private static final MaintainerApplicationDetails YOU_I_APPLICATION_DETAILS_ENCRYPTED =
+            YOU_I_APPLICATION_DETAILS.header(YOU_I_SINGLE_APPLICATION_HEADER.encryption(true));
+
     private static final String CORRECT_APPLICATION_AS_JSON =
             "{" +
                     "    \"header\": {" +
@@ -206,6 +213,7 @@ class MaintainerAppsControllerTest {
                     "      \"icon\": \"https://libertyglobal.com/s/apps/com.libertyglobal.app.awesome/1.2.3/image/1920x1080/icon.png\"," +
                     "      \"version\": \"1.2.3\"," +
                     "      \"visible\": true," +
+                    "      \"encryption\": false," +
                     "      \"ociImageUrl\": \"${OCI_IMAGE_URL}\"," +
                     "      \"latest\": true," +
                     "      \"name\": \"Awesome Application\"," +
@@ -256,6 +264,7 @@ class MaintainerAppsControllerTest {
                     "      \"id\": \"com.libertyglobal.app.awesome\"," +
                     "      \"icon\": \"https://libertyglobal.com/s/apps/com.libertyglobal.app.awesome/1.2.3/image/1920x1080/icon.png\"," +
                     "      \"visible\": true," +
+                    "      \"encryption\": false," +
                     "      \"ociImageUrl\": \"ociImageUrl\"," +
                     "      \"latest\": true," +
                     "      \"name\": \"Awesome Application\"," +
@@ -576,6 +585,28 @@ class MaintainerAppsControllerTest {
         // then
         assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
         assertThat(response.getContentAsString()).isEqualTo(jsonMaintainerApplicationDetails.write(YOU_I_APPLICATION_DETAILS).getJson());
+    }
+
+    @Test
+    void canGetDetailsByJustApplicationIdOfAnExistingApplicationWhenEncryptedTrue() throws Exception {
+        // given
+        final String platformName = UUID.randomUUID().toString();
+        final String firmwareVer = UUID.randomUUID().toString();
+        given(appsService.getApplicationDetails(anyString(), anyString(), anyString(), anyString()))
+                .willReturn(Optional.empty());
+        given(appsService.getApplicationDetails(MAINTAINER_CODE, "com.libertyglobal.app.youi", platformName, firmwareVer))
+                .willReturn(Optional.of(YOU_I_APPLICATION_DETAILS_ENCRYPTED));
+
+        // when
+        MockHttpServletResponse response = mvc
+                .perform(get("/maintainers/{maintainerCode}/apps/com.libertyglobal.app.youi?platformName={platformName}&firmwareVer={firmwareVer}",
+                        MAINTAINER_CODE, platformName, firmwareVer))
+                .andReturn()
+                .getResponse();
+
+        // then
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
+        assertThat(response.getContentAsString()).isEqualTo(jsonMaintainerApplicationDetails.write(YOU_I_APPLICATION_DETAILS_ENCRYPTED).getJson());
     }
 
     @Test

@@ -48,6 +48,7 @@ public class ApplicationMetadataBuilder {
     private Integer headerSize;
     private String headerIcon;
     private Boolean headerVisible;
+    private Boolean headerEncryption;
     private String headerOciImageUrl;
     private Category headerCategory;
     private List<Localization> headerLocalizations;
@@ -109,6 +110,11 @@ public class ApplicationMetadataBuilder {
         return this;
     }
 
+    public ApplicationMetadataBuilder withEncryption(Boolean headerEncryption) {
+        this.headerEncryption = headerEncryption;
+        return this;
+    }
+
     public ApplicationMetadataBuilder withOciImageUrl(String headerOciImageUrl) {
         this.headerOciImageUrl = headerOciImageUrl;
         return this;
@@ -156,6 +162,9 @@ public class ApplicationMetadataBuilder {
             case ApplicationDetailsPath.FIELD_VISIBLE:
                 headerVisible = Boolean.valueOf(String.valueOf(value));
                 break;
+            case ApplicationDetailsPath.FIELD_ENCRYPTION:
+                headerEncryption = Boolean.valueOf(String.valueOf(value));
+                break;
             case ApplicationDetailsPath.FIELD_OCI_IMAGE_URL:
                 headerOciImageUrl = String.valueOf(value);
                 break;
@@ -192,6 +201,7 @@ public class ApplicationMetadataBuilder {
         this.headerSize = 10000000;
         this.headerIcon = DataUtils.randomAppHeaderIcon();
         this.headerVisible = Boolean.TRUE;
+        this.headerEncryption = Boolean.FALSE;
         this.headerOciImageUrl = DataUtils.randomOciImageUrl();
         this.headerCategory = Category.APPLICATION;
         this.platform = new Platform().architecture(DataUtils.randomPlatformArch()).os(DataUtils.randomPlatformOs());
@@ -205,6 +215,7 @@ public class ApplicationMetadataBuilder {
         headerId = existingHeader.getId();
         headerVersion = existingHeader.getVersion();
         headerVisible = existingHeader.isVisible();
+        headerEncryption = existingHeader.isEncryption();
         headerOciImageUrl = existingHeader.getOciImageUrl();
         headerType = existingHeader.getType();
         headerCategory = existingHeader.getCategory();
@@ -233,6 +244,7 @@ public class ApplicationMetadataBuilder {
                 .size(headerSize)
                 .icon(headerIcon)
                 .visible(headerVisible)
+                .encryption(headerEncryption)
                 .ociImageUrl(headerOciImageUrl)
                 .localization(headerLocalizations);
 
@@ -250,6 +262,7 @@ public class ApplicationMetadataBuilder {
                 .size(headerSize)
                 .icon(headerIcon)
                 .visible(headerVisible)
+                .encryption(headerEncryption)
                 .ociImageUrl(headerOciImageUrl)
                 .localization(headerLocalizations);
 

@@ -26,6 +26,7 @@ public class ApplicationDetailsPath extends PathBase {
     private static final String FIELD_ID = "id";
     public static final String FIELD_VERSION = "version";
     public static final String FIELD_OCI_IMAGE_URL = "ociImageUrl";
+    public static final String FIELD_ENCRYPTION = "encryption";
     public static final String FIELD_VISIBLE = "visible";
     public static final String FIELD_NAME = "name";
     public static final String FIELD_CODE = "code";
@@ -76,6 +77,11 @@ public class ApplicationDetailsPath extends PathBase {
 
     public ApplicationDetailsPath visible() {
         fields.add(FIELD_VISIBLE);
+        return this;
+    }
+
+    public ApplicationDetailsPath encryption() {
+        fields.add(FIELD_ENCRYPTION);
         return this;
     }
 
@@ -240,6 +246,8 @@ public class ApplicationDetailsPath extends PathBase {
         switch (field) {
             case FIELD_VISIBLE:
                 return field().header().visible();
+            case FIELD_ENCRYPTION:
+                return field().header().encryption();
             case FIELD_OCI_IMAGE_URL:
                 return field().header().ociImageUrl();
             case FIELD_VERSION:

@@ -128,6 +128,7 @@ public abstract class BaseServiceTest {
                 .setDescription(randomUUID().toString())
                 .setIcon(randomUUID().toString())
                 .setVisible(true)
+                .setEncryption(false)
                 .setLatest(JSONB.valueOf("{\"stb\":" + latest + "}"))
                 .setLocalizations(JSONB.valueOf(objectMapper.writeValueAsString(Collections.singleton(localization))))
                 .setDependencies(JSONB.valueOf(objectMapper.writeValueAsString(Collections.singleton(dependency))))
