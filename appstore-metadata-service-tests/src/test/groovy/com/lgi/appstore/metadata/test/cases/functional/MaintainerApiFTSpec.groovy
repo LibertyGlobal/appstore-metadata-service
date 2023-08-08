@@ -45,6 +45,7 @@ import static com.lgi.appstore.metadata.test.framework.model.request.QueryParams
 import static com.lgi.appstore.metadata.test.framework.model.request.QueryParams.queryParams
 import static com.lgi.appstore.metadata.test.framework.model.response.ApplicationDetailsPath.FIELD_CATEGORY
 import static com.lgi.appstore.metadata.test.framework.model.response.ApplicationDetailsPath.FIELD_DESCRIPTION
+import static com.lgi.appstore.metadata.test.framework.model.response.ApplicationDetailsPath.FIELD_ENCRYPTION
 import static com.lgi.appstore.metadata.test.framework.model.response.ApplicationDetailsPath.FIELD_ICON
 import static com.lgi.appstore.metadata.test.framework.model.response.ApplicationDetailsPath.FIELD_NAME
 import static com.lgi.appstore.metadata.test.framework.model.response.ApplicationDetailsPath.FIELD_OCI_IMAGE_URL
@@ -208,6 +209,7 @@ class MaintainerApiFTSpec extends AsmsFeatureSpecBase {
 
         and: "application has v1 with some metadata"
         def v1Visible = false
+        def v1Encryption = false
         def v1OciImageUrl = "v1OciImageUrl"
         def v1Name = "v1Name"
         def v1Description = "v1Description"
@@ -236,6 +238,7 @@ class MaintainerApiFTSpec extends AsmsFeatureSpecBase {
                 .withId(appId)
                 .withVersion(v1)
                 .withVisible(v1Visible)
+                .withEncryption(v1Encryption)
                 .withOciImageUrl(v1OciImageUrl)
                 .withName(v1Name)
                 .withDescription(v1Description)
@@ -253,6 +256,7 @@ class MaintainerApiFTSpec extends AsmsFeatureSpecBase {
 
         and: "application has v2 with completely different metadata"
         def v2Visible = true
+        def v2Encryption = true
         def v2OciImageUrl = "v2OciImageUrl"
         def v2Name = "v2NewName"
         def v2Description = "v2NewDescription"
@@ -280,6 +284,7 @@ class MaintainerApiFTSpec extends AsmsFeatureSpecBase {
         Application appV2 = builder().fromDefaults().withId(appId)
                 .withVersion(v2)
                 .withVisible(v2Visible)
+                .withEncryption(v2Encryption)
                 .withOciImageUrl(v2OciImageUrl)
                 .withName(v2Name)
                 .withDescription(v2Description)
@@ -311,6 +316,7 @@ class MaintainerApiFTSpec extends AsmsFeatureSpecBase {
         field().header().id().from(theBody1) == appId
         field().header().version().from(theBody1) == v1
         field().header().visible().from(theBody1) == v1Visible
+        field().header().encryption().from(theBody1) == v1Encryption
         field().header().ociImageUrl().from(theBody1) == v1OciImageUrl
         field().header().name().from(theBody1) == v1Name
         field().header().category().from(theBody1) == String.valueOf(v1Category)
@@ -331,10 +337,11 @@ class MaintainerApiFTSpec extends AsmsFeatureSpecBase {
         field().maintainer().homepage().from(theBody1) == DEFAULT_DEV_HOMEPAGE
         field().maintainer().email().from(theBody1) == DEFAULT_DEV_EMAIL
 
-        and: "the body exposes version section with all versions and visibility information"
+        and: "the body exposes version section with all versions, visibility and encryption information"
         assertThat(field().versions().from(theBody1)).asList().hasSize(2)
         assertThat(field().versions().version().from(theBody1)).asList().containsExactly(v2, v1)
         assertThat(field().versions().visible().from(theBody1)).asList().containsExactly(v2Visible, v1Visible)
+        assertThat(field().versions().encryption().from(theBody1)).asList().containsExactly(v2Encryption, v1Encryption)
 
         and: "the body exposes requirements section with dependencies information"
         assertThat(field().requirements().dependencies().id().from(theBody1)).asList().containsExactlyInAnyOrder(v1Dependency1Id, v1Dependency2Id)
@@ -368,6 +375,7 @@ class MaintainerApiFTSpec extends AsmsFeatureSpecBase {
         field().header().id().from(theBody2) == appId
         field().header().version().from(theBody2) == v2
         field().header().visible().from(theBody2) == v2Visible
+        field().header().encryption().from(theBody2) == v2Encryption
         field().header().ociImageUrl().from(theBody2) == v2OciImageUrl
         field().header().category().from(theBody2) == String.valueOf(v2Category)
         field().header().name().from(theBody2) == v2Name
@@ -382,10 +390,11 @@ class MaintainerApiFTSpec extends AsmsFeatureSpecBase {
         field().maintainer().homepage().from(theBody2) == DEFAULT_DEV_HOMEPAGE
         field().maintainer().email().from(theBody2) == DEFAULT_DEV_EMAIL
 
-        and: "the body exposes version section with all versions and visibility information"
+        and: "the body exposes version section with all versions, visibility and encryption information"
         assertThat(field().versions().from(theBody2)).asList().hasSize(2)
         assertThat(field().versions().version().from(theBody2)).asList().containsExactly(v2, v1)
         assertThat(field().versions().visible().from(theBody2)).asList().containsExactly(v2Visible, v1Visible)
+        assertThat(field().versions().encryption().from(theBody2)).asList().containsExactly(v2Encryption, v1Encryption)
 
         and: "the body exposes requirements section with dependencies information"
         assertThat(field().requirements().dependencies().id().from(theBody2)).asList().containsExactlyInAnyOrder(v2Dependency1Id, v2Dependency2Id)
@@ -437,6 +446,7 @@ class MaintainerApiFTSpec extends AsmsFeatureSpecBase {
         where:
         field             | valueBefore                   || valueAfter
         FIELD_VISIBLE     | Boolean.FALSE                 || Boolean.TRUE
+        FIELD_ENCRYPTION  | Boolean.FALSE                 || Boolean.TRUE
         FIELD_NAME        | "appNameBefore"               || "appNameAfter"
         FIELD_DESCRIPTION | "Description Before ąćęłóśżź" || "Description After €\\€\\€\\€\\"
         FIELD_CATEGORY    | String.valueOf(Category.DEV)  || String.valueOf(pickRandomCategory())
@@ -497,6 +507,7 @@ class MaintainerApiFTSpec extends AsmsFeatureSpecBase {
         where:
         field             | valueV1Before                 || valueV1After // must be different than the defaults
         FIELD_VISIBLE     | Boolean.TRUE                  || Boolean.FALSE
+        FIELD_ENCRYPTION  | Boolean.FALSE                 || Boolean.TRUE
         FIELD_NAME        | "appNameBefore"               || "appNameAfter"
         FIELD_DESCRIPTION | "Description Before ąćęłóśżź" || "Description After €\\€\\€\\€\\"
         FIELD_CATEGORY    | String.valueOf(Category.DEV)  || String.valueOf(Category.RESOURCE)

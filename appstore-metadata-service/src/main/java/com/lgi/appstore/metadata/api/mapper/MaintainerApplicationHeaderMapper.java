@@ -53,6 +53,7 @@ public class MaintainerApplicationHeaderMapper {
                 .name(applicationMetadataRecord.get(APPLICATION.NAME))
                 .description(applicationMetadataRecord.get(APPLICATION.DESCRIPTION))
                 .visible(applicationMetadataRecord.get(APPLICATION.VISIBLE))
+                .encryption(applicationMetadataRecord.get(APPLICATION.ENCRYPTION))
                 .ociImageUrl(applicationMetadataRecord.get(APPLICATION.OCI_IMAGE_URL))
                 .type(applicationMetadataRecord.get(APPLICATION.TYPE))
                 .size(applicationMetadataRecord.get(APPLICATION.SIZE))

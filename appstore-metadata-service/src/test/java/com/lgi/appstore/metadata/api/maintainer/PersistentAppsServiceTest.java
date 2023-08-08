@@ -377,6 +377,7 @@ class PersistentAppsServiceTest extends BaseServiceTest {
                 .version(version)
                 .localization(Collections.singletonList(localization))
                 .visible(true)
+                .encryption(false)
                 .ociImageUrl("OCI_IMAGE_URL");
     }
 
@@ -390,6 +391,7 @@ class PersistentAppsServiceTest extends BaseServiceTest {
                 .size(10000000)
                 .localization(Collections.singletonList(localization))
                 .visible(true)
+                .encryption(false)
                 .ociImageUrl("UPDATED_OCI_IMAGE_URL");
     }
 
@@ -408,6 +410,7 @@ class PersistentAppsServiceTest extends BaseServiceTest {
                 "category",
                 "localization",
                 "visible",
+                "encryption",
                 "ociImageUrl");
         final Maintainer maintainer = maintainerApplicationDetails.getMaintainer();
         assertThat(maintainer).isNotNull();
@@ -460,6 +463,7 @@ class PersistentAppsServiceTest extends BaseServiceTest {
         assertThat(header.getId()).isEqualTo(applicationHeader.getId());
         assertThat(header.getVersion()).isEqualTo(applicationHeader.getVersion());
         assertThat(header.isVisible()).isEqualTo(applicationHeader.isVisible());
+        assertThat(header.isEncryption()).isEqualTo(applicationHeader.isEncryption());
         assertThat(header.getOciImageUrl()).isEqualTo(applicationHeader.getOciImageUrl());
     }
 }
