@@ -1,28 +1,22 @@
-#
-# If not stated otherwise in this file or this component's LICENSE file the
-# following copyright and licenses apply:
-#
-# Copyright 2023 Liberty Global Technology Services BV
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-#
-
 apiVersion: v1
 entries:
   appstore-metadata-service:
   - apiVersion: v1
+    appVersion: 0.1.9
+    created: "2023-08-09T08:45:22.990754038Z"
+    description: Appstore Metadata Service
+    digest: 39232af0761002469952ea4df6bbf9d527cb4307c18d5427286a253de1da8787
+    home: https://github.com/LibertyGlobal/appstore-metadata-service
+    kubeVersion: '>=1.12.0-0'
+    name: appstore-metadata-service
+    sources:
+    - https://github.com/LibertyGlobal/appstore-metadata-service
+    urls:
+    - https://libertyglobal.github.io/appstore-metadata-service/charts/appstore-metadata-service-0.1.9.tgz
+    version: 0.1.9
+  - apiVersion: v1
     appVersion: 0.1.8
-    created: "2023-07-25T12:13:21.246128083Z"
+    created: "2023-08-09T08:45:22.99029013Z"
     description: Appstore Metadata Service
     digest: 74c0f331b43d0980f6a049aedd0c63c71db0f5427a08873f8164ec1ee2d5c8b6
     home: https://github.com/LibertyGlobal/appstore-metadata-service
@@ -35,7 +29,7 @@ entries:
     version: 0.1.8
   - apiVersion: v1
     appVersion: 0.1.7
-    created: "2023-07-25T12:13:21.245545469Z"
+    created: "2023-08-09T08:45:22.989827222Z"
     description: Appstore Metadata Service
     digest: 59c8547ffda37b62928e375b1e792a58a6f34022c1bb591d380041a5d4aefccf
     home: https://github.com/LibertyGlobal/appstore-metadata-service
@@ -46,4 +40,4 @@ entries:
     urls:
     - https://libertyglobal.github.io/appstore-metadata-service/charts/appstore-metadata-service-0.1.7.tgz
     version: 0.1.7
-generated: "2023-07-25T12:13:21.24481705Z"
+generated: "2023-08-09T08:45:22.98913741Z"
