@@ -49,6 +49,7 @@ import static com.lgi.appstore.metadata.test.framework.model.response.Applicatio
 import static com.lgi.appstore.metadata.test.framework.model.response.ApplicationDetailsPath.FIELD_ICON
 import static com.lgi.appstore.metadata.test.framework.model.response.ApplicationDetailsPath.FIELD_NAME
 import static com.lgi.appstore.metadata.test.framework.model.response.ApplicationDetailsPath.FIELD_OCI_IMAGE_URL
+import static com.lgi.appstore.metadata.test.framework.model.response.ApplicationDetailsPath.FIELD_PREFERRED
 import static com.lgi.appstore.metadata.test.framework.model.response.ApplicationDetailsPath.FIELD_TYPE
 import static com.lgi.appstore.metadata.test.framework.model.response.ApplicationDetailsPath.FIELD_SIZE
 import static com.lgi.appstore.metadata.test.framework.model.response.ApplicationDetailsPath.FIELD_URL
@@ -127,7 +128,7 @@ class MaintainerApiFTSpec extends AsmsFeatureSpecBase {
     def "create non-existing app and view details for #behavior"() {
         given: "developer create 2 applications: first with 2 versions (incl. hidden latest) and second with only one version"
         Application app1v1 = builder().fromDefaults()
-                .withId(appId).withVersion(v1).forCreate()
+                .withId(appId).withVersion(v1).withPreferred(isV1Preferred).forCreate()
         Application app1v2 = builder().fromDefaults()
                 .withId(appId).withVersion(v2).withVisible(isV2Visible).forCreate()
         Application app2v1 = builder().fromDefaults()
@@ -151,13 +152,14 @@ class MaintainerApiFTSpec extends AsmsFeatureSpecBase {
         v2 == returnedV ? field().header().visible().from(jsonBody) == isV2Visible : IGNORE_THIS_ASSERTION
 
         where:
-        behavior                                       | appId    | v1       | v2       | isV2Visible | queryAppKey       || httpStatus   | returnedV
-        "no version specified - fallback to highest v" | randId() | "0.10.0" | "1.1.0"  | true        | appId             || SC_OK        | v2
-        "accepting 'latest' keyword"                   | randId() | "1.0.0"  | "0.10.0" | true        | appId + ":latest" || SC_OK        | v1
-        "query for specific version"                   | randId() | "0.1.0"  | "1.0.0"  | true        | appId + ":" + v1  || SC_OK        | v1
-        "fallback to latest that is hidden"            | randId() | "1.0.0"  | "2.0.0"  | false       | appId             || SC_OK        | v2
-        "not existing id"                              | randId() | "10.0.0" | "0.1.0"  | true        | "App3"            || SC_NOT_FOUND | _
-        "not existing version"                         | randId() | "10.0.0" | "0.1.0"  | true        | appId + ":3.0"    || SC_NOT_FOUND | _
+        behavior                                       | appId    | v1       | isV1Preferred | v2       | isV2Visible | queryAppKey       || httpStatus   | returnedV
+        "no version specified - fallback to highest v" | randId() | "0.10.0" | false         | "1.1.0"  | true        | appId             || SC_OK        | v2
+        "accepting 'latest' keyword"                   | randId() | "1.0.0"  | false         | "0.10.0" | true        | appId + ":latest" || SC_OK        | v1
+        "query for specific version"                   | randId() | "0.1.0"  | false         | "1.0.0"  | true        | appId + ":" + v1  || SC_OK        | v1
+        "fallback to latest that is hidden"            | randId() | "1.0.0"  | false         | "2.0.0"  | false       | appId             || SC_OK        | v2
+        "not existing id"                              | randId() | "10.0.0" | false         | "0.1.0"  | true        | "App3"            || SC_NOT_FOUND | _
+        "not existing version"                         | randId() | "10.0.0" | false         | "0.1.0"  | true        | appId + ":3.0"    || SC_NOT_FOUND | _
+        "fallback preferred version v1"                | randId() | "0.10.0" | true          | "1.1.0"  | true        | appId             || SC_OK        | v1
     }
 
     def "developer cannot access other developer application (GET/PUT/DELETE)"() {
@@ -211,6 +213,7 @@ class MaintainerApiFTSpec extends AsmsFeatureSpecBase {
         and: "application has v1 with some metadata"
         def v1Visible = false
         def v1Encryption = false
+        def v1Preferred = false
         def v1OciImageUrl = "v1OciImageUrl"
         def v1Name = "v1Name"
         def v1Description = "v1Description"
@@ -240,6 +243,7 @@ class MaintainerApiFTSpec extends AsmsFeatureSpecBase {
                 .withVersion(v1)
                 .withVisible(v1Visible)
                 .withEncryption(v1Encryption)
+                .withPreferred(v1Preferred)
                 .withOciImageUrl(v1OciImageUrl)
                 .withName(v1Name)
                 .withDescription(v1Description)
@@ -258,6 +262,7 @@ class MaintainerApiFTSpec extends AsmsFeatureSpecBase {
         and: "application has v2 with completely different metadata"
         def v2Visible = true
         def v2Encryption = true
+        def v2Preferred = true
         def v2OciImageUrl = "v2OciImageUrl"
         def v2Name = "v2NewName"
         def v2Description = "v2NewDescription"
@@ -286,6 +291,7 @@ class MaintainerApiFTSpec extends AsmsFeatureSpecBase {
                 .withVersion(v2)
                 .withVisible(v2Visible)
                 .withEncryption(v2Encryption)
+                .withPreferred(v2Preferred)
                 .withOciImageUrl(v2OciImageUrl)
                 .withName(v2Name)
                 .withDescription(v2Description)
@@ -318,6 +324,7 @@ class MaintainerApiFTSpec extends AsmsFeatureSpecBase {
         field().header().version().from(theBody1) == v1
         field().header().visible().from(theBody1) == v1Visible
         field().header().encryption().from(theBody1) == v1Encryption
+        field().header().preferred().from(theBody1) == v1Preferred
         field().header().ociImageUrl().from(theBody1) == v1OciImageUrl
         field().header().name().from(theBody1) == v1Name
         field().header().category().from(theBody1) == String.valueOf(v1Category)
@@ -376,6 +383,7 @@ class MaintainerApiFTSpec extends AsmsFeatureSpecBase {
         field().header().version().from(theBody2) == v2
         field().header().visible().from(theBody2) == v2Visible
         field().header().encryption().from(theBody2) == v2Encryption
+        field().header().preferred().from(theBody2) == v2Preferred
         field().header().ociImageUrl().from(theBody2) == v2OciImageUrl
         field().header().category().from(theBody2) == String.valueOf(v2Category)
         field().header().name().from(theBody2) == v2Name
@@ -446,6 +454,7 @@ class MaintainerApiFTSpec extends AsmsFeatureSpecBase {
         field             | valueBefore                   || valueAfter
         FIELD_VISIBLE     | Boolean.FALSE                 || Boolean.TRUE
         FIELD_ENCRYPTION  | Boolean.FALSE                 || Boolean.TRUE
+        FIELD_PREFERRED   | Boolean.FALSE                 || Boolean.TRUE
         FIELD_NAME        | "appNameBefore"               || "appNameAfter"
         FIELD_DESCRIPTION | "Description Before ąćęłóśżź" || "Description After €\\€\\€\\€\\"
         FIELD_CATEGORY    | String.valueOf(Category.DEV)  || String.valueOf(pickRandomCategory())
@@ -507,6 +516,7 @@ class MaintainerApiFTSpec extends AsmsFeatureSpecBase {
         field             | valueV1Before                 || valueV1After // must be different than the defaults
         FIELD_VISIBLE     | Boolean.TRUE                  || Boolean.FALSE
         FIELD_ENCRYPTION  | Boolean.FALSE                 || Boolean.TRUE
+        FIELD_PREFERRED   | Boolean.FALSE                 || Boolean.TRUE
         FIELD_NAME        | "appNameBefore"               || "appNameAfter"
         FIELD_DESCRIPTION | "Description Before ąćęłóśżź" || "Description After €\\€\\€\\€\\"
         FIELD_CATEGORY    | String.valueOf(Category.DEV)  || String.valueOf(Category.RESOURCE)
@@ -667,7 +677,7 @@ class MaintainerApiFTSpec extends AsmsFeatureSpecBase {
         dbSteps.listMaintainers()
 
         Application app1v1 = builder().fromDefaults()
-                .withId(id1).withVersion(v1).forCreate()
+                .withId(id1).withVersion(v1).withPreferred(isV1Preferred).forCreate()
         Application app1v2 = builder().fromDefaults()
                 .withId(id1).withVersion(v2).forCreate()
         Application app2v1 = builder().fromDefaults()
@@ -706,12 +716,13 @@ class MaintainerApiFTSpec extends AsmsFeatureSpecBase {
         }
 
         where:
-        dev2Code | id1      | id2      | id3      | limit | offset | v1       | v2      | v3      | queryDevCode     || possibleIds | possibleV | count | total | returnedLimit
-        "lgi2"   | randId() | randId() | randId() | 3     | 0      | "0.0.11" | "0.1.0" | "1.1.0" | DEFAULT_DEV_CODE || [id1, id2]  | [v1, v2]  | 2     | 2     | limit
-        "lgi2"   | randId() | randId() | randId() | null  | 0      | "0.1.1"  | "0.0.1" | "1.0.1" | dev2Code         || [id3]       | [v3]      | 1     | 1     | DEFAULT_LIMIT
-        "lgi2"   | randId() | randId() | randId() | 1     | 0      | "0.11.1" | "1.0.1" | "2.0.1" | DEFAULT_DEV_CODE || [id1, id2]  | [v1, v2]  | 1     | 2     | limit
-        "lgi2"   | randId() | randId() | randId() | 1     | 1      | "0.1.1"  | "0.0.1" | "1.0.1" | DEFAULT_DEV_CODE || [id1, id2]  | [v1, v2]  | 1     | 2     | limit
-        "lgi2"   | randId() | randId() | randId() | 1     | 2      | "0.1.1"  | "0.0.1" | "1.0.1" | DEFAULT_DEV_CODE || _           | _         | 0     | 2     | limit
+        dev2Code | id1      | id2      | id3      | limit | offset | v1       | v2      | v3      | isV1Preferred    || queryDevCode     || possibleIds | possibleV | count | total | returnedLimit
+        "lgi2"   | randId() | randId() | randId() | 3     | 0      | "0.0.11" | "0.1.0" | "1.1.0" | false            || DEFAULT_DEV_CODE || [id1, id2]  | [v1, v2]  | 2     | 2     | limit
+        "lgi2"   | randId() | randId() | randId() | null  | 0      | "0.1.1"  | "0.0.1" | "1.0.1" | false            || dev2Code         || [id3]       | [v3]      | 1     | 1     | DEFAULT_LIMIT
+        "lgi2"   | randId() | randId() | randId() | 1     | 0      | "0.11.1" | "1.0.1" | "2.0.1" | false            || DEFAULT_DEV_CODE || [id1, id2]  | [v1, v2]  | 1     | 2     | limit
+        "lgi2"   | randId() | randId() | randId() | 1     | 1      | "0.1.1"  | "0.0.1" | "1.0.1" | false            || DEFAULT_DEV_CODE || [id1, id2]  | [v1, v2]  | 1     | 2     | limit
+        "lgi2"   | randId() | randId() | randId() | 1     | 2      | "0.1.1"  | "0.0.1" | "1.0.1" | false            || DEFAULT_DEV_CODE || _           | _         | 0     | 2     | limit
+        "lgi2"   | randId() | randId() | randId() | null  | 0      | "0.1.1"  | "1.0.1" | "0.0.1" | true             || DEFAULT_DEV_CODE || [id1, id2]  | [v1]      | 2     | 3     | DEFAULT_LIMIT
     }
 
     @Unroll

@@ -102,6 +102,7 @@ curl --location --request POST 'http://localhost:8081/as3/maintainers/lgi/apps' 
             "url": "http://url/fancyappl",
             "visible": true,
             "encryption": false,
+            "preferred": false,
             "ociImageUrl": "myregistry.local:5000/testing/test-image",
             "latest" : true,
             "type": "fancy_applications",

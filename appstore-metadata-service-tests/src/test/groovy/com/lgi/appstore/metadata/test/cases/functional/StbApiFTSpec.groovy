@@ -208,7 +208,7 @@ class StbApiFTSpec extends AsmsFeatureSpecBase {
                 .withId(appId).withVersion(v1).withType("application/vnd.rdk-app.dac.native").forCreate()
         Application app1v2 = builder().fromDefaults()
                 .withId(appId).withVersion(v2).withType("application/vnd.rdk-app.dac.native")
-                .withVisible(isV2Visible).forCreate()
+                .withVisible(isV2Visible).withPreferred(isV2Preferred).forCreate()
         Application app2v1 = builder().fromDefaults().withType("application/vnd.rdk-app.dac.native")
                 .withId("someOther_$appId").withVersion(v1) forCreate()
 
@@ -230,14 +230,15 @@ class StbApiFTSpec extends AsmsFeatureSpecBase {
         receivedStatus == SC_OK ? !field().header().visible().isPresentIn(jsonBody) : IGNORE_THIS_ASSERTION
 
         where:
-        behavior                                       | appId    | v1       | v2       | isV2Visible | queryAppKey       || httpStatus   | returnedV
-        "no version specified - fallback to highest v" | randId() | "1.0.0"  | "0.10.0" | true        | appId             || SC_OK        | v1
-        "accepting 'latest' keyword"                   | randId() | "0.0.10" | "0.1.0"  | true        | appId + ":latest" || SC_OK        | v2
-        "query for specific version"                   | randId() | "0.1.0"  | "1.0.0"  | true        | appId + ":" + v1  || SC_OK        | v1
-        "no fallback to latest that is hidden"         | randId() | "1.0.0"  | "2.0.0"  | false       | appId             || SC_OK        | v1 // hidden version is not taken into the account for STB
-        "not existing id"                              | randId() | "10.0.0" | "0.1.0"  | true        | "App3"            || SC_NOT_FOUND | _
-        "not existing version"                         | randId() | "10.0.0" | "20.0.0" | true        | appId + ":3.0"    || SC_NOT_FOUND | _
-        "query for specific version that is hidden"    | randId() | "0.1.0"  | "1.0.0"  | false       | appId + ":" + v2  || SC_NOT_FOUND | _ // STB cannot get details of hidden version
+        behavior                                       | appId    | v1       | v2       | isV2Preferred | isV2Visible | queryAppKey       || httpStatus   | returnedV
+        "no version specified - fallback to highest v" | randId() | "1.0.0"  | "0.10.0" | false         | true        | appId             || SC_OK        | v1
+        "accepting 'latest' keyword"                   | randId() | "0.0.10" | "0.1.0"  | false         | true        | appId + ":latest" || SC_OK        | v2
+        "query for specific version"                   | randId() | "0.1.0"  | "1.0.0"  | false         | true        | appId + ":" + v1  || SC_OK        | v1
+        "no fallback to latest that is hidden"         | randId() | "1.0.0"  | "2.0.0"  | false         | false       | appId             || SC_OK        | v1 // hidden version is not taken into the account for STB
+        "not existing id"                              | randId() | "10.0.0" | "0.1.0"  | false         | true        | "App3"            || SC_NOT_FOUND | _
+        "not existing version"                         | randId() | "10.0.0" | "20.0.0" | false         | true        | appId + ":3.0"    || SC_NOT_FOUND | _
+        "query for specific version that is hidden"    | randId() | "0.1.0"  | "1.0.0"  | false         | false       | appId + ":" + v2  || SC_NOT_FOUND | _ // STB cannot get details of hidden version
+        "fallback preferred version v2"                | randId() | "1.0.0"  | "0.10.0" | true          | true        | appId             || SC_OK        | v2
     }
 
     def "details of each version contain separate information about app requirements, maintainer and all visible versions of the application"() {

@@ -32,6 +32,7 @@ import com.lgi.appstore.metadata.model.StbApplicationHeader;
 import com.lgi.appstore.metadata.model.StbApplicationsList;
 import com.lgi.appstore.metadata.model.StbSingleApplicationHeader;
 import com.lgi.appstore.metadata.model.StbVersion;
+import com.lgi.appstore.metadata.util.ApplicationPreferredHelper;
 import com.lgi.appstore.metadata.util.ApplicationUrlService;
 import com.lgi.appstore.metadata.util.JsonProcessorHelper;
 import org.jooq.Condition;
@@ -39,7 +40,7 @@ import org.jooq.DSLContext;
 import org.jooq.JSONB;
 import org.jooq.Record;
 import org.jooq.Record1;
-import org.jooq.Record9;
+import org.jooq.Record10;
 import org.jooq.SelectConditionStep;
 import org.jooq.SortField;
 import org.jooq.impl.DSL;
@@ -116,7 +117,7 @@ public class PersistentAppsService implements AppsService {
                                                 String maintainerName,
                                                 Integer offset,
                                                 Integer limit) {
-        final SelectConditionStep<Record9<String, String, String, String, String, String, Integer, String, JSONB>> where = dslContext.select(
+        final SelectConditionStep<Record10<String, String, String, String, String, String, Integer, String, JSONB, Boolean>> where = dslContext.select(
                         APPLICATION.ID_RDOMAIN,
                         APPLICATION.VERSION,
                         APPLICATION.ICON,
@@ -125,7 +126,8 @@ public class PersistentAppsService implements AppsService {
                         APPLICATION.TYPE,
                         APPLICATION.SIZE,
                         APPLICATION.CATEGORY,
-                        APPLICATION.LOCALIZATIONS)
+                        APPLICATION.LOCALIZATIONS,
+                        APPLICATION.PREFERRED)
                 .from(APPLICATION)
                 .leftJoin(MAINTAINER)
                 .on(APPLICATION.MAINTAINER_ID.eq(MAINTAINER.ID))
@@ -147,7 +149,8 @@ public class PersistentAppsService implements AppsService {
         if (version != null) {
             condition = condition.and(APPLICATION.VERSION.eq(version));
         } else {
-            condition = condition.and(DSL.condition(APPLICATION.LATEST.getQualifiedName() + " -> 'stb' = 'true'"));
+            condition = condition.and(DSL.condition(APPLICATION.LATEST.getQualifiedName() + " -> 'stb' = 'true'")
+                    .or(APPLICATION.PREFERRED.eq(true)));
         }
         if (type != null) {
             condition = condition.and(APPLICATION.TYPE.contains(type));
@@ -177,13 +180,15 @@ public class PersistentAppsService implements AppsService {
         final int effectiveOffset = offset != null ? offset : 0;
         final int effectiveLimit = limit != null ? limit : 10;
 
-        final List<StbApplicationHeader> applicationHeaderList = where
+        var result = where
                 .and(condition)
                 .offset(effectiveOffset)
                 .limit(effectiveLimit)
-                .fetch()
-                .stream()
-                .map(applicationMetadataRecord -> new StbApplicationHeader()
+                .fetch();
+
+        final List<StbApplicationHeader> applicationHeaderList = ApplicationPreferredHelper.matchByPreferredVersionForListStb(result)
+                        .stream()
+                        .map(applicationMetadataRecord -> new StbApplicationHeader()
                         .id(applicationMetadataRecord.get(APPLICATION.ID_RDOMAIN))
                         .version(applicationMetadataRecord.get(APPLICATION.VERSION))
                         .icon(applicationMetadataRecord.get(APPLICATION.ICON))
@@ -228,7 +233,7 @@ public class PersistentAppsService implements AppsService {
                 .map(applicationVersionRecord -> new StbVersion()
                         .version(applicationVersionRecord.get(APPLICATION.VERSION))).collect(Collectors.toList());
 
-        return dslContext.select(
+        var result = dslContext.select(
                         MAINTAINER.CODE,
                         MAINTAINER.NAME,
                         MAINTAINER.ADDRESS,
@@ -247,7 +252,8 @@ public class PersistentAppsService implements AppsService {
                         APPLICATION.FEATURES,
                         APPLICATION.DEPENDENCIES,
                         APPLICATION.SIZE,
-                        APPLICATION.OCI_IMAGE_URL
+                        APPLICATION.OCI_IMAGE_URL,
+                        APPLICATION.PREFERRED
                 )
 
                 .from(MAINTAINER)
@@ -256,7 +262,9 @@ public class PersistentAppsService implements AppsService {
                 .where(APPLICATION.ID_RDOMAIN.eq(appId))
                 .and(APPLICATION.VERSION.eq(version))
                 .and(APPLICATION.VISIBLE.eq(true))
-                .fetchOptional()
+                .fetch();
+
+        return ApplicationPreferredHelper.matchByPreferredVersionForDetailsStb(result)
                 .map(applicationMetadataRecord -> {
                     final StbSingleApplicationHeader applicationHeader = new StbSingleApplicationHeader()
                             .id(applicationMetadataRecord.get(APPLICATION.ID_RDOMAIN))
@@ -313,7 +321,7 @@ public class PersistentAppsService implements AppsService {
                 .map(applicationVersionRecord -> new StbVersion()
                         .version(applicationVersionRecord.get(APPLICATION.VERSION))).collect(Collectors.toList());
 
-        return dslContext.select(
+        var result = dslContext.select(
                         MAINTAINER.CODE,
                         MAINTAINER.NAME,
                         MAINTAINER.ADDRESS,
@@ -332,16 +340,20 @@ public class PersistentAppsService implements AppsService {
                         APPLICATION.FEATURES,
                         APPLICATION.DEPENDENCIES,
                         APPLICATION.SIZE,
-                        APPLICATION.OCI_IMAGE_URL
+                        APPLICATION.OCI_IMAGE_URL,
+                        APPLICATION.PREFERRED
                 )
 
                 .from(MAINTAINER)
                 .innerJoin(APPLICATION)
                 .on(MAINTAINER.ID.eq(APPLICATION.MAINTAINER_ID))
                 .where(APPLICATION.ID_RDOMAIN.eq(appId))
-                .and(DSL.condition(APPLICATION.LATEST.getQualifiedName() + " -> 'stb' = 'true'"))
+                .and(DSL.condition(APPLICATION.LATEST.getQualifiedName() + " -> 'stb' = 'true'")
+                        .or(APPLICATION.PREFERRED.eq(true)))
                 .and(APPLICATION.VISIBLE.eq(true))
-                .fetchOptional()
+                .fetch();
+
+        return ApplicationPreferredHelper.matchByPreferredVersionForDetailsStb(result)
                 .map(applicationMetadataRecord -> {
                     final StbSingleApplicationHeader applicationHeader = new StbSingleApplicationHeader()
                             .id(applicationMetadataRecord.get(APPLICATION.ID_RDOMAIN))
