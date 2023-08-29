@@ -33,6 +33,7 @@ import com.lgi.appstore.metadata.model.MaintainerVersion;
 import com.lgi.appstore.metadata.model.Meta;
 import com.lgi.appstore.metadata.model.Platform;
 import com.lgi.appstore.metadata.model.ResultSetMeta;
+import com.lgi.appstore.metadata.util.ApplicationPreferredHelper;
 import com.lgi.appstore.metadata.util.ApplicationUrlService;
 import com.lgi.appstore.metadata.util.JsonProcessorHelper;
 import org.jooq.Condition;
@@ -40,7 +41,7 @@ import org.jooq.DSLContext;
 import org.jooq.JSONB;
 import org.jooq.Record;
 import org.jooq.Record1;
-import org.jooq.Record12;
+import org.jooq.Record13;
 import org.jooq.Record2;
 import org.jooq.SelectJoinStep;
 import org.jooq.SortField;
@@ -95,7 +96,7 @@ public class PersistentAppsService implements AppsService {
                 .map(integerRecord1 -> integerRecord1.get(MAINTAINER.ID))
                 .orElseThrow(() -> new MaintainerNotFoundException(maintainerCode));
 
-        final SelectJoinStep<Record12<String, String, String, String, String, Boolean, Boolean, String, String, Integer, String, JSONB>> from = dslContext
+        final SelectJoinStep<Record13<String, String, String, String, String, Boolean, Boolean, Boolean, String, String, Integer, String, JSONB>> from = dslContext
                 .select(
                         APPLICATION.ID_RDOMAIN,
                         APPLICATION.VERSION,
@@ -104,6 +105,7 @@ public class PersistentAppsService implements AppsService {
                         APPLICATION.DESCRIPTION,
                         APPLICATION.VISIBLE,
                         APPLICATION.ENCRYPTION,
+                        APPLICATION.PREFERRED,
                         APPLICATION.OCI_IMAGE_URL,
                         APPLICATION.TYPE,
                         APPLICATION.SIZE,
@@ -126,7 +128,8 @@ public class PersistentAppsService implements AppsService {
         if (version != null) {
             condition = condition.and(APPLICATION.VERSION.eq(version));
         } else {
-            condition = condition.and(DSL.condition(APPLICATION.LATEST.getQualifiedName() + " -> 'maintainer' = 'true'"));
+            condition = condition.and(DSL.condition(APPLICATION.LATEST.getQualifiedName() + " -> 'maintainer' = 'true'")
+                    .or(APPLICATION.PREFERRED.eq(true)));
         }
         if (type != null) {
             condition = condition.and(APPLICATION.TYPE.contains(type));
@@ -151,11 +154,13 @@ public class PersistentAppsService implements AppsService {
         final int effectiveOffset = offset != null ? offset : 0;
         final int effectiveLimit = limit != null ? limit : 10;
 
-        final List<MaintainerApplicationHeader> applicationHeaderList = from
+        var result = from
                 .where(condition)
                 .offset(effectiveOffset)
                 .limit(effectiveLimit)
-                .fetch()
+                .fetch();
+
+        final List<MaintainerApplicationHeader> applicationHeaderList = ApplicationPreferredHelper.matchByPreferredVersionForListMaintainer(result)
                 .stream()
                 .map(applicationMetadataRecord -> MaintainerApplicationHeaderMapper.map(applicationMetadataRecord, jsonProcessorHelper))
                 .collect(Collectors.toList());
@@ -212,6 +217,7 @@ public class PersistentAppsService implements AppsService {
                         APPLICATION.DESCRIPTION,
                         APPLICATION.VISIBLE,
                         APPLICATION.ENCRYPTION,
+                        APPLICATION.PREFERRED,
                         APPLICATION.OCI_IMAGE_URL,
                         APPLICATION.VERSION,
                         APPLICATION.TYPE,
@@ -262,7 +268,7 @@ public class PersistentAppsService implements AppsService {
                         .visible(applicationVersionRecord.get(APPLICATION.VISIBLE))
                 ).collect(Collectors.toList());
 
-        return dslContext.select(
+        var result = dslContext.select(
                         MAINTAINER.NAME,
                         MAINTAINER.ADDRESS,
                         MAINTAINER.HOMEPAGE,
@@ -271,6 +277,7 @@ public class PersistentAppsService implements AppsService {
                         APPLICATION.VERSION,
                         APPLICATION.VISIBLE,
                         APPLICATION.ENCRYPTION,
+                        APPLICATION.PREFERRED,
                         APPLICATION.OCI_IMAGE_URL,
                         APPLICATION.ICON,
                         APPLICATION.NAME,
@@ -290,8 +297,11 @@ public class PersistentAppsService implements AppsService {
                 .on(MAINTAINER.ID.eq(APPLICATION.MAINTAINER_ID).and(MAINTAINER.CODE.eq(maintainerCode)))
                 .where(APPLICATION.ID_RDOMAIN.eq(appId))
                 .and(APPLICATION.MAINTAINER_ID.eq(maintainerId))
-                .and(DSL.condition(APPLICATION.LATEST.getQualifiedName() + " ->> 'maintainer' = 'true'"))
-                .fetchOptional()
+                .and(DSL.condition(APPLICATION.LATEST.getQualifiedName() + " ->> 'maintainer' = 'true'")
+                        .or(APPLICATION.PREFERRED.eq(true)))
+                .fetch();
+
+        return ApplicationPreferredHelper.matchByPreferredVersionForDetailsMaintainer(result)
                 .map(applicationMetadataRecord -> {
                     final String url = createApplicationUrlFromApplicationRecord(applicationMetadataRecord, platformName, firmwareVer);
                     return MaintainerApplicationDetailsMapper.map(applicationMetadataRecord, versions, jsonProcessorHelper, url);
@@ -319,6 +329,7 @@ public class PersistentAppsService implements AppsService {
                                 APPLICATION.VERSION,
                                 APPLICATION.VISIBLE,
                                 APPLICATION.ENCRYPTION,
+                                APPLICATION.PREFERRED,
                                 APPLICATION.OCI_IMAGE_URL,
                                 APPLICATION.NAME,
                                 APPLICATION.DESCRIPTION,
@@ -337,6 +348,7 @@ public class PersistentAppsService implements AppsService {
                                 application.getHeader().getVersion(),
                                 application.getHeader().isVisible(),
                                 application.getHeader().isEncryption(),
+                                application.getHeader().isPreferred(),
                                 application.getHeader().getOciImageUrl(),
                                 application.getHeader().getName(),
                                 application.getHeader().getDescription(),
@@ -375,6 +387,7 @@ public class PersistentAppsService implements AppsService {
                     final int affectedRows = localDslContext.update(APPLICATION)
                             .set(APPLICATION.VISIBLE, applicationForUpdate.getHeader().isVisible())
                             .set(APPLICATION.ENCRYPTION, applicationForUpdate.getHeader().isEncryption())
+                            .set(APPLICATION.PREFERRED, applicationForUpdate.getHeader().isPreferred())
                             .set(APPLICATION.OCI_IMAGE_URL, applicationForUpdate.getHeader().getOciImageUrl())
                             .set(APPLICATION.NAME, applicationForUpdate.getHeader().getName())
                             .set(APPLICATION.DESCRIPTION, applicationForUpdate.getHeader().getDescription())
@@ -394,7 +407,9 @@ public class PersistentAppsService implements AppsService {
                             .execute();
 
                     updateApplicationsLatestField(localDslContext, maintainerId, appId);
-
+                    if (applicationForUpdate.getHeader().isPreferred()) {
+                        updateApplicationsPreferredFieldForLatest(localDslContext, maintainerId, appId);
+                    }
                     return affectedRows > 0;
                 }
         );
@@ -415,6 +430,7 @@ public class PersistentAppsService implements AppsService {
                     final int affectedRows = localDslContext.update(APPLICATION)
                             .set(APPLICATION.VISIBLE, applicationForUpdate.getHeader().isVisible())
                             .set(APPLICATION.ENCRYPTION, applicationForUpdate.getHeader().isEncryption())
+                            .set(APPLICATION.PREFERRED, applicationForUpdate.getHeader().isPreferred())
                             .set(APPLICATION.OCI_IMAGE_URL, applicationForUpdate.getHeader().getOciImageUrl())
                             .set(APPLICATION.NAME, applicationForUpdate.getHeader().getName())
                             .set(APPLICATION.DESCRIPTION, applicationForUpdate.getHeader().getDescription())
@@ -434,7 +450,9 @@ public class PersistentAppsService implements AppsService {
                             .execute();
 
                     updateApplicationsLatestField(localDslContext, maintainerId, appId);
-
+                    if (applicationForUpdate.getHeader().isPreferred()) {
+                        updateApplicationsPreferredFieldForVersion(localDslContext, maintainerId, appId, version);
+                    }
                     return affectedRows > 0;
                 }
         );
@@ -560,6 +578,36 @@ public class PersistentAppsService implements AppsService {
                     .and(APPLICATION.ID.eq(latestVersions.get("stb")))
                     .execute();
         }
+    }
+
+    private void updateApplicationsPreferredFieldForVersion(DSLContext localDslContext, Integer maintainerId, String appId, String version) {
+        updateApplicationsAllPreferredFieldsToFalse(localDslContext, maintainerId, appId);
+
+        localDslContext.update(APPLICATION)
+                .set(APPLICATION.PREFERRED, true)
+                .where(APPLICATION.MAINTAINER_ID.eq(maintainerId))
+                .and(APPLICATION.ID_RDOMAIN.eq(appId))
+                .and(APPLICATION.VERSION.eq(version))
+                .execute();
+    }
+
+    private void updateApplicationsPreferredFieldForLatest(DSLContext localDslContext, Integer maintainerId, String appId) {
+        updateApplicationsAllPreferredFieldsToFalse(localDslContext, maintainerId, appId);
+
+        localDslContext.update(APPLICATION)
+                .set(APPLICATION.PREFERRED, true)
+                .where(APPLICATION.MAINTAINER_ID.eq(maintainerId))
+                .and(APPLICATION.ID_RDOMAIN.eq(appId))
+                .and(DSL.condition(APPLICATION.LATEST.getQualifiedName() + " -> 'maintainer' = 'true'"))
+                .execute();
+    }
+
+    private void updateApplicationsAllPreferredFieldsToFalse(DSLContext localDslContext, Integer maintainerId, String appId) {
+        localDslContext.update(APPLICATION)
+                .set(APPLICATION.PREFERRED, false)
+                .where(APPLICATION.MAINTAINER_ID.eq(maintainerId))
+                .and(APPLICATION.ID_RDOMAIN.eq(appId))
+                .execute();
     }
 
     private String createApplicationUrlFromApplicationRecord(Record applicationMetadataRecord, String platformName, String firmwareVer) {

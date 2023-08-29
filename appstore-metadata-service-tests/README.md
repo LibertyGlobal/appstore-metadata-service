@@ -139,6 +139,7 @@ curl -v -X POST -H "Content-type: application/json" -d '{
     "version": "1.2.3",
     "visible": true,
     "encryption": false,
+    "preferred": false,
     "ociImageUrl": "myregistry.local:5000/testing/test-image"
   },
   "requirements": {
@@ -182,6 +183,7 @@ curl -v -X POST -H "Content-type: application/json" -d '{
     "version": "1.2.3",
     "visible": true,
     "encryption": false,
+    "preferred": false,
     "ociImageUrl": "myregistry.local:5000/testing/test-image"
   },
   "requirements": {
@@ -219,6 +221,7 @@ curl -v -X POST -H "Content-type: application/json" -d '{
     "version": "0.0.1",
     "visible": true,
     "encryption": false,
+    "preferred": false,
     "ociImageUrl": "myregistry.local:5000/testing/test-image"
   },
   "requirements": {

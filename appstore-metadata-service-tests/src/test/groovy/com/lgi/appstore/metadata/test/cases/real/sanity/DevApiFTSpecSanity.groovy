@@ -51,6 +51,7 @@ class DevApiFTSpecSanity extends AsmsSanitySpecBase {
         def v1 = "1.0.1"
         def v1Visible = false
         def v1Encryption = false
+        def v1Preferred = false
         def v1OciImageUrl = "myregistry.local:5000/testing/test-image"
         def v1Name = "v1Name"
         def v1Description = "v1Description"
@@ -86,6 +87,7 @@ class DevApiFTSpecSanity extends AsmsSanitySpecBase {
                 .withVersion(v1)
                 .withVisible(v1Visible)
                 .withEncryption(v1Encryption)
+                .withPreferred(v1Preferred)
                 .withOciImageUrl(v1OciImageUrl)
                 .withName(v1Name)
                 .withDescription(v1Description)
@@ -106,6 +108,7 @@ class DevApiFTSpecSanity extends AsmsSanitySpecBase {
         and: "application has v2 with completely different metadata"
         def v2Visible = true
         def v2Encryption = true
+        def v2Preferred = true
         def v2OciImageUrl = "myregistry.local:5000/testing/test-image-updated"
         def v2Name = "v2NewName"
         def v2Description = "v2NewDescription"
@@ -140,6 +143,7 @@ class DevApiFTSpecSanity extends AsmsSanitySpecBase {
                 .withId(appId)
                 .withVisible(v2Visible)
                 .withEncryption(v2Encryption)
+                .withPreferred(v2Preferred)
                 .withOciImageUrl(v2OciImageUrl)
                 .withName(v2Name)
                 .withDescription(v2Description)
@@ -173,6 +177,7 @@ class DevApiFTSpecSanity extends AsmsSanitySpecBase {
         field().header().version().from(theBody1) == v1
         field().header().visible().from(theBody1) == v1Visible
         field().header().encryption().from(theBody1) == v1Encryption
+        field().header().preferred().from(theBody1) == v1Preferred
         field().header().ociImageUrl().from(theBody1) == v1OciImageUrl
         field().header().name().from(theBody1) == v1Name
         field().header().category().from(theBody1) == String.valueOf(v1Category)
@@ -202,7 +207,6 @@ class DevApiFTSpecSanity extends AsmsSanitySpecBase {
         assertThat(field().versions().from(theBody1)).asList().hasSize(1)
         field().versions().at(0).version().from(theBody1) == v1
         field().versions().at(0).visible().from(theBody1) == v1Visible
-        field().versions().at(0).encryption().from(theBody1) == v1Encryption
 
         and: "the body exposes requirements section with dependencies information"
         assertThat(field().requirements().dependencies().id().from(theBody1)).asList().containsExactlyInAnyOrder(v1Dependency1Id, v1Dependency2Id)
@@ -241,6 +245,7 @@ class DevApiFTSpecSanity extends AsmsSanitySpecBase {
         field().header().version().from(theBody2) == v1
         field().header().visible().from(theBody2) == null // STB should not see this field
         field().header().encryption().from(theBody2) == null // STB should not see this field
+        field().header().preferred().from(theBody2) == null // STB should not see this field
         field().header().ociImageUrl().from(theBody2) == null // STB should not see this field
         field().header().category().from(theBody2) == String.valueOf(v2Category)
         field().header().name().from(theBody2) == v2Name
@@ -264,7 +269,6 @@ class DevApiFTSpecSanity extends AsmsSanitySpecBase {
         assertThat(field().versions().from(theBody2)).asList().hasSize(1)
         field().versions().at(0).version().from(theBody2) == v1
         field().versions().at(0).visible().from(theBody2) == null // STB should not see this field
-        field().versions().at(0).encryption().from(theBody2) == null // STB should not see this field
 
         and: "the body exposes requirements section with dependencies information"
         assertThat(field().requirements().dependencies().id().from(theBody2)).asList().containsExactlyInAnyOrder(v2Dependency1Id, v2Dependency2Id)

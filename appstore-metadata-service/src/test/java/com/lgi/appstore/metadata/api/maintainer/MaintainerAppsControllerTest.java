@@ -111,7 +111,8 @@ class MaintainerAppsControllerTest {
                     "Container contains both Flutter application and Flutter engine running on wayland-egl, developed by Liberty Global while evaluating Google Flutter UI toolkit.")
             .category(Category.APPLICATION)
             .visible(true)
-            .encryption(false);
+            .encryption(false)
+            .preferred(false);
 
     private static final MaintainerApplicationHeader WAYLAND_EGL_TEST_APPLICATION_HEADER = new MaintainerApplicationHeader()
             .id("com.libertyglobal.app.waylandegltest")
@@ -124,7 +125,8 @@ class MaintainerAppsControllerTest {
                     "Source code example of simple Wayland EGL application intended as tutorial for developers. Contains the few but necessary setup code for any direct to wayland-egl client application such as how to connect to wayland server, create/use EGL surface and draw on screen via opengles api. Application shows simple rectangle on screen. Applications based on this example should run on the various wayland compositors supporting the wayland-egl protocol out there.")
             .category(Category.APPLICATION)
             .visible(true)
-            .encryption(false);
+            .encryption(false)
+            .preferred(false);
 
     private static final MaintainerApplicationHeader YOU_I_APPLICATION_HEADER = new MaintainerApplicationHeader()
             .id("com.libertyglobal.app.youi")
@@ -138,6 +140,7 @@ class MaintainerAppsControllerTest {
             .category(Category.APPLICATION)
             .visible(true)
             .encryption(false)
+            .preferred(false)
             .localization(
                     List.of(
                             new Localization()
@@ -167,6 +170,7 @@ class MaintainerAppsControllerTest {
             .category(Category.APPLICATION)
             .visible(true)
             .encryption(false)
+            .preferred(false)
             .localization(
                     List.of(
                             new Localization()
@@ -214,6 +218,7 @@ class MaintainerAppsControllerTest {
                     "      \"version\": \"1.2.3\"," +
                     "      \"visible\": true," +
                     "      \"encryption\": false," +
+                    "      \"preferred\": false," +
                     "      \"ociImageUrl\": \"${OCI_IMAGE_URL}\"," +
                     "      \"latest\": true," +
                     "      \"name\": \"Awesome Application\"," +
@@ -265,6 +270,7 @@ class MaintainerAppsControllerTest {
                     "      \"icon\": \"https://libertyglobal.com/s/apps/com.libertyglobal.app.awesome/1.2.3/image/1920x1080/icon.png\"," +
                     "      \"visible\": true," +
                     "      \"encryption\": false," +
+                    "      \"preferred\": false," +
                     "      \"ociImageUrl\": \"ociImageUrl\"," +
                     "      \"latest\": true," +
                     "      \"name\": \"Awesome Application\"," +
