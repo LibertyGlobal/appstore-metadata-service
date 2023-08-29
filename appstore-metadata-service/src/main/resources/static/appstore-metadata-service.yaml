@@ -765,6 +765,10 @@ components:
               description: OCI Image URL
               example: "myregistry.local:5000/testing/test-image"
               pattern: '^(?!\s*$).+' # validate for non-empty string
+            version:
+              type: string
+              description: Version to update (working only with non-latest version)
+              example: 1.2.3
     StbApplicationDetails:
       type: object
       required:

@@ -264,7 +264,8 @@ public class ApplicationMetadataBuilder {
                 .visible(headerVisible)
                 .encryption(headerEncryption)
                 .ociImageUrl(headerOciImageUrl)
-                .localization(headerLocalizations);
+                .localization(headerLocalizations)
+                .version(headerVersion);
 
         return new ApplicationForUpdate()
                 .header(appHeader)

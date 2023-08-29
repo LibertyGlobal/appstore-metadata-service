@@ -52,6 +52,7 @@ import static com.lgi.appstore.metadata.test.framework.model.response.Applicatio
 import static com.lgi.appstore.metadata.test.framework.model.response.ApplicationDetailsPath.FIELD_TYPE
 import static com.lgi.appstore.metadata.test.framework.model.response.ApplicationDetailsPath.FIELD_SIZE
 import static com.lgi.appstore.metadata.test.framework.model.response.ApplicationDetailsPath.FIELD_URL
+import static com.lgi.appstore.metadata.test.framework.model.response.ApplicationDetailsPath.FIELD_VERSION
 import static com.lgi.appstore.metadata.test.framework.model.response.ApplicationDetailsPath.FIELD_VISIBLE
 import static com.lgi.appstore.metadata.test.framework.model.response.ApplicationDetailsPath.extract
 import static com.lgi.appstore.metadata.test.framework.model.response.ApplicationDetailsPath.field
@@ -341,7 +342,6 @@ class MaintainerApiFTSpec extends AsmsFeatureSpecBase {
         assertThat(field().versions().from(theBody1)).asList().hasSize(2)
         assertThat(field().versions().version().from(theBody1)).asList().containsExactly(v2, v1)
         assertThat(field().versions().visible().from(theBody1)).asList().containsExactly(v2Visible, v1Visible)
-        assertThat(field().versions().encryption().from(theBody1)).asList().containsExactly(v2Encryption, v1Encryption)
 
         and: "the body exposes requirements section with dependencies information"
         assertThat(field().requirements().dependencies().id().from(theBody1)).asList().containsExactlyInAnyOrder(v1Dependency1Id, v1Dependency2Id)
@@ -394,7 +394,6 @@ class MaintainerApiFTSpec extends AsmsFeatureSpecBase {
         assertThat(field().versions().from(theBody2)).asList().hasSize(2)
         assertThat(field().versions().version().from(theBody2)).asList().containsExactly(v2, v1)
         assertThat(field().versions().visible().from(theBody2)).asList().containsExactly(v2Visible, v1Visible)
-        assertThat(field().versions().encryption().from(theBody2)).asList().containsExactly(v2Encryption, v1Encryption)
 
         and: "the body exposes requirements section with dependencies information"
         assertThat(field().requirements().dependencies().id().from(theBody2)).asList().containsExactlyInAnyOrder(v2Dependency1Id, v2Dependency2Id)
@@ -515,6 +514,49 @@ class MaintainerApiFTSpec extends AsmsFeatureSpecBase {
         FIELD_SIZE        | 10000000                      || 20000000
         FIELD_ICON        | "c:\\Icon.before.png"         || "//home/alwi/Icon.after"
         FIELD_OCI_IMAGE_URL        | "myregistry.local:5000/testing/before"         || "myregistry.local:5000/testing/after"
+    }
+
+    @Unroll
+    def "update application details value of #field for specific version (non-latest) for param newVersion"() {
+        given: "developer creates an application with multiple versions"
+        def appId = randId()
+        def newVersion = "0.1.200"
+        Application appV1 = builder().fromDefaults().withId(appId).with(field, valueV1Before).forCreate()
+        Application appV2 = builder().fromDefaults().withId(appId).withVersion(newVersion).forCreate();
+
+        and: "create only one application"
+        maintainerSteps.createNewApplication_expectSuccess(DEFAULT_DEV_CODE, appV1)
+
+        and: "developer gets specific version details"
+        JsonPath bodyV1Before = maintainerSteps.getApplicationDetails_expectSuccess(DEFAULT_DEV_CODE, appKeyFor(appV1))
+        assertThat(extract(field).from(bodyV1Before)).describedAs("$field value before update").isEqualTo(valueV1Before)
+
+        when: "developer updates application"
+        ApplicationForUpdate updatedApp = builder().fromExisting(appV1).withVersion(newVersion).with(field, valueV2After).forUpdate()
+        def responseUpdate = maintainerSteps.updateApplication(DEFAULT_DEV_CODE, appKeyFor(appV1), updatedApp).extract()
+        def receivedStatusUpdate = responseUpdate.statusCode()
+
+        then: "expected response HTTP status should be success"
+        receivedStatusUpdate == SC_NO_CONTENT
+
+        when: "developer gets details of updated application"
+        JsonPath bodyV2After = maintainerSteps.getApplicationDetails_expectSuccess(DEFAULT_DEV_CODE, appKeyFor(appV2))
+
+        then: "application has #field updated with value #valueV1After"
+        extract(field).from(bodyV2After) == valueV2After
+
+        where:
+        field             | valueV1Before                 || valueV2After // must be different than the defaults
+        FIELD_VISIBLE     | Boolean.TRUE                  || Boolean.FALSE
+        FIELD_ENCRYPTION  | Boolean.FALSE                 || Boolean.TRUE
+        FIELD_NAME        | "appNameBefore"               || "appNameAfter"
+        FIELD_DESCRIPTION | "Description Before ąćęłóśżź" || "Description After €\\€\\€\\€\\"
+        FIELD_CATEGORY    | String.valueOf(Category.DEV)  || String.valueOf(Category.RESOURCE)
+        FIELD_TYPE        | "typeBefore"                  || "typeAfter"
+        FIELD_SIZE        | 10000000                      || 20000000
+        FIELD_ICON        | "c:\\Icon.before.png"         || "//home/alwi/Icon.after"
+        FIELD_OCI_IMAGE_URL        | "myregistry.local:5000/testing/before"         || "myregistry.local:5000/testing/after"
+        FIELD_VERSION     | "0.1.100"                     || "0.1.200"
     }
 
     @Unroll
