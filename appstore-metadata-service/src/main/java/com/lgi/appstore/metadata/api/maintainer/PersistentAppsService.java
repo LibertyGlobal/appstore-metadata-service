@@ -40,7 +40,6 @@ import org.jooq.DSLContext;
 import org.jooq.JSONB;
 import org.jooq.Record;
 import org.jooq.Record1;
-import org.jooq.Record11;
 import org.jooq.Record12;
 import org.jooq.Record2;
 import org.jooq.SelectJoinStep;
@@ -62,6 +61,7 @@ import java.util.stream.Collectors;
 
 import static com.lgi.appstore.metadata.jooq.model.Tables.MAINTAINER;
 import static com.lgi.appstore.metadata.jooq.model.tables.Application.APPLICATION;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 @Primary
 @Service("MaintainerPersistentAppsService")
@@ -422,6 +422,7 @@ public class PersistentAppsService implements AppsService {
                             .set(APPLICATION.TYPE, applicationForUpdate.getHeader().getType())
                             .set(APPLICATION.SIZE, applicationForUpdate.getHeader().getSize())
                             .set(APPLICATION.CATEGORY, applicationForUpdate.getHeader().getCategory().toString())
+                            .set(APPLICATION.VERSION, getVersion(version, applicationForUpdate))
                             .set(APPLICATION.LOCALIZATIONS, JSONB.valueOf(jsonProcessorHelper.writeValueAsString(JsonObjectNames.LOCALIZATIONS, applicationForUpdate.getHeader().getLocalization())))
                             .set(APPLICATION.PLATFORM, JSONB.valueOf(jsonProcessorHelper.writeValueAsString(JsonObjectNames.PLATFORM, applicationForUpdate.getRequirements().getPlatform())))
                             .set(APPLICATION.HARDWARE, JSONB.valueOf(jsonProcessorHelper.writeValueAsString(JsonObjectNames.HARDWARE, applicationForUpdate.getRequirements().getHardware())))
@@ -570,5 +571,11 @@ public class PersistentAppsService implements AppsService {
                 applicationMetadataRecord.get(APPLICATION.VERSION),
                 applicationMetadataRecord.get(APPLICATION.OCI_IMAGE_URL))
         );
+    }
+
+    private String getVersion(String version, ApplicationForUpdate applicationForUpdate) {
+        return isNotBlank(applicationForUpdate.getHeader().getVersion())
+                ? applicationForUpdate.getHeader().getVersion()
+                : version;
     }
 }

@@ -46,6 +46,9 @@ import com.lgi.appstore.metadata.util.ApplicationUrlService;
 import com.lgi.appstore.metadata.util.JsonProcessorHelper;
 import org.jooq.DSLContext;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.validation.Valid;
@@ -58,12 +61,14 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class PersistentAppsServiceTest extends BaseServiceTest {
 
     private static final String DEFAULT_VERSION = "1.0.0";
+    private static final String NEW_VERSION = "1.1.0";
 
     private final AppsService appsService;
 
@@ -204,8 +209,10 @@ class PersistentAppsServiceTest extends BaseServiceTest {
         verifyMaintainerApplicationDetails(maintainerApplicationAfterUpdate, maintainerRecord, applicationForUpdate);
     }
 
-    @Test
-    void canUpdateApplication() {
+    @ParameterizedTest
+    @ValueSource(strings = {DEFAULT_VERSION, NEW_VERSION})
+    @NullAndEmptySource
+    void canUpdateApplication(String versionForUpdate) {
         final MaintainerRecord maintainerRecord = createRandomMaintainerRecord();
         final String maintainerCode = maintainerRecord.getCode();
         final Application application = createRandomApplication(maintainerCode);
@@ -220,7 +227,7 @@ class PersistentAppsServiceTest extends BaseServiceTest {
                 .dependencies(Collections.singletonList(createRandomDependency()))
                 .features(Collections.singletonList(createRandomFeature()));
         applicationForUpdate.setRequirements(updatedRequirements);
-        final ApplicationHeaderForUpdate applicationHeaderForUpdate = createRandomApplicationHeaderForUpdate(createRandomLocalization());
+        final ApplicationHeaderForUpdate applicationHeaderForUpdate = createRandomApplicationHeaderForUpdate(createRandomLocalization(), versionForUpdate);
         applicationForUpdate.setHeader(applicationHeaderForUpdate);
 
         appsService.updateApplication(maintainerCode, maintainerApplicationHeader.getId(), maintainerApplicationHeader.getVersion(), applicationForUpdate);
@@ -382,6 +389,10 @@ class PersistentAppsServiceTest extends BaseServiceTest {
     }
 
     private ApplicationHeaderForUpdate createRandomApplicationHeaderForUpdate(Localization localization) {
+        return createRandomApplicationHeaderForUpdate(localization, null);
+    }
+
+    private ApplicationHeaderForUpdate createRandomApplicationHeaderForUpdate(Localization localization, String version) {
         return new ApplicationHeaderForUpdate()
                 .category(Category.APPLICATION)
                 .description(UUID.randomUUID().toString())
@@ -392,7 +403,8 @@ class PersistentAppsServiceTest extends BaseServiceTest {
                 .localization(Collections.singletonList(localization))
                 .visible(true)
                 .encryption(false)
-                .ociImageUrl("UPDATED_OCI_IMAGE_URL");
+                .ociImageUrl("UPDATED_OCI_IMAGE_URL")
+                .version(version);
     }
 
     private void verifyMaintainerApplicationDetails(Optional<MaintainerApplicationDetails> maybeMaintainerApplicationDetails,
@@ -412,6 +424,11 @@ class PersistentAppsServiceTest extends BaseServiceTest {
                 "visible",
                 "encryption",
                 "ociImageUrl");
+        if (isNotBlank(applicationForUpdate.getHeader().getVersion())) {
+            assertThat(header.getVersion()).isEqualTo(applicationForUpdate.getHeader().getVersion());
+        } else {
+            assertThat(header.getVersion()).isEqualTo(DEFAULT_VERSION);
+        }
         final Maintainer maintainer = maintainerApplicationDetails.getMaintainer();
         assertThat(maintainer).isNotNull();
         assertThat(maintainer.getAddress()).isEqualTo(maintainerRecord.getAddress());
