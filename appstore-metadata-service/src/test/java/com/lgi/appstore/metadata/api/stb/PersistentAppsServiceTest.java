@@ -273,6 +273,7 @@ class PersistentAppsServiceTest extends BaseServiceTest {
         verifyStbSingleApplicationHeader(header, applicationRecord, localization);
         final Maintainer maintainer = stbApplicationDetails.getMaintainer();
         assertThat(maintainer).isNotNull();
+        assertThat(maintainer.getCode()).isEqualTo(maintainerRecord.getCode());
         assertThat(maintainer.getAddress()).isEqualTo(maintainerRecord.getAddress());
         assertThat(maintainer.getEmail()).isEqualTo(maintainerRecord.getEmail());
         assertThat(maintainer.getHomepage()).isEqualTo(maintainerRecord.getHomepage());

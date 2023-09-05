@@ -22,7 +22,7 @@ import org.jooq.JSONB;
 import org.jooq.Record10;
 import org.jooq.Record13;
 import org.jooq.Record20;
-import org.jooq.Record21;
+import org.jooq.Record22;
 import org.jooq.Result;
 
 import java.util.List;
@@ -66,8 +66,8 @@ public class ApplicationPreferredHelper {
         return result.stream().findAny();
     }
 
-    public static Optional<Record21<String, String, String, String, String, String, Boolean, Boolean, Boolean, String, String, String, String, String, Integer, String, JSONB, JSONB, JSONB, JSONB, JSONB>>
-    matchByPreferredVersionForDetailsMaintainer(Result<Record21<String, String, String, String, String, String, Boolean, Boolean, Boolean, String, String, String, String, String, Integer, String, JSONB, JSONB, JSONB, JSONB, JSONB>> result) {
+    public static Optional<Record22<String, String, String, String, String, String, String, Boolean, Boolean, Boolean, String, String, String, String, String, Integer, String, JSONB, JSONB, JSONB, JSONB, JSONB>>
+    matchByPreferredVersionForDetailsMaintainer(Result<Record22<String, String, String, String, String, String, String, Boolean, Boolean, Boolean, String, String, String, String, String, Integer, String, JSONB, JSONB, JSONB, JSONB, JSONB>> result) {
         if (result.size() > 1) {
             return result.stream()
                     .filter(record -> record.get(APPLICATION.PREFERRED).equals(true))

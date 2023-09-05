@@ -55,6 +55,7 @@ public class MaintainerApplicationDetailsMapper {
         return new MaintainerApplicationDetails()
                 .header(applicationHeader)
                 .maintainer(new com.lgi.appstore.metadata.model.Maintainer()
+                        .code(applicationMetadataRecord.get(MAINTAINER.CODE))
                         .name(applicationMetadataRecord.get(MAINTAINER.NAME))
                         .address(applicationMetadataRecord.get(MAINTAINER.ADDRESS))
                         .homepage(applicationMetadataRecord.get(MAINTAINER.HOMEPAGE))
