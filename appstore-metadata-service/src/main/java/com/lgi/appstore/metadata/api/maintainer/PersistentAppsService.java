@@ -206,6 +206,7 @@ public class PersistentAppsService implements AppsService {
                 ).collect(Collectors.toList());
 
         return dslContext.select(
+                        MAINTAINER.CODE,
                         MAINTAINER.NAME,
                         MAINTAINER.ADDRESS,
                         MAINTAINER.HOMEPAGE,
@@ -269,6 +270,7 @@ public class PersistentAppsService implements AppsService {
                 ).collect(Collectors.toList());
 
         var result = dslContext.select(
+                        MAINTAINER.CODE,
                         MAINTAINER.NAME,
                         MAINTAINER.ADDRESS,
                         MAINTAINER.HOMEPAGE,

@@ -434,6 +434,7 @@ class PersistentAppsServiceTest extends BaseServiceTest {
         }
         final Maintainer maintainer = maintainerApplicationDetails.getMaintainer();
         assertThat(maintainer).isNotNull();
+        assertThat(maintainer.getCode()).isEqualTo(maintainerRecord.getCode());
         assertThat(maintainer.getAddress()).isEqualTo(maintainerRecord.getAddress());
         assertThat(maintainer.getEmail()).isEqualTo(maintainerRecord.getEmail());
         assertThat(maintainer.getHomepage()).isEqualTo(maintainerRecord.getHomepage());
@@ -455,6 +456,7 @@ class PersistentAppsServiceTest extends BaseServiceTest {
         verifyMaintainerHeader(header, application.getHeader());
         final Maintainer maintainer = maintainerApplicationDetails.getMaintainer();
         assertThat(maintainer).isNotNull();
+        assertThat(maintainer.getCode()).isEqualTo(maintainerRecord.getCode());
         assertThat(maintainer.getAddress()).isEqualTo(maintainerRecord.getAddress());
         assertThat(maintainer.getEmail()).isEqualTo(maintainerRecord.getEmail());
         assertThat(maintainer.getHomepage()).isEqualTo(maintainerRecord.getHomepage());

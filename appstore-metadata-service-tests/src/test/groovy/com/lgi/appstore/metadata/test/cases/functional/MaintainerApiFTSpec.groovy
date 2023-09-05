@@ -340,6 +340,7 @@ class MaintainerApiFTSpec extends AsmsFeatureSpecBase {
         field().header().icon().from(theBody1) == v1Icon
 
         and: "the body exposes maintainer section with his details"
+        field().maintainer().code().from(theBody1) == DEFAULT_DEV_CODE
         field().maintainer().name().from(theBody1) == DEFAULT_DEV_NAME
         field().maintainer().address().from(theBody1) == DEFAULT_DEV_ADDRESS
         field().maintainer().homepage().from(theBody1) == DEFAULT_DEV_HOMEPAGE
@@ -393,6 +394,7 @@ class MaintainerApiFTSpec extends AsmsFeatureSpecBase {
         field().header().icon().from(theBody2) == v2Icon
 
         and: "the body exposes maintainer section with his details"
+        field().maintainer().code().from(theBody2) == DEFAULT_DEV_CODE
         field().maintainer().name().from(theBody2) == DEFAULT_DEV_NAME
         field().maintainer().address().from(theBody2) == DEFAULT_DEV_ADDRESS
         field().maintainer().homepage().from(theBody2) == DEFAULT_DEV_HOMEPAGE
