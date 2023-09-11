@@ -203,10 +203,11 @@ class DevApiFTSpecSanity extends AsmsSanitySpecBase {
         field().maintainer().homepage().from(theBody1) == DEFAULT_DEV_HOMEPAGE
         field().maintainer().email().from(theBody1) == DEFAULT_DEV_EMAIL
 
-        and: "the body exposes version section with all versions, visibility and encryption information"
+        and: "the body exposes version section with all versions, visibility, encryption, and preferred information"
         assertThat(field().versions().from(theBody1)).asList().hasSize(1)
         field().versions().at(0).version().from(theBody1) == v1
         field().versions().at(0).visible().from(theBody1) == v1Visible
+        field().versions().at(0).preferred().from(theBody1) == v1Preferred
 
         and: "the body exposes requirements section with dependencies information"
         assertThat(field().requirements().dependencies().id().from(theBody1)).asList().containsExactlyInAnyOrder(v1Dependency1Id, v1Dependency2Id)
@@ -265,10 +266,11 @@ class DevApiFTSpecSanity extends AsmsSanitySpecBase {
         field().maintainer().homepage().from(theBody2) == DEFAULT_DEV_HOMEPAGE
         field().maintainer().email().from(theBody2) == DEFAULT_DEV_EMAIL
 
-        and: "the body exposes version section with all versions, visibility and encryption information"
+        and: "the body exposes version section with all versions, visibility, encryption and preferred information"
         assertThat(field().versions().from(theBody2)).asList().hasSize(1)
         field().versions().at(0).version().from(theBody2) == v1
         field().versions().at(0).visible().from(theBody2) == null // STB should not see this field
+        field().versions().at(0).preferred().from(theBody2) == null // STB should not see this field
 
         and: "the body exposes requirements section with dependencies information"
         assertThat(field().requirements().dependencies().id().from(theBody2)).asList().containsExactlyInAnyOrder(v2Dependency1Id, v2Dependency2Id)

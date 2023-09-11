@@ -364,11 +364,12 @@ class StbApiFTSpec extends AsmsFeatureSpecBase {
         field().maintainer().homepage().from(theBody1) == DEFAULT_DEV_HOMEPAGE
         field().maintainer().email().from(theBody1) == DEFAULT_DEV_EMAIL
 
-        and: "the body exposes version section with all versions, visibility and encryption information"
+        and: "the body exposes version section with all versions, visibility, encryption and preferred information"
         assertThat(field().versions().from(theBody1)).asList().hasSize(2) // 3rd hidden version should not be exposed
         assertThat(field().versions().version().from(theBody1)).asList().containsExactly(v2, v1)
         assertThat(field().versions().visible().from(theBody1)).asList().containsExactly(null, null) // 'visible' field should not be exposed
         assertThat(field().versions().encryption().from(theBody1)).asList().containsExactly(null, null) // 'encryption' field should not be exposed
+        assertThat(field().versions().preferred().from(theBody1)).asList().containsExactly(null, null) // 'preferred' field should not be exposed
 
         and: "the body does not expose ociImageUrl"
         field().header().ociImageUrl().from(theBody1) == null
@@ -416,11 +417,12 @@ class StbApiFTSpec extends AsmsFeatureSpecBase {
         field().maintainer().homepage().from(theBody2) == DEFAULT_DEV_HOMEPAGE
         field().maintainer().email().from(theBody2) == DEFAULT_DEV_EMAIL
 
-        and: "the body exposes version section with all versions, visibility and encryption information"
+        and: "the body exposes version section with all versions, visibility, encryption and preferred information"
         assertThat(field().versions().from(theBody2)).asList().hasSize(2) // 3rd hidden version should not be exposed
         assertThat(field().versions().version().from(theBody2)).asList().containsExactly(v2, v1)
         assertThat(field().versions().visible().from(theBody2)).asList().containsExactly(null, null) // 'visible' field should not be exposed
         assertThat(field().versions().encryption().from(theBody2)).asList().containsExactly(null, null) // 'encryption' field should not be exposed
+        assertThat(field().versions().preferred().from(theBody2)).asList().containsExactly(null, null) // 'preferred' field should not be exposed
 
         and: "the body exposes requirements section with dependencies information"
         assertThat(field().requirements().dependencies().id().from(theBody2)).asList().containsExactlyInAnyOrder(v2Dependency1Id, v2Dependency2Id)

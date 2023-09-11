@@ -350,6 +350,7 @@ class MaintainerApiFTSpec extends AsmsFeatureSpecBase {
         assertThat(field().versions().from(theBody1)).asList().hasSize(2)
         assertThat(field().versions().version().from(theBody1)).asList().containsExactly(v2, v1)
         assertThat(field().versions().visible().from(theBody1)).asList().containsExactly(v2Visible, v1Visible)
+        assertThat(field().versions().preferred().from(theBody1)).asList().containsExactly(v2Preferred, v1Preferred)
 
         and: "the body exposes requirements section with dependencies information"
         assertThat(field().requirements().dependencies().id().from(theBody1)).asList().containsExactlyInAnyOrder(v1Dependency1Id, v1Dependency2Id)
@@ -404,6 +405,7 @@ class MaintainerApiFTSpec extends AsmsFeatureSpecBase {
         assertThat(field().versions().from(theBody2)).asList().hasSize(2)
         assertThat(field().versions().version().from(theBody2)).asList().containsExactly(v2, v1)
         assertThat(field().versions().visible().from(theBody2)).asList().containsExactly(v2Visible, v1Visible)
+        assertThat(field().versions().preferred().from(theBody2)).asList().containsExactly(v2Preferred, v1Preferred)
 
         and: "the body exposes requirements section with dependencies information"
         assertThat(field().requirements().dependencies().id().from(theBody2)).asList().containsExactlyInAnyOrder(v2Dependency1Id, v2Dependency2Id)
@@ -601,6 +603,7 @@ class MaintainerApiFTSpec extends AsmsFeatureSpecBase {
         responseGetStatus == SC_OK ? assertThat(field().versions().from(bodyGet)).asList().hasSize(1) : IGNORE_THIS_ASSERTION
         responseGetStatus == SC_OK ? field().versions().version().at(0).from(bodyGet) == returnedV : IGNORE_THIS_ASSERTION
         responseGetStatus == SC_OK ? field().versions().visible().at(0).from(bodyGet) == true : IGNORE_THIS_ASSERTION
+        responseGetStatus == SC_OK ? field().versions().preferred().at(0).from(bodyGet) == false : IGNORE_THIS_ASSERTION
 
         where:
         behavior                              | appId    | v1      | v2      | deleteAppKey      || getHttpCode  | returnedV

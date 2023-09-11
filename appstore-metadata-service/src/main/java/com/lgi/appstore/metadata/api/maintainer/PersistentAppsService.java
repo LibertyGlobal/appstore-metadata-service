@@ -192,7 +192,8 @@ public class PersistentAppsService implements AppsService {
         final List<MaintainerVersion> versions = dslContext
                 .select(
                         APPLICATION.VERSION,
-                        APPLICATION.VISIBLE
+                        APPLICATION.VISIBLE,
+                        APPLICATION.PREFERRED
                 )
                 .from(APPLICATION)
                 .where(APPLICATION.ID_RDOMAIN.eq(appId))
@@ -203,6 +204,7 @@ public class PersistentAppsService implements AppsService {
                 .map(applicationVersionRecord -> new MaintainerVersion()
                         .version(applicationVersionRecord.get(APPLICATION.VERSION))
                         .visible(applicationVersionRecord.get(APPLICATION.VISIBLE))
+                        .preferred(applicationVersionRecord.get(APPLICATION.PREFERRED))
                 ).collect(Collectors.toList());
 
         return dslContext.select(
@@ -255,7 +257,8 @@ public class PersistentAppsService implements AppsService {
 
         final List<MaintainerVersion> versions = dslContext.select(
                         APPLICATION.VERSION,
-                        APPLICATION.VISIBLE
+                        APPLICATION.VISIBLE,
+                        APPLICATION.PREFERRED
                 )
 
                 .from(APPLICATION)
@@ -267,6 +270,7 @@ public class PersistentAppsService implements AppsService {
                 .map(applicationVersionRecord -> new MaintainerVersion()
                         .version(applicationVersionRecord.get(APPLICATION.VERSION))
                         .visible(applicationVersionRecord.get(APPLICATION.VISIBLE))
+                        .preferred(applicationVersionRecord.get(APPLICATION.PREFERRED))
                 ).collect(Collectors.toList());
 
         var result = dslContext.select(

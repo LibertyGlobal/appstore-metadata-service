@@ -974,6 +974,11 @@ components:
               type: boolean
               description: Visible version attribute
               example: true
+            preferred:
+              type: boolean
+              description: Preferred attribute
+              default: false
+              example: false
     MaintainerVersions:
       type: array
       description: semantically sorted versions of the application
