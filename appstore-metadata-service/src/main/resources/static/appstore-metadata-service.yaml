@@ -666,6 +666,7 @@ components:
           example: https://libertyglobal.com/s/apps/com.libertyglobal.app.awesome/1.2.3/image/1920x1080/icon.png
         name:
           type: string
+          pattern: '^(?!\s*$).+' # validate for non-empty string
           description: Application name
           example: Awesome Application
         description:
@@ -707,6 +708,7 @@ components:
           properties:
             id:
               type: string
+              pattern: '^(?!\s*$).+' # validate for non-empty string
               description: Reverse Domain Notation ID
               example: com.libertyglobal.app.awesome
             version:

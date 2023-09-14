@@ -746,6 +746,80 @@ class MaintainerAppsControllerTest {
     }
 
     @Test
+    void cannotAddApplicationWithoutApplicationName() throws Exception {
+        // given
+        String aNull = CORRECT_APPLICATION_AS_JSON.replace("\"Awesome Application\"", "null");
+        // when
+        MockHttpServletResponse response = mvc
+                .perform(
+                        post("/maintainers/{maintainerCode}/apps", MAINTAINER_CODE)
+                                .content(aNull)
+                                .contentType(MediaType.APPLICATION_JSON))
+                .andReturn()
+                .getResponse();
+
+        // then
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.getContentAsString()).isEqualTo("{\"message\":\"[header.name: must not be null]\"}");
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"", "  ", "     "})
+    void cannotAddApplicationWithBlankApplicationName(String applicationName) throws Exception {
+        // given
+        String aNull = CORRECT_APPLICATION_AS_JSON.replace("\"Awesome Application\"", "\"" + applicationName + "\"");
+        // when
+        MockHttpServletResponse response = mvc
+                .perform(
+                        post("/maintainers/{maintainerCode}/apps", MAINTAINER_CODE)
+                                .content(aNull)
+                                .contentType(MediaType.APPLICATION_JSON))
+                .andReturn()
+                .getResponse();
+
+        // then
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.getContentAsString()).isEqualTo("{\"message\":\"[header.name: must match \\\"^(?!\\\\s*$).+\\\"]\"}");
+    }
+
+        @Test
+    void cannotAddApplicationWithoutApplicationId() throws Exception {
+        // given
+        String aNull = CORRECT_APPLICATION_AS_JSON.replaceFirst("\"com.libertyglobal.app.awesome\"", "null");
+        // when
+        MockHttpServletResponse response = mvc
+                .perform(
+                        post("/maintainers/{maintainerCode}/apps", MAINTAINER_CODE)
+                                .content(aNull)
+                                .contentType(MediaType.APPLICATION_JSON))
+                .andReturn()
+                .getResponse();
+
+        // then
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.getContentAsString()).isEqualTo("{\"message\":\"[header.id: must not be null]\"}");
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"", "  ", "     "})
+    void cannotAddApplicationWithBlankApplicationId(String applicationName) throws Exception {
+        // given
+        String aNull = CORRECT_APPLICATION_AS_JSON.replaceFirst("\"com.libertyglobal.app.awesome\"", "\"" + applicationName + "\"");
+        // when
+        MockHttpServletResponse response = mvc
+                .perform(
+                        post("/maintainers/{maintainerCode}/apps", MAINTAINER_CODE)
+                                .content(aNull)
+                                .contentType(MediaType.APPLICATION_JSON))
+                .andReturn()
+                .getResponse();
+
+        // then
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.getContentAsString()).isEqualTo("{\"message\":\"[header.id: must match \\\"^(?!\\\\s*$).+\\\"]\"}");
+    }
+
+    @Test
     void cannotGetApplicationDetailsWithoutPlatformName() throws Exception {
         // given
 
