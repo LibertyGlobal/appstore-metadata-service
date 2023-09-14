@@ -1014,8 +1014,6 @@ components:
           example: developer@libertyglobal.com
     MaintainerForUpdate:
       type: object
-      required:
-        - name
       properties:
         name:
           type: string
