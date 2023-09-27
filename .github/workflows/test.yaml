@@ -56,6 +56,6 @@ jobs:
           distribution: 'temurin'
           cache: maven
       - name: Test
-        run:
+        run: |
           mvn verify -DskipJarUpload=true -Ddb.port=5432 -Ddocker.skip=true
           mvn verify -Dci-stage=integration-tests -DskipJarUpload=true -Ddb.port=5432 -Ddocker.skip=true
