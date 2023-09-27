@@ -54,8 +54,12 @@ jobs:
       - name: Generate and Publish Helm
         run: |
           git pull
+          cat charts/index.yaml | grep '#' > charts/license.txt
           helm package --version ${{ inputs.version }} --app-version ${{ inputs.version }} helm/appstore-metadata-service -d charts/
           helm repo index charts/ --url ${{ env.HELM_REPOSITORY }}
+          { cat charts/license.txt; cat charts/index.yaml; } > charts/index.yaml.withlicenseheader
+          mv charts/index.yaml.withlicenseheader charts/index.yaml
+          rm charts/license.txt
           git config --global user.name "${{ env.CI_COMMIT_AUTHOR }}"
           git config --global user.email "{{ env.CI_COMMIT_AUTHOR_EMAIL }}"
           git add charts/
