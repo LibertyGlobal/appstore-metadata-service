@@ -193,7 +193,8 @@ public class PersistentAppsService implements AppsService {
                 .select(
                         APPLICATION.VERSION,
                         APPLICATION.VISIBLE,
-                        APPLICATION.PREFERRED
+                        APPLICATION.PREFERRED,
+                        APPLICATION.ENCRYPTION
                 )
                 .from(APPLICATION)
                 .where(APPLICATION.ID_RDOMAIN.eq(appId))
@@ -205,6 +206,7 @@ public class PersistentAppsService implements AppsService {
                         .version(applicationVersionRecord.get(APPLICATION.VERSION))
                         .visible(applicationVersionRecord.get(APPLICATION.VISIBLE))
                         .preferred(applicationVersionRecord.get(APPLICATION.PREFERRED))
+                        .encryption(applicationVersionRecord.get(APPLICATION.ENCRYPTION))
                 ).collect(Collectors.toList());
 
         return dslContext.select(
@@ -258,7 +260,8 @@ public class PersistentAppsService implements AppsService {
         final List<MaintainerVersion> versions = dslContext.select(
                         APPLICATION.VERSION,
                         APPLICATION.VISIBLE,
-                        APPLICATION.PREFERRED
+                        APPLICATION.PREFERRED,
+                        APPLICATION.ENCRYPTION
                 )
 
                 .from(APPLICATION)
@@ -271,6 +274,7 @@ public class PersistentAppsService implements AppsService {
                         .version(applicationVersionRecord.get(APPLICATION.VERSION))
                         .visible(applicationVersionRecord.get(APPLICATION.VISIBLE))
                         .preferred(applicationVersionRecord.get(APPLICATION.PREFERRED))
+                        .encryption(applicationVersionRecord.get(APPLICATION.ENCRYPTION))
                 ).collect(Collectors.toList());
 
         var result = dslContext.select(

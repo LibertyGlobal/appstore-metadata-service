@@ -981,6 +981,11 @@ components:
               description: Preferred attribute
               default: false
               example: false
+            encryption:
+              type: boolean
+              description: Encryption attribute
+              default: false
+              example: false
     MaintainerVersions:
       type: array
       description: semantically sorted versions of the application
