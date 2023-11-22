@@ -178,13 +178,13 @@ public class PersistentAppsService implements AppsService {
         final Integer total = whereTotal.and(condition).fetchSingle().component1();
 
         final int effectiveOffset = offset != null ? offset : 0;
-        final int effectiveLimit = limit != null ? limit : 10;
+        final int effectiveLimit = limit != null ? limit : 0;
+        
+        var readyToLimit = where
+            .and(condition)
+            .offset(effectiveOffset);
 
-        var result = where
-                .and(condition)
-                .offset(effectiveOffset)
-                .limit(effectiveLimit)
-                .fetch();
+        var result = (effectiveLimit != 0 ? readyToLimit.limit(effectiveLimit) : readyToLimit).fetch();
 
         final List<StbApplicationHeader> applicationHeaderList = ApplicationPreferredHelper.matchByPreferredVersionForListStb(result)
                         .stream()

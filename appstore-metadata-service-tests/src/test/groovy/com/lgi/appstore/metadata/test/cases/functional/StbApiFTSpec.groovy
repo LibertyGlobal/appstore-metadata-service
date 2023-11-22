@@ -67,7 +67,7 @@ import static org.apache.http.HttpStatus.SC_OK
 import static org.assertj.core.api.Assertions.assertThat
 
 class StbApiFTSpec extends AsmsFeatureSpecBase {
-    public static final int DEFAULT_LIMIT = 10
+    public static final int DEFAULT_LIMIT = 0
     private static final boolean IGNORE_THIS_ASSERTION = true
 
     @Unroll
@@ -99,7 +99,11 @@ class StbApiFTSpec extends AsmsFeatureSpecBase {
 
         then: "it gets response SC_OK"
         receivedStatus == SC_OK
-        assertThat(ApplicationsPath.field().applications().from(jsonBody)).asList().hasSizeLessThanOrEqualTo(returnedLimit)
+        if (returnedLimit == 0) {
+                count == total
+        } else {
+                assertThat(ApplicationsPath.field().applications().from(jsonBody)).asList().hasSizeLessThanOrEqualTo(returnedLimit)
+        }
 
         and: "the amount of items is as desired"
         ApplicationsPath.field().meta().resultSet().count().from(jsonBody) == count

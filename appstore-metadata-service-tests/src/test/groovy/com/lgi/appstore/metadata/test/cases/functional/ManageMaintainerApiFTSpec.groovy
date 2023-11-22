@@ -43,7 +43,7 @@ import static org.assertj.core.api.Assertions.assertThat
 
 class ManageMaintainerApiFTSpec extends AsmsFeatureSpecBase {
     def static final IGNORE_CASE = Comparator.comparing(Function.identity(), String.CASE_INSENSITIVE_ORDER)
-    def static final DEFAULT_LIMIT = 10
+    def static final DEFAULT_LIMIT = 0
 
     @Unroll
     def "query for maintainers list returns amount corresponding to given limit=#limit offset=#offset"() {
@@ -83,7 +83,11 @@ class ManageMaintainerApiFTSpec extends AsmsFeatureSpecBase {
 
         then: "he gets positive response"
         receivedStatus == SC_OK
-        assertThat(field().maintainers().from(jsonBody)).asList().hasSizeLessThanOrEqualTo(returnedLimit)
+        if (returnedLimit == 0) {
+                count == total
+        } else {
+                assertThat(field().maintainers().from(jsonBody)).asList().hasSizeLessThanOrEqualTo(returnedLimit)
+        }
 
         and: "the amount of items is as desired"
         field().meta().resultSet().count().from(jsonBody) == count

@@ -188,6 +188,121 @@ class PersistentAppsServiceTest extends BaseServiceTest {
                 .containsExactlyElementsOf(orderedVersions);
     }
 
+    @Test
+    void omittingLimitParamReturnsAllApplications() throws Exception {
+        final MaintainerRecord maintainerRecord = createRandomMaintainerRecord();
+        final String maintainerCode = maintainerRecord.getCode();
+        final String applicationId1 = "TestApplication1";
+        final String applicationId2 = "TestApplication2";
+        createRandomApplicationRecord(maintainerRecord, applicationId1, "1.0.0", true);
+        createRandomApplicationRecord(maintainerRecord, applicationId2, "1.0.0", true);
+
+        final StbApplicationsList stbApplicationsList = appsService.listApplications(null, null, null, null, null, null, null, null, null);
+
+        assertThat(stbApplicationsList).isNotNull();
+        final Meta meta = stbApplicationsList.getMeta();
+        assertThat(meta).isNotNull();
+        final ResultSetMeta resultSet = meta.getResultSet();
+        assertThat(resultSet).isNotNull();
+        assertThat(resultSet.getLimit()).isEqualTo(0);
+        assertThat(resultSet.getCount()).isEqualTo(2);
+        assertThat(resultSet.getTotal()).isEqualTo(2);
+        final List<StbApplicationHeader> applications = stbApplicationsList.getApplications();
+        assertThat(applications).isNotNull().hasSize(2);
+    }
+
+    @Test
+    void passingLimitParamGreaterThanTotalReturnsCorrectNumberOfApplications() throws Exception {
+        final MaintainerRecord maintainerRecord = createRandomMaintainerRecord();
+        final String maintainerCode = maintainerRecord.getCode();
+        final String applicationId1 = "TestApplication1";
+        final String applicationId2 = "TestApplication2";
+        createRandomApplicationRecord(maintainerRecord, applicationId1, "1.0.0", true);
+        createRandomApplicationRecord(maintainerRecord, applicationId2, "1.0.0", true);
+
+        final StbApplicationsList stbApplicationsList = appsService.listApplications(null, null, null, null, null, null, null, null, 10);
+
+        assertThat(stbApplicationsList).isNotNull();
+        final Meta meta = stbApplicationsList.getMeta();
+        assertThat(meta).isNotNull();
+        final ResultSetMeta resultSet = meta.getResultSet();
+        assertThat(resultSet).isNotNull();
+        assertThat(resultSet.getLimit()).isEqualTo(10);
+        assertThat(resultSet.getCount()).isEqualTo(2);
+        assertThat(resultSet.getTotal()).isEqualTo(2);
+        final List<StbApplicationHeader> applications = stbApplicationsList.getApplications();
+        assertThat(applications).isNotNull().hasSize(2);
+    }
+
+    @Test
+    void passingLimitParamLessThanTotalReturnsCorrectNumberOfApplications() throws Exception {
+        final MaintainerRecord maintainerRecord = createRandomMaintainerRecord();
+        final String maintainerCode = maintainerRecord.getCode();
+        final String applicationId1 = "TestApplication1";
+        final String applicationId2 = "TestApplication2";
+        createRandomApplicationRecord(maintainerRecord, applicationId1, "1.0.0", true);
+        createRandomApplicationRecord(maintainerRecord, applicationId2, "1.0.0", true);
+
+        final StbApplicationsList stbApplicationsList = appsService.listApplications(null, null, null, null, null, null, null, null, 1);
+
+        assertThat(stbApplicationsList).isNotNull();
+        final Meta meta = stbApplicationsList.getMeta();
+        assertThat(meta).isNotNull();
+        final ResultSetMeta resultSet = meta.getResultSet();
+        assertThat(resultSet).isNotNull();
+        assertThat(resultSet.getLimit()).isEqualTo(1);
+        assertThat(resultSet.getCount()).isEqualTo(1);
+        assertThat(resultSet.getTotal()).isEqualTo(2);
+        final List<StbApplicationHeader> applications = stbApplicationsList.getApplications();
+        assertThat(applications).isNotNull().hasSize(1);
+    }
+
+    @Test
+    void passingLimitParamEqualToTotalReturnsCorrectNumberOfApplications() throws Exception {
+        final MaintainerRecord maintainerRecord = createRandomMaintainerRecord();
+        final String maintainerCode = maintainerRecord.getCode();
+        final String applicationId1 = "TestApplication1";
+        final String applicationId2 = "TestApplication2";
+        createRandomApplicationRecord(maintainerRecord, applicationId1, "1.0.0", true);
+        createRandomApplicationRecord(maintainerRecord, applicationId2, "1.0.0", true);
+
+        final StbApplicationsList stbApplicationsList = appsService.listApplications(null, null, null, null, null, null, null, null, 2);
+
+        assertThat(stbApplicationsList).isNotNull();
+        final Meta meta = stbApplicationsList.getMeta();
+        assertThat(meta).isNotNull();
+        final ResultSetMeta resultSet = meta.getResultSet();
+        assertThat(resultSet).isNotNull();
+        assertThat(resultSet.getLimit()).isEqualTo(2);
+        assertThat(resultSet.getCount()).isEqualTo(2);
+        assertThat(resultSet.getTotal()).isEqualTo(2);
+        final List<StbApplicationHeader> applications = stbApplicationsList.getApplications();
+        assertThat(applications).isNotNull().hasSize(2);
+    }
+
+    @Test
+    void passingZeroLimitReturnsAllApplications() throws Exception {
+        final MaintainerRecord maintainerRecord = createRandomMaintainerRecord();
+        final String maintainerCode = maintainerRecord.getCode();
+        final String applicationId1 = "TestApplication1";
+        final String applicationId2 = "TestApplication2";
+        createRandomApplicationRecord(maintainerRecord, applicationId1, "1.0.0", true);
+        createRandomApplicationRecord(maintainerRecord, applicationId2, "1.0.0", true);
+
+        final StbApplicationsList stbApplicationsList = appsService.listApplications(null, null, null, null, null, null, null, null, 0);
+
+        assertThat(stbApplicationsList).isNotNull();
+        final Meta meta = stbApplicationsList.getMeta();
+        assertThat(meta).isNotNull();
+        final ResultSetMeta resultSet = meta.getResultSet();
+        assertThat(resultSet).isNotNull();
+        assertThat(resultSet.getLimit()).isEqualTo(0);
+        assertThat(resultSet.getCount()).isEqualTo(2);
+        assertThat(resultSet.getTotal()).isEqualTo(2);
+        final List<StbApplicationHeader> applications = stbApplicationsList.getApplications();
+        assertThat(applications).isNotNull().hasSize(2);
+    }
+
     @ParameterizedTest
     @CsvSource({"application/vnd.rdk-app.html5,HTML5", "application/vnd.rdk-app.dac.native,DAC_NATIVE"})
     void applicationTypeShouldBeReturnedBasedOnApplicationId(String type, ApplicationType expectedType) throws Exception {

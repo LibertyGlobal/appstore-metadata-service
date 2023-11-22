@@ -159,16 +159,17 @@ public class PersistentMaintainersService implements MaintainersService {
     @Override
     public MaintainerList searchMaintainers(final String name, Integer limit, Integer offset) {
         final int effectiveOffset = offset != null ? offset : 0;
-        final int effectiveLimit = limit != null ? limit : 10;
+        final int effectiveLimit = limit != null ? limit : 0;
 
         final Condition whereCondition = StringUtils.isNoneEmpty(name)
                 ? MAINTAINER.NAME.startsWithIgnoreCase(name)
                 : DSL.noCondition();
 
-        final List<Maintainer> maintainers = dslContext.selectFrom(MAINTAINER)
+        var readyToLimit = dslContext.selectFrom(MAINTAINER)
                 .where(whereCondition)
-                .limit(effectiveLimit)
-                .offset(effectiveOffset)
+                .offset(effectiveOffset);
+
+        final List<Maintainer> maintainers = (effectiveLimit != 0 ? readyToLimit.limit(effectiveLimit) : readyToLimit)
                 .fetchInto(Maintainer.class);
 
         final int total = dslContext.selectCount()

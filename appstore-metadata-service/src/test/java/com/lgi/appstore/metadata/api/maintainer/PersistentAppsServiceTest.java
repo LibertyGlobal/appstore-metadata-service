@@ -340,6 +340,121 @@ class PersistentAppsServiceTest extends BaseServiceTest {
                 .containsExactlyElementsOf(orderedVersions);
     }
 
+    @Test
+    void omittingLimitParamReturnsAllApplications() {
+        final MaintainerRecord maintainerRecord = createRandomMaintainerRecord();
+        final String maintainerCode = maintainerRecord.getCode();
+        final String applicationId1 = "TestApplication1";
+        final String applicationId2 = "TestApplication2";
+        final Application application1 = createRandomApplication(maintainerCode, "1.0.0", applicationId1);
+        final Application application2 = createRandomApplication(maintainerCode, "1.0.0", applicationId2);
+
+        final MaintainerApplicationsList maintainerApplicationsList = appsService.listApplications(maintainerCode, null, null, null, null, null, null, null, null);
+
+        assertThat(maintainerApplicationsList).isNotNull();
+        final Meta meta = maintainerApplicationsList.getMeta();
+        assertThat(meta).isNotNull();
+        final ResultSetMeta resultSet = meta.getResultSet();
+        assertThat(resultSet).isNotNull();
+        assertThat(resultSet.getLimit()).isEqualTo(0);
+        assertThat(resultSet.getCount()).isEqualTo(2);
+        assertThat(resultSet.getTotal()).isEqualTo(2);
+        final List<MaintainerApplicationHeader> applications = maintainerApplicationsList.getApplications();
+        assertThat(applications).isNotNull().hasSize(2);
+    }
+
+    @Test
+    void passingLimitParamGreaterThanTotalReturnsCorrectNumberOfApplications() {
+        final MaintainerRecord maintainerRecord = createRandomMaintainerRecord();
+        final String maintainerCode = maintainerRecord.getCode();
+        final String applicationId1 = "TestApplication1";
+        final String applicationId2 = "TestApplication2";
+        final Application application1 = createRandomApplication(maintainerCode, "1.0.0", applicationId1);
+        final Application application2 = createRandomApplication(maintainerCode, "1.0.0", applicationId2);
+
+        final MaintainerApplicationsList maintainerApplicationsList = appsService.listApplications(maintainerCode, null, null, null, null, null, null, null, 10);
+
+        assertThat(maintainerApplicationsList).isNotNull();
+        final Meta meta = maintainerApplicationsList.getMeta();
+        assertThat(meta).isNotNull();
+        final ResultSetMeta resultSet = meta.getResultSet();
+        assertThat(resultSet).isNotNull();
+        assertThat(resultSet.getLimit()).isEqualTo(10);
+        assertThat(resultSet.getCount()).isEqualTo(2);
+        assertThat(resultSet.getTotal()).isEqualTo(2);
+        final List<MaintainerApplicationHeader> applications = maintainerApplicationsList.getApplications();
+        assertThat(applications).isNotNull().hasSize(2);
+    }
+
+    @Test
+    void passingLimitParamLessThanTotalReturnsCorrectNumberOfApplications() {
+        final MaintainerRecord maintainerRecord = createRandomMaintainerRecord();
+        final String maintainerCode = maintainerRecord.getCode();
+        final String applicationId1 = "TestApplication1";
+        final String applicationId2 = "TestApplication2";
+        final Application application1 = createRandomApplication(maintainerCode, "1.0.0", applicationId1);
+        final Application application2 = createRandomApplication(maintainerCode, "1.0.0", applicationId2);
+
+        final MaintainerApplicationsList maintainerApplicationsList = appsService.listApplications(maintainerCode, null, null, null, null, null, null, null, 1);
+
+        assertThat(maintainerApplicationsList).isNotNull();
+        final Meta meta = maintainerApplicationsList.getMeta();
+        assertThat(meta).isNotNull();
+        final ResultSetMeta resultSet = meta.getResultSet();
+        assertThat(resultSet).isNotNull();
+        assertThat(resultSet.getLimit()).isEqualTo(1);
+        assertThat(resultSet.getCount()).isEqualTo(1);
+        assertThat(resultSet.getTotal()).isEqualTo(2);
+        final List<MaintainerApplicationHeader> applications = maintainerApplicationsList.getApplications();
+        assertThat(applications).isNotNull().hasSize(1);
+    }
+
+    @Test
+    void passingLimitParamEqualToTotalReturnsCorrectNumberOfApplications() {
+        final MaintainerRecord maintainerRecord = createRandomMaintainerRecord();
+        final String maintainerCode = maintainerRecord.getCode();
+        final String applicationId1 = "TestApplication1";
+        final String applicationId2 = "TestApplication2";
+        final Application application1 = createRandomApplication(maintainerCode, "1.0.0", applicationId1);
+        final Application application2 = createRandomApplication(maintainerCode, "1.0.0", applicationId2);
+
+        final MaintainerApplicationsList maintainerApplicationsList = appsService.listApplications(maintainerCode, null, null, null, null, null, null, null, 2);
+
+        assertThat(maintainerApplicationsList).isNotNull();
+        final Meta meta = maintainerApplicationsList.getMeta();
+        assertThat(meta).isNotNull();
+        final ResultSetMeta resultSet = meta.getResultSet();
+        assertThat(resultSet).isNotNull();
+        assertThat(resultSet.getLimit()).isEqualTo(2);
+        assertThat(resultSet.getCount()).isEqualTo(2);
+        assertThat(resultSet.getTotal()).isEqualTo(2);
+        final List<MaintainerApplicationHeader> applications = maintainerApplicationsList.getApplications();
+        assertThat(applications).isNotNull().hasSize(2);
+    }
+
+    @Test
+    void passingZeroLimitReturnsAllApplications() {
+        final MaintainerRecord maintainerRecord = createRandomMaintainerRecord();
+        final String maintainerCode = maintainerRecord.getCode();
+        final String applicationId1 = "TestApplication1";
+        final String applicationId2 = "TestApplication2";
+        final Application application1 = createRandomApplication(maintainerCode, "1.0.0", applicationId1);
+        final Application application2 = createRandomApplication(maintainerCode, "1.0.0", applicationId2);
+
+        final MaintainerApplicationsList maintainerApplicationsList = appsService.listApplications(maintainerCode, null, null, null, null, null, null, null, 0);
+
+        assertThat(maintainerApplicationsList).isNotNull();
+        final Meta meta = maintainerApplicationsList.getMeta();
+        assertThat(meta).isNotNull();
+        final ResultSetMeta resultSet = meta.getResultSet();
+        assertThat(resultSet).isNotNull();
+        assertThat(resultSet.getLimit()).isEqualTo(0);
+        assertThat(resultSet.getCount()).isEqualTo(2);
+        assertThat(resultSet.getTotal()).isEqualTo(2);
+        final List<MaintainerApplicationHeader> applications = maintainerApplicationsList.getApplications();
+        assertThat(applications).isNotNull().hasSize(2);
+    }
+
     private Application createRandomApplication(String maintainerCode) {
         return createRandomApplication(maintainerCode, DEFAULT_VERSION);
     }

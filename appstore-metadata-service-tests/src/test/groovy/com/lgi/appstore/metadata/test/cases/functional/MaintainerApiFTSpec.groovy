@@ -81,7 +81,7 @@ import static org.assertj.core.api.Assertions.assertThat
 
 class MaintainerApiFTSpec extends AsmsFeatureSpecBase {
     def static final IGNORE_THIS_ASSERTION = true
-    def static final DEFAULT_LIMIT = 10
+    def static final DEFAULT_LIMIT = 0
 
     @Unroll
     def "create application very basic validation for #behavior"() {
@@ -709,7 +709,11 @@ class MaintainerApiFTSpec extends AsmsFeatureSpecBase {
 
         then: "he gets positive response"
         receivedStatus == SC_OK
-        assertThat(ApplicationsPath.field().applications().from(jsonBody)).asList().hasSizeLessThanOrEqualTo(returnedLimit)
+        if (returnedLimit == 0) {
+                count == total
+        } else {
+                assertThat(ApplicationsPath.field().applications().from(jsonBody)).asList().hasSizeLessThanOrEqualTo(returnedLimit)
+        }
 
         and: "the amount of items is as desired"
         ApplicationsPath.field().meta().resultSet().count().from(jsonBody) == count
